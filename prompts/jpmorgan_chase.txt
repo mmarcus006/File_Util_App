@@ -1,0 +1,65 @@
+```json
+{
+  "institution_name": "JPMorgan Chase",
+  "account_info": {
+    "account_number": "Look for 'Account Number' in tables like 'Account Summary' or 'Portfolio Activity'. Also check for 'ACCT.' in headers (e.g., 'SAHANA CAPITAL TRUST ACCT. E53713005') or 'Primary Account:' (Checking/Savings). Use the primary account number relevant to the section being processed.",
+    "account_holder_name": "Look for the name(s) associated with the account number, typically found near the top under headers like 'SAHANA CAPITAL TRUST', 'MUNIR R JAVERI', or 'MUNIR JAVERI AND DEEPA JAVERI'."
+  },
+  "statement_period": {
+    "statement_period_start_date": "Look for 'For the Period M/D/YY to M/D/YY' usually located at the top right.",
+    "statement_period_end_date": "Look for 'For the Period M/D/YY to M/D/YY' usually located at the top right."
+  },
+  "statement_summary": {
+    "beginning_market_value": "Look for 'Beginning Net Market Value' in 'Account Summary' or 'Consolidated Summary'. For Checking/Savings, use 'Beginning Balance' from 'Savings/Checking Account Summary'.",
+    "ending_market_value": "Look for 'Ending Net Market Value' in 'Account Summary' or 'Consolidated Summary'. For Checking/Savings, use 'Ending Balance' from 'Savings/Checking Account Summary'.",
+    "change_in_market_value": "Look for 'Change In Value' in 'Account Summary' or 'Consolidated Summary'. Alternatively, use 'Change in Investment Value' (Current Period Value) from 'Portfolio Activity'.",
+    "net_contributions_withdrawals_period": "Look for 'Net Additions/Withdrawals' (Current Period Value) in the 'Portfolio Activity' section (Principal). Ensure sign is correct (+ for net additions, - for net withdrawals). For Checking/Savings, calculate from 'Deposits & Credits' minus the sum of 'Payments & Transfers' and 'Fees, Charges & Other Withdrawals'.",
+    "beginning_cash_balance": "Look for 'Beginning Cash Balance' in 'Portfolio Activity Summary' (Principal or Income section). For Checking/Savings, use 'Beginning Balance'.",
+    "ending_cash_balance": "Look for 'Ending Cash Balance' in 'Portfolio Activity Summary' (Principal or Income section). For Checking/Savings, use 'Ending Balance'."
+  },
+  "tax_summary": {
+    "total_dividends_period": "Sum 'Domestic Dividends/Distributions' and 'Foreign Dividends' from the 'Tax Summary' section (Current Period Value).",
+    "total_dividends_ytd": "Sum 'Domestic Dividends/Distributions' and 'Foreign Dividends' from the 'Tax Summary' section (Year-to-Date Value).",
+    "total_taxable_interest_period": "Look for 'Interest Income' in the 'Tax Summary' section (Current Period Value). *Note: Verify this doesn't include tax-exempt if listed separately.*",
+    "total_taxable_interest_ytd": "Look for 'Interest Income' in the 'Tax Summary' section (Year-to-Date Value). *Note: Verify this doesn't include tax-exempt if listed separately.*",
+    "total_tax_exempt_interest_period": "Look for 'Tax-Exempt Income' in the 'Tax Summary' section (Current Period Value).",
+    "total_tax_exempt_interest_ytd": "Look for 'Tax-Exempt Income' in the 'Tax Summary' section (Year-to-Date Value).",
+    "total_realized_gain_loss_period": "Look for 'Realized Gain/Loss' in the 'Tax Summary' section (Current Period Value). If not present, sum ST and LT period values.",
+    "total_realized_gain_loss_ytd": "Look for 'Realized Gain/Loss' in the 'Tax Summary' section (Year-to-Date Value). If not present, sum ST and LT YTD values.",
+    "total_realized_st_gain_loss_period": "Look for 'ST Realized Gain/Loss' in the 'Tax Summary' section (Current Period Value).",
+    "total_realized_st_gain_loss_ytd": "Look for 'ST Realized Gain/Loss' in the 'Tax Summary' section (Year-to-Date Value).",
+    "total_realized_lt_gain_loss_period": "Look for 'LT Realized Gain/Loss' in the 'Tax Summary' section (Current Period Value).",
+    "total_realized_lt_gain_loss_ytd": "Look for 'LT Realized Gain/Loss' in the 'Tax Summary' section (Year-to-Date Value)."
+  },
+  "holdings": {
+    "security_description": "Extract from the first column in sections like 'Equity Detail', 'Cash & Fixed Income Detail', 'Alternative Assets Detail', 'Specialty Assets Detail'.",
+    "cusip": "Look for the identifier often labeled 'ID:' or following the security name, usually alphanumeric (e.g., '78462F-10-3', '4812A2-80-1').",
+    "ticker_symbol": "Look for label 'TICKER:'.",
+    "quantity": "Look for 'Quantity' column.",
+    "market_price": "Look for 'Price' column.",
+    "market_value": "Look for 'Value' or 'Market Value' column.",
+    "adjusted_cost_basis": "Look for 'Original Cost' or 'Adjusted Tax Cost' column.",
+    "unrealized_gain_loss": "Look for 'Unrealized Gain/Loss' column.",
+    "unrealized_gain_loss_term": "Set to null, as term (Short/Long) is usually not specified in the holdings summary.",
+    "estimated_annual_income": "Look for 'Est. Annual Inc.' or 'Estimated Annual Income' column.",
+    "current_yield": "Look for 'Yield' column. Extract as percentage value (e.g., 1.37 for 1.37%).",
+    "accrued_interest": "Look for 'Accrued Div.' or 'Accrued Interest' column.",
+    "coupon_rate": "Look for the rate listed with fixed income securities (e.g., '5.0%'). Extract as percentage value.",
+    "maturity_date": "Look for the date listed with fixed income securities (e.g., '03/14/24')."
+  },
+  "transactions": {
+    "transaction_date": "Use the 'Settle Date' column (Investment/Trust) or 'Date' column (Checking/Savings).",
+    "settlement_date": "Use the 'Settle Date' column if different from transaction date, otherwise null or same as transaction_date.",
+    "transaction_type": "Map the 'Type' or 'Description' column. Examples: 'Div Domest'/'Dividend' -> 'Dividend', 'Interest Income'/'Interest Payment' -> 'Interest', 'Purchase' -> 'Buy', 'Sale' -> 'Sell', 'Fees & Commissions' -> 'Fee', 'Misc Receipt'/'Online Transfer From'/'Remote Online Deposit'/'Book Transfer Credit' -> 'Deposit' or 'Transfer In', 'Misc Debit'/'Online Transfer To'/'Recurring Card Purchase'/'Zelle Payment' -> 'Withdrawal' or 'Electronic Payment' or 'Purchase', 'Cash Sweep To/From' -> 'Sweep Out'/'Sweep In', 'Adw Christopher Distributi' -> 'Distribution'. Use context if needed.",
+    "security_description": "Extract from the 'Description' column if the transaction involves a specific security.",
+    "cusip": "Extract from the 'ID:' field within the description if available.",
+    "ticker_symbol": "Extract from the 'TICKER:' field within the description if available.",
+    "quantity": "Look for 'Quantity' column.",
+    "price_per_unit": "Look for 'Per Unit Amount' or implied price from Amount/Quantity.",
+    "net_amount": "Use 'Amount' column (Checking/Savings) or 'PRINCIPAL Amount'/'INCOME Amount' (Investment/Trust). Also check 'Deposits & Credits' (positive) and 'Transfers & Withdrawals' (negative). Ensure sign is correct: negative for debits/purchases/withdrawals/fees, positive for credits/sales/deposits/income.",
+    "realized_gain_loss": "Look for 'Realized Gain/Loss' column specifically within sale transaction details (e.g., in 'TRADE ACTIVITY' section).",
+    "realized_gain_loss_term": "Look for 'S' or 'L' indicator next to the realized gain/loss amount on the transaction line.",
+    "description_notes": "Include any additional relevant text from the 'Description' column not captured elsewhere (e.g., Transaction IDs, PPD IDs, Beneficiary/Originator info)."
+  }
+}
+```

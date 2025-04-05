@@ -1,0 +1,31 @@
+I have provided a franchise disclosure document in document layout export format in JSON. All Tables are in HTML and headers have a "text_level" attribute. page_idx is the page number. Provide a JSON Schema Output, ONLY PROVIDE VALID JSON, of the franchise name, issuance date, Franchise Address, Phone Number (If available), Email (If available), website (if available), exhibit to find current and former franchisee information (example below), and then the beginning and ending page numbers of each of the 23 typical section headers found in a franchise disclosure document. These will usually look like the "ITEM" followed by A Number and then the title, below are the official 23 heading from the FTC. Also provide the starting and ending page numbers of the exhibit(s) that contain the contact info of former and current franchisees.
+
+#Official Headers for Sections 1 through 23:
+ITEM 1. The Franchisor, its Predecessors, and its Affiliates
+ITEM 2. Business Experience
+ITEM 3. Litigation
+ITEM 4. Bankruptcy
+ITEM 5. Initial Franchise Fee
+ITEM 6. Other Fees
+ITEM 7. Initial Investment
+ITEM 8. Restrictions On Sources Of Products And Services
+ITEM 9. Franchisee’s Obligations
+ITEM 10. Financing
+ITEM 11. Franchisor’s Obligations
+ITEM 12. Territory
+ITEM 13. Trademarks
+ITEM 14. Patents, Copyrights and Proprietary Information
+ITEM 15. Obligation To Participate In The Actual Operation Of The Franchise Business
+ITEM 16. Restrictions On What The Franchisee May Sell
+ITEM 17. Renewal, Termination, Transfer And Dispute Resolution
+ITEM 18. Public Figures
+ITEM 19. Financial Performance Representations
+ITEM 20. List Of Outlets
+ITEM 21. Financial Statements
+ITEM 22. Contracts
+ITEM 23. Receipt
+
+#Example of where to find current and former franchisee's (Answer=Exhibit I)
+Source:
+
+<html><body><table><tr><td>QUESTION</td><td>WHERE TOFINDINFORMATION</td></tr><tr><td>How much can I earn?</td><td>Item 19 may give you information about Unit sales, costs, profits or losses. You should also try to obtain this information from others, like current and former franchisees. You can find their names and contact information in Item 20 or Exhibit I

@@ -1,0 +1,161 @@
+fdd_layout_section
+No description available
+
+
+Language: Bash
+Columns
+
+Name	Format	Type	Description
+section_id	
+integer
+
+number	
+fdd_id	
+integer
+
+number	
+identified_item_number	
+integer
+
+number	
+identified_header_text	
+text
+
+string	
+start_page	
+integer
+
+number	
+end_page	
+integer
+
+number	
+Read rows
+Documentation
+To read rows in this table, use the select method.
+
+Read all rows
+
+curl 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?select=*' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk"
+Read specific columns
+
+curl 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?select=some_column,other_column' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk"
+Read referenced tables
+
+curl 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?select=some_column,other_table(foreign_key)' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk"
+With pagination
+
+curl 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?select=*' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Range: 0-9"
+Filtering
+Documentation
+Supabase provides a wide range of filters
+
+With filtering
+
+curl --get 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Range: 0-9" \
+-d "select=*" \
+\
+`# Filters` \
+-d "column=eq.Equal+to" \
+-d "column=gt.Greater+than" \
+-d "column=lt.Less+than" \
+-d "column=gte.Greater+than+or+equal+to" \
+-d "column=lte.Less+than+or+equal+to" \
+-d "column=like.*CaseSensitive*" \
+-d "column=ilike.*CaseInsensitive*" \
+-d "column=is.null" \
+-d "column=in.(Array,Values)" \
+-d "column=neq.Not+equal+to" \
+\
+`# Arrays` \
+-d "array_column=cs.{array,contains}" \
+-d "array_column=cd.{contained,by}" \
+\
+`# Logical operators` \
+-d "column=not.like.Negate+filter" \
+-d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
+Insert rows
+Documentation
+insert lets you insert into your tables. You can also insert in bulk and do UPSERT.
+
+insert will also return the replaced values for UPSERT.
+
+Insert a row
+
+curl -X POST 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Content-Type: application/json" \
+-H "Prefer: return=minimal" \
+-d '{ "some_column": "someValue", "other_column": "otherValue" }'
+Insert many rows
+
+curl -X POST 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Content-Type: application/json" \
+-d '[{ "some_column": "someValue" }, { "other_column": "otherValue" }]'
+Upsert matching rows
+
+curl -X POST 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Content-Type: application/json" \
+-H "Prefer: resolution=merge-duplicates" \
+-d '{ "some_column": "someValue", "other_column": "otherValue" }'
+Update rows
+Documentation
+update lets you update rows. update will match all rows by default. You can update specific rows using horizontal filters, e.g. eq, lt, and is.
+
+update will also return the replaced values for UPDATE.
+
+Update matching rows
+
+curl -X PATCH 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?some_column=eq.someValue' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Content-Type: application/json" \
+-H "Prefer: return=minimal" \
+-d '{ "other_column": "otherValue" }'
+Delete rows
+Documentation
+delete lets you delete rows. delete will match all rows by default, so remember to specify your filters!
+
+Delete matching rows
+
+curl -X DELETE 'https://uuthslgzdaaglwnckkjl.supabase.co/rest/v1/fdd_layout_section?some_column=eq.someValue' \
+-H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1dGhzbGd6ZGFhZ2x3bmNra2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzM3MTcsImV4cCI6MjA1NDcwOTcxN30.cwiOba5-fXqy7sCFU44z04J6F2RTgMDr_SoakLz8qtk"
+Subscribe to changes
+Documentation
+Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
+
+Subscribe to all events
+
+# Realtime streams are only supported by our client libraries
+Subscribe to inserts
+
+# Realtime streams are only supported by our client libraries
+Subscribe to updates
+
+# Realtime streams are only supported by our client libraries
+Subscribe to deletes
+
+# Realtime streams are only supported by our client libraries
+
+Copy
+Subscribe to specific rows
+
+# Realtime streams are only supported by our client libraries
