@@ -1,0 +1,55 @@
+**Morgan Stanley Bank Statement Extraction Guide**
+
+For Morgan Stanley statements, pay special attention to the following:
+
+1. Account information is typically found in the header area of the first page. Look for an 8-digit account number and the full account holder name.
+
+2. The statement period is clearly labeled at the top of the first page, usually in the format "Statement Period: January 01, 2023 - January 31, 2023".
+
+3. Morgan Stanley statements include a comprehensive "Account Summary" section with:
+   - Beginning asset value
+   - Ending asset value
+   - Net change (gain/loss)
+   - Income summary
+   - Cash activity
+   
+4. Look for an "Asset Allocation" section that provides percentage breakdowns by asset class.
+
+5. Holdings appear in a detailed "Your Assets" section with:
+   - Security descriptions (with ticker symbols often in parentheses)
+   - CUSIP numbers
+   - Quantity/shares
+   - Price per share
+   - Estimated market value
+   - Estimated yield and annual income
+   - Cost basis information (when available)
+   
+6. The "Activity" section lists all transactions chronologically with:
+   - Transaction date
+   - Settlement date
+   - Activity type (Buy, Sell, Dividend, etc.)
+   - Security description
+   - Quantity
+   - Price (for trades)
+   - Amount (with negative values for debits)
+   
+7. Tax information appears in the "Income Summary" section with both period and YTD values for:
+   - Dividends
+   - Interest (taxable and tax-exempt)
+   - Capital gains
+   - Other income
+
+Important: For accounts with multiple portfolios, focus on extracting the consolidated data for the entire account.
+
+Your output must strictly follow the provided JSON schema structure.
+
+**Morgan Stanley Specific Hints:**
+
+*   **Institution Name:** Set to "Morgan Stanley".
+*   **Account Info:** Find Account Number ("Active Assets Account") in header. Account Holder Name under "STATEMENT FOR:".
+*   **Statement Period:** Look for "For the Period Month D-D, YYYY".
+*   **Statement Summary:** Use "Account Summary" (Page 3/4). "Beginning/Ending Total Value", "Change in Value". Calculate `net_contributions_withdrawals_period` from Period's Cash Flow activity if not directly stated.
+*   **Cash Balances:** Use "CASH FLOW" -> "OPENING/CLOSING CASH, BDP, MMFs".
+*   **Tax Summary:** Use "INCOME AND DISTRIBUTION SUMMARY" and "GAIN/(LOSS) SUMMARY" (Page 4). Extract Period ("This Period") and YTD ("This Year") values for Interest, Tax-Exempt Income, Other Dividends, Short-Term Gain, Long-Term Gain. Sum ST/LT Gain for Total Realized G/L.
+*   **Holdings:** Look under "STOCKS", "EXCHANGE-TRADED & CLOSED-END FUNDS", "GOVERNMENT SECURITIES", "MUTUAL FUNDS". "Share Price"/"Unit Price", "Market Value", "Total Cost"/"Adj Total Cost", "Unrealized Gain/(Loss)". Ticker is usually in parentheses "(XXX)". CUSIP may be present for some fixed income. "ST"/"LT" often shown next to Unrealized G/L. "Est Ann Income", "Current Yield %". Accrued Interest might be in summary or fixed income details.
+*   **Transactions:** Look under "CASH FLOW ACTIVITY BY DATE" (Page 9). "Activity Date" is primary date, "Settlement Date" is also available. Map "Activity Type" to `transaction_type`. "Credits/(Debits)" column is `net_amount` (ensure Debits are negative). Realized G/L per transaction is generally not shown here. 

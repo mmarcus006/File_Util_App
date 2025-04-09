@@ -1,0 +1,52 @@
+**Goldman Sachs Bank Statement Extraction Guide**
+
+For Goldman Sachs statements, pay special attention to the following:
+
+1. Account information appears prominently at the top of the statement, including the account number and the full account holder name.
+
+2. The statement period is clearly indicated, typically in the format "January 1, 2023 to January 31, 2023" or "For the Month Ending January 31, 2023".
+
+3. The "Account Summary" or "Portfolio Summary" section includes:
+   - Beginning market value
+   - Ending market value
+   - Net change in portfolio value
+   - Net money movements (deposits/withdrawals)
+   - Income earned
+
+4. Holdings are listed in the "Asset Detail" or "Holdings" section with:
+   - Security descriptions (with ticker symbols often in parentheses)
+   - CUSIP numbers 
+   - Quantity
+   - Market price
+   - Market value
+   - Percentage of portfolio
+   - Estimated annual income and yield (for income-producing assets)
+   - Unrealized gain/loss when available
+
+5. Transactions are detailed in the "Activity" section, organized by type:
+   - Purchase and sale transactions
+   - Income transactions (dividends, interest)
+   - Cash transactions (deposits, withdrawals, fees)
+   - Each transaction includes date, settlement date, description, quantity, and amount
+
+6. Goldman Sachs often provides a separate "Income Summary" with:
+   - Current period dividends and interest
+   - Year-to-date dividends and interest
+   - Realized gains/losses (short-term and long-term)
+
+7. The "Cash Activity Summary" section breaks down all cash movements in and out of the account.
+
+Important: Goldman Sachs provides a wealth of analytical data (asset allocation, performance metrics, etc.). Focus only on extracting the core financial data as specified in the schema.
+
+Your output must strictly follow the provided JSON schema structure.
+
+**Goldman Sachs Specific Hints:**
+
+*   **Institution Name:** Set to "Goldman Sachs".
+*   **Account Info:** Find Account Number ("Portfolio No:") on Page 1. Account Holder Name is at the top left.
+*   **Statement Period:** Look for "Period Covering Month DD, YYYY to Month DD, YYYY" or "Period Ended...".
+*   **Statement Summary:** Use "Overview" (Page 3). Find "MARKET VALUE AS OF [Start/End Date]", "CHANGE IN MARKET VALUE". Find `net_contributions_withdrawals_period` under "INVESTMENT RESULTS" -> "Net Deposits (Withdrawals)" (Current Month).
+*   **Cash Balances:** Use "Cash Activity" (Page 7) -> "CLOSING BALANCE AS OF [Previous/Current Period End Date]".
+*   **Tax Summary:** Use "US Tax Summary" (Page 4) and/or "Tax Details" (Page 9). Extract Period ("Current Month") and YTD ("Year to date" or "Quarter to Date" - use YTD if available) values for Corporate Interest, Bank Interest (sum for Taxable Interest), Dividends Received. Realized G/L summaries might appear here if sales occurred, extract if present.
+*   **Holdings:** Look under "Holdings" (Page 5), e.g., "PUBLIC EQUITY", "CASH, DEPOSITS & MONEY MARKET FUNDS". "Market Price"/"Unit Price", "Market Value", "Adjusted Cost/Original Cost"/"Cost Basis", "Unrealized Gain (Loss)". Ticker is usually in parentheses "(XXX)". CUSIP may be present. Term for Unrealized G/L likely in "Tax Lots" (Page 10), use if needed, otherwise null. "Estimated Annual Income", "Current Yield". "Accrued Income".
+*   **Transactions:** Look under "Investment Activity" (Page 6) and "Cash Activity" (Page 7), "Deposits and Withdrawals" (Page 11). "Effective Date" or "Process Date" is primary date. Map descriptions to `transaction_type`. "Amount" is `net_amount` (ensure withdrawals/debits are negative). Realized G/L per transaction is generally not shown here. 

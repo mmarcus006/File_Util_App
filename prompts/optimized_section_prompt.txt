@@ -1,0 +1,69 @@
+You are an expert AI assistant specialized in analyzing Franchise Disclosure Documents (FDDs).
+
+I have provided the content of an FDD, exported from a document layout analysis tool into JSON format. This JSON contains text elements, tables (in HTML), page numbers (`page_idx`), and text hierarchy (`text_level`).
+
+Your task is to extract specific information from this FDD JSON content and return it **ONLY** as a single, valid JSON object conforming precisely to the following structure (imagine this as a Pydantic model definition):
+
+```json
+{
+  "franchise_name": "string", // The name of the franchise.
+  "issuance_date": "string", // The date the FDD was issued (e.g., "April 1, 2024").
+  "franchise_address": "string", // The principal address of the franchisor.
+  "phone_number": "string | null", // The phone number of the franchisor, if available.
+  "email": "string | null", // The email address of the franchisor, if available.
+  "website": "string | null", // The website URL of the franchisor, if available.
+  "exhibit_for_franchisee_information": "string | null", // The exhibit letter (e.g., "I") containing franchisee contact info.
+  "fdd_sections": [ // A list of the 23 standard FDD sections.
+    {
+      "item_number": "integer", // The ITEM number (1-23).
+      "header": "string", // The official header text.
+      "start_page": "integer", // Starting page number.
+      "end_page": "integer" // Ending page number.
+    }
+  ],
+  "exhibits": [ // Optional list of exhibits, MUST include the one with franchisee info if found.
+    {
+      "exhibit_letter": "string", // The letter designation (e.g., "I").
+      "title": "string", // The title of the exhibit.
+      "start_page": "integer", // Starting page number.
+      "end_page": "integer" // Ending page number.
+    }
+  ] | null
+}
+```
+
+**Key Information to Extract:**
+
+1.  **Basic Info:** franchise_name, issuance_date, franchise_address, phone_number, email, website. Find these typically on the cover page or Item 1.
+2.  **Franchisee Info Exhibit:** Identify the Exhibit letter (e.g., "Exhibit I") where current and former franchisee contact details are listed. Look for references in Item 20 or specific exhibit lists. Example hint: `<html><body><table><tr><td>How much can I earn?</td><td>Item 19 may give you information... You can find their names and contact information in Item 20 or Exhibit I</td></tr></table></body></html>` -> Answer is "Exhibit I".
+3.  **FDD Sections (Items 1-23):** For each of the 23 standard FDD Items listed below, find its starting and ending page number (`page_idx`). Headers usually have a high `text_level` (like 1) and follow the pattern "ITEM [Number] [Title]". The end page is the page before the next Item starts (or the last relevant page for Item 23).
+4.  **Exhibit Page Numbers:** Find the start and end page numbers for the specific exhibit identified in step 2.
+
+**Official FDD Section Headers:**
+ITEM 1. The Franchisor, its Predecessors, and its Affiliates
+ITEM 2. Business Experience
+ITEM 3. Litigation
+ITEM 4. Bankruptcy
+ITEM 5. Initial Franchise Fee
+ITEM 6. Other Fees
+ITEM 7. Initial Investment
+ITEM 8. Restrictions On Sources Of Products And Services
+ITEM 9. Franchisee's Obligations
+ITEM 10. Financing
+ITEM 11. Franchisor's Obligations
+ITEM 12. Territory
+ITEM 13. Trademarks
+ITEM 14. Patents, Copyrights and Proprietary Information
+ITEM 15. Obligation To Participate In The Actual Operation Of The Franchise Business
+ITEM 16. Restrictions On What The Franchisee May Sell
+ITEM 17. Renewal, Termination, Transfer And Dispute Resolution
+ITEM 18. Public Figures
+ITEM 19. Financial Performance Representations
+ITEM 20. List Of Outlets
+ITEM 21. Financial Statements
+ITEM 22. Contracts
+ITEM 23. Receipt
+
+**Input Data:** The FDD content in JSON format will follow this prompt.
+
+**Output Requirement:** Respond ONLY with the valid JSON object matching the specified structure. Do not include any other text, explanations, or markdown formatting like ```json ... ``` around the output JSON. 

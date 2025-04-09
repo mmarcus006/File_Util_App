@@ -1,0 +1,23 @@
+# Core dependencies
+streamlit>=1.32.0
+pymupdf>=1.24.0
+pydantic>=2.5.3
+sqlalchemy>=2.0.27
+litellm>=1.10.1
+python-dotenv>=1.0.0
+docling>=0.1.0
+markdownify
+mistralai>=0.1.0
+sentence-transformers>=2.2.2
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Development tools
+pytest>=7.4.3
+black>=23.12.1
+flake8>=6.1.0
+mypy>=1.7.1
+ruff>=0.1.13
+pytesseract
+pillow
+opencv-python
