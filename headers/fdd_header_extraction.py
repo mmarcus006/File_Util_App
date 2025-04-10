@@ -647,6 +647,7 @@ def process_huridocs_directory(input_dir: str,
                              fallback_threshold: float = 50.0) -> Dict[str, List[Dict[str, Any]]]:
     """
     Process all Huridocs JSON files in a directory and save results to output directory.
+    Skip files that already have output files.
     
     Args:
         input_dir: Directory containing Huridocs JSON files
@@ -669,6 +670,9 @@ def process_huridocs_directory(input_dir: str,
     print(f"Found {len(json_files)} JSON files in {input_dir}")
     
     # Process each file
+    skipped_files = 0
+    processed_files = 0
+    
     for i, filename in enumerate(json_files):
         input_path = os.path.join(input_dir, filename)
         
@@ -677,7 +681,23 @@ def process_huridocs_directory(input_dir: str,
         output_filename = f"{base_name}_extracted_headers.json"
         output_path = os.path.join(output_dir, output_filename)
         
+        # Check if output file already exists
+        if os.path.exists(output_path):
+            print(f"[{i+1}/{len(json_files)}] Skipping: {filename} (output file already exists)")
+            skipped_files += 1
+            
+            # Try to load existing results
+            try:
+                with open(output_path, 'r', encoding='utf-8') as f:
+                    results = json.load(f)
+                all_results[filename] = results
+            except Exception as e:
+                print(f"  Error loading existing results: {str(e)}")
+            
+            continue
+        
         print(f"[{i+1}/{len(json_files)}] Processing: {filename}")
+        processed_files += 1
         
         try:
             # Process the file
@@ -707,7 +727,9 @@ def process_huridocs_directory(input_dir: str,
     
     # Print summary
     print("\nProcessing Summary:")
-    print(f"Successfully processed {len(all_results)} of {len(json_files)} files")
+    print(f"Skipped {skipped_files} files (already processed)")
+    print(f"Processed {processed_files} new files")
+    print(f"Total files tracked: {len(all_results)} of {len(json_files)}")
     
     return all_results
 
