@@ -132,23 +132,42 @@ def save_results_to_json(results: dict, output_path: str) -> None:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
 def check_already_processed(pdf_path: str, output_dir: str, tracking_file_path: str) -> bool:
-    """Check if a PDF has already been processed by checking the tracking file"""
-    # Generate expected output filename
+    """Check if a PDF has already been processed by checking the tracking file or existing output files."""
+    # Generate expected output filename and PDF base name
     pdf_filename = os.path.basename(pdf_path)
     pdf_basename = os.path.splitext(pdf_filename)[0]
-    output_filename = f"{pdf_basename}_huridocs_analysis.json"
-    output_path = os.path.normpath(os.path.join(output_dir, output_filename))
-    
-    # Load tracking data
+    expected_output_filename = f"{pdf_basename}_huridocs_analysis.json"
+    expected_output_path = os.path.normpath(os.path.join(output_dir, expected_output_filename))
+
+    # 1. Check the tracking file first
     if os.path.exists(tracking_file_path):
         try:
             with open(tracking_file_path, 'r') as f:
                 processed_files = json.load(f)
-            
-            # Check if output path is in the tracking file
-            return output_path in processed_files
+            if expected_output_path in processed_files:
+                # Found in tracking file
+                return True
         except json.JSONDecodeError:
-            return False
+            print(f"Warning: Tracking file {tracking_file_path} is corrupted. Skipping tracking file check.")
+            pass # Proceed to directory check if tracking file is invalid
+
+    # 2. If not found in tracking file (or file is corrupted/missing), check the output directory
+    try:
+        for filename in os.listdir(output_dir):
+            if filename.endswith("_huridocs_analysis.json"):
+                # Extract base name from the JSON filename
+                json_basename = filename.replace("_huridocs_analysis.json", "")
+                if json_basename == pdf_basename:
+                    # Found a matching JSON file in the output directory
+                    print(f"Found existing output file for {pdf_basename} in {output_dir}, skipping.")
+                    # Optional: Add the found path to the tracking file for consistency?
+                    # update_tracking_file(os.path.join(output_dir, filename), tracking_file_path)
+                    return True
+    except FileNotFoundError:
+        # Output directory might not exist yet if this is the first run
+        return False
+
+    # If neither check found the file, it hasn't been processed
     return False
 
 def update_tracking_file(output_path: str, tracking_file_path: str):
