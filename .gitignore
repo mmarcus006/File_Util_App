@@ -132,7 +132,6 @@ dmypy.json
 # Large files and directories to exclude
 directory_scan_*.json
 *.xlsm
-*.csv
 data/
 9Round_Franchising_LLC_FDD_2024_ID636440/
 .archive/
