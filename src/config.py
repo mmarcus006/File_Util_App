@@ -22,3 +22,6 @@ DB_SCHEMA = os.getenv("SUPABASE_DB_SCHEMA", "public")  # The default schema in S
 
 # Other configuration settings
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "t") 
+
+# Folder paths
+FDD_PDF_FOLDER = os.getenv("FDD_PDF_FOLDER")

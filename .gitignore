@@ -1,61 +1,165 @@
-# Analysis output
-data/huridoc_analysis_output/
-db_replica/*.csv
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Excel files
-*.xls
-*.xlsx
-*.xlsm
+# C extensions
+*.so
 
-# JSON files (except package files)
-*.json
-!package.json
-!package-lock.json
-!tsconfig.json
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Large data files - avoid indexing
-directory_scan_*.json
-*_content_list.json
-layout.json
-*.pdf
+# PyInstaller
+*.manifest
+*.spec
 
-# Generated documentation
-full.md
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Database files
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# SQLite database
 *.db
 *.sqlite3
 *.sqlite
 
-# Data directories
-cache/
-cache/extractions/
-samples/
-New_Samples/
-data/processed_outputs/
-data/split_fdds/
-*_FDD_*/images/
+# JSON files (LFS will handle these)
+*.json
 
-# Excel and spreadsheet files
-*.xlsx
-*.xlsm
-*.csv
-
-# Environment and dependencies
-.venv/
-.env
-.roo/
-
-# Generated files
-__pycache__/
-*.py[cod]
-.mypy_cache/
-.pytest_cache/ 
-
-*jpg
+# Image Files
+*.jpg
 *.jpeg
 *.png
 *.gif
 *.bmp
 *.tiff
 *.ico
+
+# PDF Files (LFS will handle these)
+*.pdf
+*PDF
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Misc
+.DS_Store
+
+# Large files and directories to exclude
+directory_scan_*.json
+*.xlsm
+data/
+9Round_Franchising_LLC_FDD_2024_ID636440/
+.archive/
+.roo/
+db_replica/
+output/
+samples/
+New_Samples/
+*_FDD_*/images/
+
+
+# Exclude specific large/generated files
+html.md
+full.md
+All_Json_Files.csv
+AllJsonFiles.xlsm
+
+# Keep the .gitignore rules
+!.gitignore 

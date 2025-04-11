@@ -44,8 +44,8 @@ def convert_html_to_md(
 
 if __name__ == "__main__":
     # Define the input and output file names
-    input_html_file: str = "html.html"
-    output_md_file: str = "html.md"
+    input_html_file: str = "input.html"  # Default input filename
+    output_md_file: str = "output/output.md" # Default output path
 
     # Get the directory of the current script
     script_dir: Path = Path(__file__).parent.resolve()

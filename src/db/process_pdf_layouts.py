@@ -172,6 +172,52 @@ def update_tracking_file(output_path: str, tracking_file_path: str):
     with open(tracking_file_path, 'w') as f:
         json.dump(processed_files, f, indent=2)
 
+def process_single_pdf(pdf_path: str) -> None:
+    """Processes a single PDF file using the layout analysis API."""
+    # Define paths (similar to main, maybe refactor later if needed)
+    output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "huridoc_analysis_output")
+    os.makedirs(output_dir, exist_ok=True)
+    tracking_file_path = r"C:\\Projects\\File_Util_App\\src\\processed_files_tracking.json" # Use double backslashes for Windows paths in strings
+
+    # Check if the container is running, start if not
+    if not check_container_running():
+        if not start_container():
+            print("Failed to start container. Exiting single PDF processing.")
+            return
+
+    # Check if already processed using tracking file
+    if check_already_processed(pdf_path, output_dir, tracking_file_path):
+        print(f"Already processed (found in tracking file): {pdf_path}, skipping.")
+        return
+
+    try:
+        # Generate output filename
+        pdf_filename = os.path.basename(pdf_path)
+        pdf_basename = os.path.splitext(pdf_filename)[0]
+        output_filename = f"{pdf_basename}_huridocs_analysis.json"
+        output_path = os.path.join(output_dir, output_filename)
+
+        print(f"Processing single PDF: {pdf_path}")
+
+        # Analyze the PDF
+        # Assuming analyze_pdf can handle direct Windows paths if running on Windows
+        # Or if the container setup handles path mapping appropriately.
+        # If WSL conversion is strictly needed, the convert_windows_path_to_wsl
+        # function would need to be called here, but it was commented out in main.
+        results = analyze_pdf(pdf_path)
+
+        # Save results
+        save_results_to_json(results, output_path)
+        print(f"Analysis results saved to: {output_path}")
+
+        # After successful processing, update tracking file
+        update_tracking_file(output_path, tracking_file_path)
+
+        print(f"Successfully processed single PDF: {pdf_path}")
+
+    except Exception as e:
+        print(f"Error processing single PDF {pdf_path}: {e}")
+
 def main():
     # Define paths
     output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "huridoc_analysis_output")

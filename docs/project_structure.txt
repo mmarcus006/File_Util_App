@@ -1,0 +1,76 @@
+Project Structure:
+./
+  └── .archive/
+  ├── .cursor/
+  │   └── rules/
+  └── .roo/
+  └── 9Round_Franchising_LLC_FDD_2024_ID636440/
+  ├── app/
+  │   └── __init__.py
+  │   ├── components/
+  │   │   └── __init__.py
+  │   │   └── upload_component.py
+  │   └── config.py
+  │   └── gemini_extractor.py
+  │   └── main.py
+  │   ├── models/
+  │   │   └── __init__.py
+  │   │   └── models.py
+  │   ├── services/
+  │   │   └── __init__.py
+  │   │   └── data_parser.py
+  │   │   └── docling_service.py
+  │   │   └── llm_extractor_v2.py
+  │   │   └── pdf_processor.py
+  │   │   └── pydantic_ai_extractor.py
+  │   ├── utils/
+  │   │   └── __init__.py
+  │   │   └── error_handler.py
+  │   │   └── pdf_processor.py
+  └── create_franchise_db.py
+  ├── data/
+  │   └── huridoc_analysis_output/
+  │   └── processed_outputs/
+  │   └── split_fdds/
+  └── db_replica/
+  └── directory_scanner.py
+  └── docs/
+  └── file_structure.py
+  ├── file_utils/
+  │   └── __init__.py
+  │   └── copy_pdf_folders.py
+  │   └── group_wi_fdds.py
+  │   └── move_missing_pdfs.py
+  │   └── pdf_json_comparison.py
+  │   └── update_processed_outputs_with_file_paths.py
+  └── html_to_md.py
+  └── marker_single_file_custom.py
+  └── notebook/
+  └── process_statements.py
+  └── prompts/
+  ├── src/
+  │   └── __init__.py
+  │   └── config.py
+  │   ├── db/
+  │   │   └── __init__.py
+  │   │   └── export_supabase_tables.py
+  │   │   └── import_data_to_supabase.py
+  │   │   └── models.py
+  │   │   └── process_pdf_layouts.py
+  │   │   └── process_pdf_layouts_V2.py
+  │   │   └── setup_supabase_db.py
+  │   │   └── supabase_utils.py
+  │   ├── headers/
+  │   │   └── __init__.py
+  │   │   └── get_toc.py
+  │   │   └── header_detection.py
+  │   │   └── split_fdd_pdfs.py
+  │   └── processor.py
+  │   └── test.py
+  ├── tests/
+  │   └── __init__.py
+  │   └── test_database.py
+  │   └── test_db_models.py
+  │   └── test_error_handler.py
+  │   └── test_pdf_processor.py
+  └── toc_md_files/
