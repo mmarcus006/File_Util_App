@@ -37,4 +37,15 @@ numpy>=1.24.3
 supabase
 boto3
 python-dotenv
-
+PyMuPDF
+Pillow
+pdfplumber
+nltk
+spacy
+pandas
+numpy
+scikit-learn
+PyPDF2
+requests
+torch
+transformers

@@ -1,0 +1,14 @@
+PyMuPDF
+Pillow
+pdfplumber
+nltk
+spacy
+pandas
+numpy
+scikit-learn
+PyPDF2
+requests
+torch
+transformers
+boto3>=1.28.0
+python-dotenv>=1.0.0 
