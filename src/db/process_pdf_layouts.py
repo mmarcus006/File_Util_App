@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import time
 import json
@@ -7,6 +8,13 @@ import requests
 from pathlib import Path
 import socket
 import pandas as pd
+
+# Add project root to Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, project_root)
+
+# Now import from config
+from src.config import TRACKING_FILE, FDD_CSV_FILE, HURIDOC_OUTPUT_DIR, is_wsl, get_wsl_path, WSL_PATHS
 
 def check_container_running(container_name="pdf-document-layout-analysis"):
     """Check if the specified Docker container is running"""
@@ -26,40 +34,87 @@ def start_container():
     print("Starting Docker container for PDF document layout analysis...")
     
     try:
-        # Path to the virtual environment activation script
-        venv_path = r"\\wsl.localhost\Ubuntu\home\miller\Projects\pdf-document-layout-analysis\.venv\bin\activate.fish"
+        # Check if Docker is running
+        subprocess.run(["docker", "info"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Docker run command
-        docker_cmd = [
-            "docker", "run", "--rm", "--name", "pdf-document-layout-analysis", 
-            "--gpus", '"device=0"', "-p", "5060:5060", 
-            "--entrypoint", "./start.sh", "huridocs/pdf-document-layout-analysis:v0.0.23"
-        ]
+        # Check if container is already running
+        if check_container_running():
+            print("Container is already running, will use existing instance")
+            return True
+            
+        # Docker run command - modified for different platforms
+        if sys.platform == "darwin":  # macOS
+            # Check if Apple Silicon
+            is_apple_silicon = subprocess.run(
+                ["sysctl", "-n", "machdep.cpu.brand_string"], 
+                capture_output=True, 
+                text=True
+            ).stdout.strip().startswith("Apple")
+            
+            if is_apple_silicon:
+                print("Starting container for Apple Silicon (without GPU acceleration)")
+                # Simpler command without GPU acceleration but should work reliably
+                docker_cmd = [
+                    "docker", "run", "-d", "--rm", "--name", "pdf-document-layout-analysis", 
+                    "-p", "5060:5060", 
+                    "--entrypoint", "./start.sh", "huridocs/pdf-document-layout-analysis:v0.0.23"
+                ]
+            else:
+                print("Starting container for Intel Mac")
+                docker_cmd = [
+                    "docker", "run", "-d", "--rm", "--name", "pdf-document-layout-analysis", 
+                    "-p", "5060:5060", 
+                    "--entrypoint", "./start.sh", "huridocs/pdf-document-layout-analysis:v0.0.23"
+                ]
+        else:  # Linux/Windows
+            docker_cmd = [
+                "docker", "run", "-d", "--rm", "--name", "pdf-document-layout-analysis", 
+                "--gpus", '"device=0"', "-p", "5060:5060", 
+                "--entrypoint", "./start.sh", "huridocs/pdf-document-layout-analysis:v0.0.23"
+            ]
         
         # Start the process
-        process = subprocess.Popen(
-            docker_cmd,
+        print(f"Running command: {' '.join(docker_cmd)}")
+        result = subprocess.run(
+            docker_cmd if sys.platform != "win32" else " ".join(docker_cmd),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            shell=True
+            shell=sys.platform == "win32"  # Use shell on Windows only
         )
         
-        # Wait for the API to become available
-        wait_for_api_availability()
+        if result.returncode != 0:
+            print(f"Error starting container: {result.stderr}")
+            return False
+            
+        print("Container started in detached mode, waiting for API...")
         
-        return True
+        # Wait for the API to become available with increased timeout
+        if wait_for_api_availability(timeout=300):  # 5 minutes timeout
+            print("Container started successfully!")
+            return True
+        else:
+            print("Container didn't start properly within the timeout period.")
+            # Don't stop container since it might still be initializing
+            print("You may need to manually check 'docker logs pdf-document-layout-analysis'")
+            return False
+            
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Docker isn't running or isn't installed. Details: {e}")
+        return False
     except Exception as e:
         print(f"Error starting container: {e}")
         return False
 
-def wait_for_api_availability(host="localhost", port=5060, timeout=120):
+def wait_for_api_availability(host="localhost", port=5060, timeout=300):
     """Wait for the API to become available"""
     start_time = time.time()
     
-    print(f"Waiting for API to become available at {host}:{port}...")
+    print(f"Waiting for API to become available at {host}:{port} (timeout: {timeout}s)...")
+    attempt = 0
     
     while time.time() - start_time < timeout:
+        attempt += 1
         try:
             # Try connecting to the port
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,20 +125,54 @@ def wait_for_api_availability(host="localhost", port=5060, timeout=120):
             if result == 0:
                 # Port is open, try making a request to verify API is running
                 try:
-                    # Simple request to see if API responds
-                    response = requests.get(f"http://{host}:{port}")
-                    if response.status_code == 200:
-                        print("API is available!")
-                        return True
-                except requests.RequestException:
-                    pass  # API not fully ready yet
+                    print(f"Port {port} is open, checking if API is responding...")
+                    # First try POST request which is what's used for processing
+                    try:
+                        response = requests.post(f"http://{host}:{port}", timeout=10)
+                        if response.status_code in [200, 400, 422]:  # 400/422 are expected if no file provided
+                            print(f"API is available! Response status: {response.status_code}")
+                            return True
+                    except:
+                        # Try GET request as fallback
+                        response = requests.get(f"http://{host}:{port}", timeout=10)
+                        if response.status_code in [200, 405]:  # 405 is Method Not Allowed (expected)
+                            print(f"API is available! Response status: {response.status_code}")
+                            return True
+                        else:
+                            print(f"API returned status code {response.status_code}, waiting...")
+                except requests.RequestException as e:
+                    print(f"API not fully ready yet: {e}")
+            else:
+                if attempt % 10 == 0:  # Only print every 10 attempts to reduce noise
+                    print(f"Attempt {attempt}: Port {port} not open yet (result: {result})...")
             
+            if attempt < 30:
+                # Sleep for shorter duration initially
+                time.sleep(2)
+            else:
+                # Sleep longer after many attempts
+                time.sleep(5)
+                
+        except Exception as e:
+            print(f"Error checking API availability: {e}")
             time.sleep(2)
-            print(".", end="", flush=True)
-        except Exception:
-            pass
     
     print(f"\nTimeout waiting for API after {timeout} seconds")
+    # Try to get the Docker logs to help diagnose issues
+    try:
+        result = subprocess.run(
+            ["docker", "logs", "pdf-document-layout-analysis"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        print("Docker container logs (last 500 chars):")
+        print(result.stdout[-500:] if result.stdout else "No output")
+        print("Error logs:")
+        print(result.stderr[-500:] if result.stderr else "No errors")
+    except Exception as e:
+        print(f"Could not fetch container logs: {e}")
+    
     return False
 
 def convert_windows_path_to_wsl(windows_path: str) -> str:
@@ -193,10 +282,10 @@ def update_tracking_file(output_path: str, tracking_file_path: str):
 
 def process_single_pdf(pdf_path: str) -> None:
     """Processes a single PDF file using the layout analysis API."""
-    # Define paths (similar to main, maybe refactor later if needed)
-    output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "huridoc_analysis_output")
+    # Use paths from config
+    output_dir = str(HURIDOC_OUTPUT_DIR)
     os.makedirs(output_dir, exist_ok=True)
-    tracking_file_path = r"C:\\Projects\\File_Util_App\\src\\processed_files_tracking.json" # Use double backslashes for Windows paths in strings
+    tracking_file_path = TRACKING_FILE
 
     # Check if the container is running, start if not
     if not check_container_running():
@@ -205,7 +294,7 @@ def process_single_pdf(pdf_path: str) -> None:
             return
 
     # Check if already processed using tracking file
-    if check_already_processed(pdf_path, output_dir, tracking_file_path):
+    if check_already_processed(pdf_path, output_dir, str(tracking_file_path)):
         print(f"Already processed (found in tracking file): {pdf_path}, skipping.")
         return
 
@@ -218,11 +307,11 @@ def process_single_pdf(pdf_path: str) -> None:
 
         print(f"Processing single PDF: {pdf_path}")
 
+        # Convert path for WSL if needed
+        if is_wsl():
+            pdf_path = get_wsl_path(pdf_path)
+
         # Analyze the PDF
-        # Assuming analyze_pdf can handle direct Windows paths if running on Windows
-        # Or if the container setup handles path mapping appropriately.
-        # If WSL conversion is strictly needed, the convert_windows_path_to_wsl
-        # function would need to be called here, but it was commented out in main.
         results = analyze_pdf(pdf_path)
 
         # Save results
@@ -230,7 +319,7 @@ def process_single_pdf(pdf_path: str) -> None:
         print(f"Analysis results saved to: {output_path}")
 
         # After successful processing, update tracking file
-        update_tracking_file(output_path, tracking_file_path)
+        update_tracking_file(output_path, str(tracking_file_path))
 
         print(f"Successfully processed single PDF: {pdf_path}")
 
@@ -238,11 +327,11 @@ def process_single_pdf(pdf_path: str) -> None:
         print(f"Error processing single PDF {pdf_path}: {e}")
 
 def main():
-    # Define paths
-    output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "huridoc_analysis_output")
+    # Use paths from config
+    output_dir = str(HURIDOC_OUTPUT_DIR)
     os.makedirs(output_dir, exist_ok=True)
-    fdd_csv_path = r"C:\Projects\File_Util_App\db_replica\fdd.csv"
-    tracking_file_path = r"C:\Projects\File_Util_App\src\processed_files_tracking.json"
+    fdd_csv_path = FDD_CSV_FILE
+    tracking_file_path = TRACKING_FILE
     
     # Check if the container is running, start if not
     if not check_container_running():
@@ -251,7 +340,7 @@ def main():
             return
     
     # Read the FDD CSV file
-    df = pd.read_csv(fdd_csv_path, delimiter='|', skiprows=0)
+    df = pd.read_csv(str(fdd_csv_path), delimiter='|', skiprows=0)
     
     # Add new columns if they don't exist
     if 'layout_analysis_json_path' not in df.columns:
@@ -268,25 +357,24 @@ def main():
         windows_path = row['original_pdf_path']
         
         # Check if already processed using tracking file
-        if check_already_processed(windows_path, output_dir, tracking_file_path):
+        if check_already_processed(windows_path, output_dir, str(tracking_file_path)):
             print(f"Already processed (found in tracking file): {windows_path}, skipping.")
             continue
         
         try:
-            # Convert to WSL path
-            #wsl_path = convert_windows_path_to_wsl(windows_path)
+            # Convert path for WSL if needed
+            pdf_path = get_wsl_path(windows_path) if is_wsl() else windows_path
             
             # Generate output filename
-            pdf_filename = os.path.basename(windows_path)
+            pdf_filename = os.path.basename(pdf_path)
             pdf_basename = os.path.splitext(pdf_filename)[0]
             output_filename = f"{pdf_basename}_huridocs_analysis.json"
             output_path = os.path.join(output_dir, output_filename)
             
-            print(f"Processing PDF: {windows_path}")
-            print(f"Using WSL path: {windows_path}")
+            print(f"Processing PDF: {pdf_path}")
             
             # Analyze the PDF
-            results = analyze_pdf(windows_path)
+            results = analyze_pdf(pdf_path)
             
             # Save results
             save_results_to_json(results, output_path)
@@ -297,13 +385,13 @@ def main():
             df.at[index, 'huridoc_analysis_complete'] = True
             
             # Save the updated dataframe
-            df.to_csv(fdd_csv_path, sep='|', index=False)
+            df.to_csv(str(fdd_csv_path), sep='|', index=False)
             
             # After successful processing, update tracking file
-            update_tracking_file(output_path, tracking_file_path)
+            update_tracking_file(output_path, str(tracking_file_path))
             
         except Exception as e:
-            print(f"Error processing PDF {windows_path}: {e}")
+            print(f"Error processing PDF {pdf_path}: {e}")
     
     print("Processing complete!")
 
