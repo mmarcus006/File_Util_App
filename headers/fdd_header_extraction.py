@@ -735,8 +735,8 @@ def process_huridocs_directory(input_dir: str,
 
 if __name__ == "__main__":
     # Process a directory of Huridocs JSON files
-    input_dir = r"/Users/miller/Documents/GitHub/File_Util_App/data/huridoc_analysis_output"
-    output_dir = r"/Users/miller/Documents/GitHub/File_Util_App\output\header_output"
+    input_dir = r"C:\Projects\File_Util_App\data\huridoc_analysis_output"
+    output_dir = r"C:\Projects\File_Util_App\output\header_output"
     
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)

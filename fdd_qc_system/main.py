@@ -18,16 +18,6 @@ except ImportError as e:
     print(f"[FATAL] Failed to import required modules: {str(e)}")
     sys.exit(1)
 
-def _convert_win_to_wsl_path(win_path: str) -> str:
-    """Converts a Windows path (C:\\...) to a WSL path (/mnt/c/...)."""
-    if not win_path or ':' not in win_path:
-        return win_path # Return original if not a typical Windows path
-
-    drive, path_part = win_path.split(':', 1)
-    # Correctly replace single backslashes
-    wsl_path = f"/mnt/{drive.lower()}{path_part.replace('\\', '/')}"
-    return wsl_path
-
 def _extract_id_from_filename(filename: str) -> Optional[str]:
     """Extracts the ID part (before '_origin') from a filename."""
     match = re.match(r"^(.*?)_origin", filename)
@@ -68,36 +58,34 @@ def _load_corrected_files() -> Set[str]:
 
 def _discover_files(pdf_source_dir_win: str, json_source_dir_win: str) -> Dict[str, Dict[str, str]]:
     """Discovers matching PDF and JSON files from source directories."""
-    pdf_source_dir_wsl = _convert_win_to_wsl_path(pdf_source_dir_win)
-    json_source_dir_wsl = _convert_win_to_wsl_path(json_source_dir_win)
     pdf_files_by_id = {}
     json_files_by_id = {}
 
-    # Scan PDF directory
-    if os.path.isdir(pdf_source_dir_wsl):
+    # Scan PDF directory - Use Windows path directly
+    if os.path.isdir(pdf_source_dir_win):
         try:
-            for filename in os.listdir(pdf_source_dir_wsl):
+            for filename in os.listdir(pdf_source_dir_win):
                 if filename.lower().endswith(".pdf"):
                     file_id = _extract_id_from_filename(filename)
                     if file_id:
-                        pdf_files_by_id[file_id] = os.path.join(pdf_source_dir_wsl, filename)
+                        pdf_files_by_id[file_id] = os.path.join(pdf_source_dir_win, filename)
         except OSError as e:
-            print(f"Error reading PDF directory {pdf_source_dir_wsl}: {e}")
+            print(f"Error reading PDF directory {pdf_source_dir_win}: {e}")
     else:
-        print(f"PDF source directory not found: {pdf_source_dir_wsl}")
+        print(f"PDF source directory not found: {pdf_source_dir_win}")
 
-    # Scan JSON directory
-    if os.path.isdir(json_source_dir_wsl):
+    # Scan JSON directory - Use Windows path directly
+    if os.path.isdir(json_source_dir_win):
         try:
-            for filename in os.listdir(json_source_dir_wsl):
+            for filename in os.listdir(json_source_dir_win):
                 if filename.lower().endswith(".json"):
                     file_id = _extract_id_from_filename(filename)
                     if file_id:
-                        json_files_by_id[file_id] = os.path.join(json_source_dir_wsl, filename)
+                        json_files_by_id[file_id] = os.path.join(json_source_dir_win, filename)
         except OSError as e:
-            print(f"Error reading JSON directory {json_source_dir_wsl}: {e}")
+            print(f"Error reading JSON directory {json_source_dir_win}: {e}")
     else:
-        print(f"JSON source directory not found: {json_source_dir_wsl}")
+        print(f"JSON source directory not found: {json_source_dir_win}")
 
     # Find matching pairs
     discovered_pairs = {}

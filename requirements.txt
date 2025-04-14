@@ -8,8 +8,10 @@ python-dotenv>=1.0.0
 docling>=0.1.0
 markdownify
 mistral
+generativeai
+google-generativeai
 sentence-transformers>=2.2.2
-numpy>=1.24.0
+numpy>=1.24.3
 scipy>=1.10.0
 rapidfuzz>=3.0.0
 
@@ -24,28 +26,17 @@ pillow
 opencv-python
 requests>=2.28.0
 supabase>=0.0.2
-python-dotenv>=0.20.0
-pydantic>=1.9.0
 typing-extensions>=4.2.0 
 
 # LLM dependencies
 openai>=1.1.0
 anthropic>=0.39.0
-sentence-transformers>=2.2.0
 scikit-learn>=1.2.2
-numpy>=1.24.3
-supabase
 boto3
-python-dotenv
-PyMuPDF
-Pillow
 pdfplumber
 nltk
 spacy
 pandas
-numpy
-scikit-learn
 PyPDF2
-requests
 torch
 transformers
