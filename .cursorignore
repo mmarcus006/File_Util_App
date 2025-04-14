@@ -46,7 +46,6 @@ logs/
 
 # Large files
 *.csv
-*.json
 *.pkl
 *.parquet
 *.h5
