@@ -531,6 +531,30 @@ class FDDQualityControlApp:
             return
 
         try:
+            # Check if there's a selected header with a potentially modified page number
+            selection = self.headers_table_component.headers_table.selection()
+            if selection:
+                try:
+                    # Get the item number
+                    item = selection[0]
+                    values = self.headers_table_component.headers_table.item(item, "values")
+                    item_number = int(values[0])
+                    
+                    # Get the current page number from the entry field
+                    current_page = int(self.expected_page_var.get())
+                    
+                    # Apply any pending changes to the JSON processor
+                    self.json_processor.update_header_page_number(item_number, current_page)
+                    
+                    # Also update in verification results
+                    if self.verification_results and item_number in self.verification_results:
+                        self.verification_results[item_number]["expected_page"] = current_page
+                        
+                    self.update_status(f"Applied pending changes to Item {item_number} before saving.")
+                except (ValueError, IndexError):
+                    # If we can't parse the values, just continue with saving
+                    pass
+            
             # Save the data using the data manager
             saved_path = self.data_manager.save_corrected_json(
                 self.json_processor, self.current_json_path
