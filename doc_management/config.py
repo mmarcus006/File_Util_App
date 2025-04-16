@@ -26,72 +26,21 @@ logger = logging.getLogger(__name__)
 
 class Config:
     """Configuration class for the application."""
+    # Define configuration variables
+    GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+    
+    # CSV file path
+    MATCH_RESULTS_CSV = os.getenv("MATCH_RESULTS_CSV", "C:\\Projects\\File_Util_App\\csvs\\MatchResults.csv")
+    
+    # Directory paths for file lookup
+    HURIDOC_ANALYSIS_DIR = os.getenv("HURIDOC_ANALYSIS_DIR", "C:\\Projects\\File_Util_App\\data\\huridoc_analysis_output")
+    PROCESSED_OUTPUTS_DIR = os.getenv("PROCESSED_OUTPUTS_DIR", "C:\\Projects\\File_Util_App\\data\\processed_outputs")
+    HEADER_OUTPUT_DIR = os.getenv("HEADER_OUTPUT_DIR", "C:\\Projects\\File_Util_App\\output\\header_output")
+    
+    # Directory for split PDF outputs
+    SPLIT_PDF_DIR = os.getenv("SPLIT_PDF_DIR", "C:\\Projects\\File_Util_App\\output\\split_pdfs")
+    
+    # SQLite database path
+    DATABASE_PATH = os.getenv("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "database.db"))
 
-    # Supabase configuration
-    SUPABASE_URL = os.getenv("SUPABASE_URL")
-    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-    SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-
-    # S3 configuration
-    S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "your-existing-bucket-name")
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-
-    @classmethod
-    def validate(cls) -> bool:
-        """
-        Validate that all required configuration variables are set.
-        
-        Returns:
-            bool: True if all required variables are set, False otherwise.
-        """
-        required_vars = [
-            "SUPABASE_URL",
-            "SUPABASE_ANON_KEY",
-            "S3_BUCKET_NAME",
-            "AWS_ACCESS_KEY_ID",
-            "AWS_SECRET_ACCESS_KEY",
-        ]
-        
-        missing_vars = [var for var in required_vars if not getattr(cls, var)]
-        
-        if missing_vars:
-            logger.error(f"Missing required environment variables: {', '.join(missing_vars)}")
-            return False
-            
-        return True
-
-    @classmethod
-    def get_supabase_config(cls) -> Dict[str, str | None]:
-        """
-        Get Supabase configuration.
-        
-        Returns:
-            Dict[str, str | None]: Dictionary with Supabase configuration.
-        """
-        return {
-            "url": cls.SUPABASE_URL,
-            "anon_key": cls.SUPABASE_ANON_KEY,
-            "service_role_key": cls.SUPABASE_SERVICE_ROLE_KEY,
-        }
-
-    @classmethod
-    def get_s3_config(cls) -> Dict[str, str | None]:
-        """
-        Get S3 configuration.
-        
-        Returns:
-            Dict[str, str | None]: Dictionary with S3 configuration.
-        """
-        return {
-            "bucket_name": cls.S3_BUCKET_NAME,
-            "aws_access_key_id": cls.AWS_ACCESS_KEY_ID,
-            "aws_secret_access_key": cls.AWS_SECRET_ACCESS_KEY,
-            "region_name": cls.AWS_REGION,
-        }
-
-
-# Validate configuration on import
-if not Config.validate():
-    logger.warning("Configuration validation failed. Some features may not work correctly.")
+    
