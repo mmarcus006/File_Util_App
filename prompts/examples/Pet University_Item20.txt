@@ -1,0 +1,249 @@
+{
+  "t1": {
+    "title": "Table No. 1\nSystemwide Outlet Summary*\nFor calendar years 2021, 2022 and 2023",
+    "columns": [
+      "outlet_type",
+      "year",
+      "outlets_start_year",
+      "outlets_end_year",
+      "net_change"
+    ],
+    "rows": [
+      [
+        "Franchised",
+        2021,
+        0,
+        0,
+        0
+      ],
+      [
+        "Franchised",
+        2022,
+        0,
+        0,
+        0
+      ],
+      [
+        "Franchised",
+        2023,
+        0,
+        0,
+        0
+      ],
+      [
+        "Affiliate-\nOwned",
+        2021,
+        3,
+        3,
+        0
+      ],
+      [
+        "Affiliate-\nOwned",
+        2022,
+        3,
+        3,
+        0
+      ],
+      [
+        "Affiliate-\nOwned",
+        2023,
+        3,
+        3,
+        0
+      ],
+      [
+        "Total Outlets",
+        2021,
+        3,
+        3,
+        0
+      ],
+      [
+        "Total Outlets",
+        2022,
+        3,
+        3,
+        0
+      ],
+      [
+        "Total Outlets",
+        2023,
+        3,
+        3,
+        0
+      ]
+    ]
+  },
+  "t2": {
+    "title": "Table No. 2\nTransfers of Outlets from Franchisees to New Owners (other than the Franchisor)*\nFor calendar years 2021, 2022 and 2023",
+    "columns": [
+      "state",
+      "year",
+      "number_of_transfers"
+    ],
+    "rows": [
+      [
+        "Total",
+        2021,
+        0
+      ],
+      [
+        "Total",
+        2022,
+        0
+      ],
+      [
+        "Total",
+        2023,
+        0
+      ]
+    ]
+  },
+  "t3": {
+    "title": "Table No. 3\nStatus of Franchised Outlets*\nFor calendar years 2021, 2022 and 2023",
+    "columns": [
+      "state",
+      "year",
+      "outlets_start_year",
+      "outlets_opened",
+      "terminations",
+      "non_renewals",
+      "reacquired_by_franchisor",
+      "ceased_operations_other",
+      "outlets_end_year"
+    ],
+    "rows": [
+      [
+        "Total",
+        2021,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        "Total",
+        2022,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        "Total",
+        2023,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "t4": {
+    "title": "Table No. 4\nStatus of Affiliate-Owned Outlets\nFor calendar years 2021, 2022 and 2023",
+    "columns": [
+      "state",
+      "year",
+      "outlets_start_year",
+      "outlets_opened",
+      "outlets_reacquired",
+      "outlets_closed",
+      "outlets_sold_to_franchisee",
+      "outlets_end_year"
+    ],
+    "rows": [
+      [
+        "Wisconsin",
+        2021,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        "Wisconsin",
+        2022,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        "Wisconsin",
+        2023,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        "Totals",
+        2021,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        "Totals",
+        2022,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        "Totals",
+        2023,
+        3,
+        0,
+        0,
+        0,
+        0,
+        3
+      ]
+    ]
+  },
+  "t5": {
+    "title": "Table No. 5\nPROJECTED OPENINGS\nas of December 31, 2023",
+    "columns": [
+      "state",
+      "franchise_agreements_signed_not_opened",
+      "projected_new_franchised",
+      "projected_new_company_owned"
+    ],
+    "rows": [
+      [
+        "Wisconsin",
+        0,
+        3,
+        0
+      ],
+      [
+        "TOTAL",
+        0,
+        3,
+        0
+      ]
+    ]
+  }
+}
