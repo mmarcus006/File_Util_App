@@ -518,7 +518,7 @@ def main(db_path: str = "franchise_directory.sqlite"):
     engine = create_engine(db_url, echo=False, future=True)
     event.listen(engine, "connect", _enable_sqlite_fk)
 
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine, checkfirst=True)
 
     with Session(engine) as s:
         seed_states(s)
