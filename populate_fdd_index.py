@@ -86,11 +86,6 @@ def populate_fdd_index(db_path: str, pdf_split_dir: str):
 
     db_url = f"sqlite:///{Path(db_path).resolve()}"
     engine = create_engine(db_url, echo=False, future=True)
-    # Ensure FKs are enabled if relationships are added later
-    # sqlalchemy.event.listen(engine, "connect", _enable_sqlite_fk)
-
-    # Check if the table exists, create if not (though schema script should handle this)
-    # FDDFileIndex.__table__.create(engine, checkfirst=True)
 
     processed_filings = 0
     processed_files = 0
