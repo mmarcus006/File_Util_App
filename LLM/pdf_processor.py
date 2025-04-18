@@ -61,25 +61,25 @@ def configure_gemini(api_key: Optional[str] = None) -> None:
         _gemini_configured = False
         raise
 
-def extract_structured_data_from_pdf(
-    pdf_path: Path,
+def extract_structured_data_from_pdfs(
+    pdf_paths: List[Path], # Changed to accept a list of paths
     system_prompt: str,
-    user_prompt: str, # Added user prompt
+    user_prompt: str,
     schema_dict: Dict[str, Any],
     model_name: str = DEFAULT_MODEL_NAME,
-    api_key: Optional[str] = None, # Allow passing API key directly
+    api_key: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
     """
-    Uploads a PDF, calls the Gemini model with prompts and schema for structured
-    extraction, and returns the parsed data.
+    Uploads one or more PDFs, calls the Gemini model with prompts and schema
+    for structured extraction, and returns the parsed data.
 
-    Handles API configuration, file upload, API call, response parsing,
+    Handles API configuration, file uploads, API call, response parsing,
     and file deletion.
 
     Args:
-        pdf_path: Path to the PDF file.
+        pdf_paths: A list of paths to the PDF files.
         system_prompt: The system instruction for the model.
-        user_prompt: The user query or instruction related to the PDF.
+        user_prompt: The user query or instruction related to the PDF(s).
         schema_dict: A dictionary representing the desired JSON output schema.
         model_name: The Gemini model to use (defaults to DEFAULT_MODEL_NAME).
         api_key: Optional API key. If provided, configure_gemini will be called.
@@ -88,9 +88,11 @@ def extract_structured_data_from_pdf(
     Returns:
         A dictionary containing the extracted structured data, or None if an error occurs.
     """
-    if not pdf_path.exists():
-        print(f"Error: PDF file not found at {pdf_path}")
-        return None
+    # Check if all PDF files exist
+    for pdf_path in pdf_paths:
+        if not pdf_path.exists():
+            print(f"Error: PDF file not found at {pdf_path}")
+            return None
 
     global _gemini_configured
     if not _gemini_configured:
@@ -103,19 +105,27 @@ def extract_structured_data_from_pdf(
             print(f"Unexpected Configuration Error: {e}")
             return None
 
-    uploaded_file = None
+    uploaded_files: List[Any] = [] # Store multiple uploaded files (Type hint adjusted)
+    pdf_names = ", ".join([p.name for p in pdf_paths]) # For logging
     try:
-        # 1. Upload the file
-        print(f"Uploading {pdf_path.name}...", end="", flush=True)
-        # Use a short timeout for the upload operation if it tends to hang
-        # Note: upload_file itself doesn't have a direct timeout parameter.
-        # Consider wrapping in threading/async logic if hangs are frequent.
-        uploaded_file = genai.upload_file( # type: ignore[attr-defined]
-            path=pdf_path,
-            display_name=pdf_path.name,
-            mime_type="application/pdf"
-        )
-        print(f" Upload successful. File URI: {uploaded_file.uri}")
+        # 1. Upload all files
+        for pdf_path in pdf_paths:
+            print(f"Uploading {pdf_path.name}...", end="", flush=True)
+            try:
+                # Use a short timeout for the upload operation if it tends to hang
+                # Note: upload_file itself doesn't have a direct timeout parameter.
+                # Consider wrapping in threading/async logic if hangs are frequent.
+                uploaded_file = genai.upload_file( # type: ignore[attr-defined]
+                    path=pdf_path,
+                    display_name=pdf_path.name,
+                    mime_type="application/pdf"
+                )
+                print(f" Upload successful. File URI: {uploaded_file.uri}")
+                uploaded_files.append(uploaded_file)
+            except Exception as upload_error:
+                print(f"\nError uploading {pdf_path.name}: {upload_error}")
+                # Clean up any files already uploaded before returning
+                raise # Re-raise to trigger final cleanup
 
         # 2. Prepare Model and Generation Config
         model = GenerativeModel(model_name)
@@ -124,10 +134,14 @@ def extract_structured_data_from_pdf(
             response_schema=schema_dict,
         )
 
-        # 3. Call the model with System Prompt, User Prompt, and File
-        print(f"Sending request to model '{model_name}' for {pdf_path.name}...", end="", flush=True)
+        # 3. Construct content with prompts and all uploaded files
+        content_parts = [system_prompt, user_prompt]
+        for uploaded_file in uploaded_files:
+            content_parts.append(uploaded_file)
+
+        print(f"Sending request to model '{model_name}' for files: {pdf_names}...", end="", flush=True)
         response = model.generate_content(
-            contents=[system_prompt, user_prompt, uploaded_file], # Added user_prompt
+            contents=content_parts, # Use the combined parts
             generation_config=generation_config
         )
         print(" Request complete.")
@@ -137,15 +151,15 @@ def extract_structured_data_from_pdf(
         if response.text:
             try:
                 extracted_data = json.loads(response.text)
-                print(f"Successfully parsed structured data for {pdf_path.name}.")
+                print(f"Successfully parsed structured data for files: {pdf_names}.")
                 return extracted_data
             except json.JSONDecodeError as e:
-                print(f"Error: Could not decode JSON response from API for {pdf_path.name}. Details: {e}")
+                print(f"Error: Could not decode JSON response from API for files: {pdf_names}. Details: {e}")
                 print(f"Raw response text: {response.text[:500]}...")
                 return None
         else:
             # Handle cases where response is empty or blocked
-            print(f"Warning: No text content found in the response for {pdf_path.name}.")
+            print(f"Warning: No text content found in the response for files: {pdf_names}.")
             if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
                 print(f"Prompt Feedback: {response.prompt_feedback}")
             if response.candidates and not response.candidates[0].content.parts:
@@ -154,58 +168,96 @@ def extract_structured_data_from_pdf(
 
     except google_exceptions.GoogleAPIError as e:
         # Catch more specific API errors if possible, e.g., PermissionDenied, InvalidArgument
-        print(f"\nGoogle API Error during processing {pdf_path.name}: {e}")
+        print(f"\nGoogle API Error during processing {pdf_names}: {e}")
         return None
     except Exception as e:
         # Catch potential errors during upload or other steps
-        print(f"\nAn unexpected error occurred processing {pdf_path.name}: {e.__class__.__name__}: {e}")
+        print(f"\nAn unexpected error occurred processing {pdf_names}: {e.__class__.__name__}: {e}")
         return None
     finally:
-        # 5. Delete the uploaded file - crucial for cleanup
-        if uploaded_file:
-            try:
-                print(f"Attempting to delete uploaded file: {uploaded_file.name}...", end="", flush=True)
-                # Use file name for deletion
-                genai.delete_file(name=uploaded_file.name) # type: ignore[attr-defined]
-                print(" Deleted successfully.")
-            except Exception as delete_error:
-                # Log non-critical cleanup errors
-                print(f"\nWarning: Failed to delete uploaded file {uploaded_file.name}. " \
-                      f"Manual cleanup may be required. Error: {delete_error}")
+        # 5. Delete all uploaded files - crucial for cleanup
+        if uploaded_files:
+            print(f"Attempting to delete {len(uploaded_files)} uploaded file(s)...", end="", flush=True)
+            deleted_count = 0
+            for uploaded_file in uploaded_files:
+                try:
+                    genai.delete_file(name=uploaded_file.name) # type: ignore[attr-defined]
+                    deleted_count += 1
+                except Exception as delete_error:
+                    # Log non-critical cleanup errors but continue trying to delete others
+                    print(f"\nWarning: Failed to delete uploaded file {uploaded_file.name}. "
+                          f"Manual cleanup may be required. Error: {delete_error}")
+            print(f" {deleted_count}/{len(uploaded_files)} deleted successfully.")
 
 
 if __name__ == '__main__':
-    # Example usage
-    pdf_path_Item_1 = Path("/Users/miller/projects/File_Util_App/prompts/pdf_example/ITEM_1/ce6d8ac9-6268-4796-8e4b-6483406b4640_ITEM_1.pdf")
-    
-    pdf_path_intro = Path("/Users/miller/projects/File_Util_App/prompts/pdf_example/ITEM_1/INTRO/intro_BOSSESPIZZACHICKEN.pdf")
-    
-    system_prompt_path=Path("/Users/miller/projects/File_Util_App/prompts/system_prompts/Item_1_Intro_Prompt.md")
-    
-    with open(system_prompt_path, 'r') as file:
-        system_prompt = file.read()
-        
-    schema_path = Path("/Users/miller/projects/File_Util_App/prompts/schemas/ITEM_1_INTRO_schema.json")
-    
-    with open(schema_path, 'r') as file:
-        schema_dict = json.load(file)
-        
-    user_prompt = "Follow your instructions and extract the structured data from the PDF."
-    
-    # Combine the pages from both PDFs
-    from PyPDF2 import PdfMerger
-    
-    merger = PdfMerger()
-    merger.append(pdf_path_Item_1)
-    merger.append(pdf_path_intro)
-    
-    # Create a temporary combined PDF
-    combined_pdf_path = Path("temp_combined.pdf")
-    merger.write(combined_pdf_path)
-    merger.close()
-    
-    # Process the combined PDF
-    result = extract_structured_data_from_pdf(combined_pdf_path, system_prompt, user_prompt, schema_dict)
-    
-    # Clean up the temporary file
-    combined_pdf_path.unlink()
+    # Example usage demonstrating modularity
+
+    # --- Configuration (Set these paths/values) --- #
+    # Use absolute paths or paths relative to where the script is run
+    pdf_dir = Path("/Users/miller/projects/File_Util_App/prompts/pdf_example/ITEM_1")
+    pdf_files_to_process = [
+        pdf_dir / "ce6d8ac9-6268-4796-8e4b-6483406b4640_ITEM_1.pdf",
+        pdf_dir / "INTRO" / "intro_BOSSESPIZZACHICKEN.pdf"
+    ]
+    prompt_dir = Path("/Users/miller/projects/File_Util_App/prompts")
+    system_prompt_file = prompt_dir / "system_prompts" / "Item_1_Intro_Prompt.md"
+    schema_file = prompt_dir / "schemas" / "ITEM_1_INTRO_schema.json"
+    user_prompt_text = "Follow your instructions and extract the structured data from the provided PDF pages covering the introduction and Item 1, stopping before Item 2."
+    # --- End Configuration --- #
+
+    # Load System Prompt
+    try:
+        with open(system_prompt_file, 'r') as file:
+            system_prompt = file.read()
+    except FileNotFoundError:
+        print(f"Error: System prompt file not found at {system_prompt_file}")
+        exit(1)
+    except Exception as e:
+        print(f"Error reading system prompt file: {e}")
+        exit(1)
+
+    # Load Schema
+    try:
+        with open(schema_file, 'r') as file:
+            schema_dict = json.load(file)
+    except FileNotFoundError:
+        print(f"Error: Schema file not found at {schema_file}")
+        exit(1)
+    except json.JSONDecodeError:
+        print(f"Error: Could not decode JSON from schema file: {schema_file}")
+        exit(1)
+    except Exception as e:
+        print(f"Error reading schema file: {e}")
+        exit(1)
+
+    # Check if PDF files exist before processing
+    missing_files = [p for p in pdf_files_to_process if not p.exists()]
+    if missing_files:
+        print("Error: The following PDF files were not found:")
+        for p in missing_files:
+            print(f" - {p}")
+        exit(1)
+
+    # Call the processing function
+    # Assumes GEMINI_API_KEY2 is set in the environment
+    # Or pass api_key="YOUR_API_KEY" directly
+    extracted_data = extract_structured_data_from_pdfs(
+        pdf_paths=pdf_files_to_process,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt_text,
+        schema_dict=schema_dict
+        # model_name="gemini-1.5-pro-latest" # Optionally specify a different model
+    )
+
+    if extracted_data:
+        print("\n--- Extracted Data --- ")
+        # Pretty print the JSON output
+        print(json.dumps(extracted_data, indent=2))
+        # Optionally save to a file
+        # output_path = Path("extracted_output.json")
+        # with open(output_path, 'w') as f:
+        #     json.dump(extracted_data, f, indent=2)
+        # print(f"\nExtracted data saved to {output_path}")
+    else:
+        print("\nExtraction failed.")

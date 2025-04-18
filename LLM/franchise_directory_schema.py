@@ -17,7 +17,7 @@ from typing import List, Optional
 
 from sqlalchemy import (
     Date, DateTime, ForeignKey, Integer, Numeric, String, Text,
-    UniqueConstraint, CheckConstraint, create_engine, event, MetaData
+    UniqueConstraint, CheckConstraint, create_engine, event, MetaData, Index
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 
@@ -464,7 +464,28 @@ class T5ProjectedOpenings(Base):
     projected_new_company_owned:            Mapped[Optional[int]]
 
 # ---------------------------------------------------------------------#
-# 6.  State seeding utility
+# 6.  FDD File Index Table
+# ---------------------------------------------------------------------#
+
+class FDDFileIndex(Base):
+    """Stores index information for individual files created by splitting FDD PDFs."""
+    __tablename__ = "fdd_file_index"
+    __table_args__ = (
+        # Indexing filing_id for faster lookups when processing a specific FDD
+        Index("ix_fdd_file_index_filing_id", "filing_id"),
+        # Ensure file paths are unique per filing if needed, though full paths might suffice
+        # UniqueConstraint("filing_id", "file_path", name="uq_fdd_file_path"),
+    )
+
+    # Not linking directly to FDDDocument PK via FK for now, using the folder name as ID
+    filing_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    file_path: Mapped[str] = mapped_column(Text, nullable=False, unique=True) # Assuming full path is unique
+    section_identifier: Mapped[Optional[str]] # e.g., "ITEM_1", "intro", "exhibit_a"
+    section_type: Mapped[Optional[str]]       # e.g., "ITEM", "INTRO", "EXHIBIT", "OTHER"
+    extracted_item_number: Mapped[Optional[int]]  # e.g., 1, 20
+
+# ---------------------------------------------------------------------#
+# 7.  State seeding utility
 # ---------------------------------------------------------------------#
 
 _US_STATES = [
@@ -489,7 +510,7 @@ def seed_states(session: Session):
         session.commit()
 
 # ---------------------------------------------------------------------#
-# 7.  Entrypoint
+# 8.  Entrypoint
 # ---------------------------------------------------------------------#
 
 def main(db_path: str = "franchise_directory.sqlite"):
