@@ -17,3 +17,5 @@ Now, process the following input text from Item 20 of an FDD. Analyze it careful
 
 #Final Output
 Produce ONLY the JSON object containing the extracted table data, adhering strictly to the schema. Do not include any explanatory text before or after the JSON object.
+
+Here are some example outputs:

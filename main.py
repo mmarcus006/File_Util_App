@@ -7,36 +7,79 @@ from dotenv import load_dotenv
 
 # Import components from our modules
 from LLM.schemas import ExtractionOutput
-from LLM.llm_config import SYSTEM_PROMPT_TEMPLATE
-from LLM.pdf_processor import find_fdd_intro_pdfs, extract_fdd_data_with_gemini
+from LLM.config import (
+    SYSTEM_PROMPT_TEMPLATE,
+    PDF_SEARCH_DIRECTORIES,
+    PDF_KEYWORDS,
+    OUTPUT_FILENAMES,
+    PROMPT_DIR,
+    SCHEMA_DIR,
+    OUTPUT_DIR
+)
+from LLM.pdf_processor import (
+    find_fdd_intro_pdfs,
+    extract_fdd_data_with_gemini,
+    output_file_exists
+)
 
 # --- Configuration --- #
 
-# Load environment variables (especially GOOGLE_API_KEY)
+# Load environment variables (especially API keys)
 load_dotenv()
 
-# Define directories to search for PDFs
-# Replace with your actual directories containing FDD PDFs
-# Example: PDF_SEARCH_DIRECTORIES = ["/path/to/fdd_folder1", "/path/to/fdd_folder2"]
-PDF_SEARCH_DIRECTORIES = ["/Users/miller/Library/CloudStorage/OneDrive-Personal/FDD_PDFS/split_pdfs"]
+# --- Helper Functions --- #
 
-# Keywords to identify the target PDF files (intro/item 1 sections)
-PDF_KEYWORDS = ["intro", "item_1"]
-
-# Output file for results
-OUTPUT_FILENAME = "fdd_intro_extractions.json"
+def ensure_directories_exist():
+    """Create necessary directories if they don't exist."""
+    # Create directories defined in config
+    for directory in [PROMPT_DIR, SCHEMA_DIR, OUTPUT_DIR]:
+        directory.mkdir(parents=True, exist_ok=True)
+    
+    # Create PDF search directories if they're local to the project
+    for directory in PDF_SEARCH_DIRECTORIES:
+        dir_path = Path(directory)
+        # Only create directories that are within our project
+        if str(dir_path).startswith(str(Path.cwd())):
+            dir_path.mkdir(parents=True, exist_ok=True)
+            print(f"Created directory: {dir_path}")
 
 # --- Main Logic --- #
 
 def main():
     """Orchestrates the PDF finding and extraction process."""
     print("Starting FDD Introduction Extraction Process...")
+    
+    # Ensure necessary directories exist
+    ensure_directories_exist()
+    
+    # Debug: Print out configuration
+    print("\n--- Configuration ---")
+    print(f"PDF search directories: {PDF_SEARCH_DIRECTORIES}")
+    print(f"PDF keywords: {PDF_KEYWORDS['intro']}")
+    print(f"Output filename: {OUTPUT_FILENAMES['intro']}")
+    
+    # Determine output filename from config
+    output_filename = OUTPUT_FILENAMES["intro"]
+    
+    # Check if output file already exists
+    if output_file_exists(output_filename):
+        print(f"Output file {output_filename} already exists. To reprocess, delete or rename this file.")
+        user_response = input("Do you want to continue anyway? (y/n): ").strip().lower()
+        if user_response != 'y':
+            print("Exiting without processing.")
+            return
 
     # 1. Find relevant PDF files
-    target_pdfs = find_fdd_intro_pdfs(PDF_SEARCH_DIRECTORIES, PDF_KEYWORDS)
+    print("\nSearching for PDF files...")
+    target_pdfs = find_fdd_intro_pdfs(PDF_SEARCH_DIRECTORIES, PDF_KEYWORDS["intro"])
 
     if not target_pdfs:
-        print("No relevant PDF files found. Exiting.")
+        print("No relevant PDF files found.")
+        print("\nTo add PDF files for processing:")
+        for directory in PDF_SEARCH_DIRECTORIES:
+            print(f"1. Place PDF files in: {directory}")
+            print(f"2. Ensure filenames contain one of these keywords: {PDF_KEYWORDS['intro']}")
+        print("\nExiting.")
         return
 
     print(f"\nFound {len(target_pdfs)} target PDFs to process.")
@@ -49,7 +92,7 @@ def main():
         # Perform extraction using Gemini
         extracted_data = extract_fdd_data_with_gemini(
             pdf_path=pdf_path,
-            pydantic_schema=ExtractionOutput, # Pass the Pydantic model class
+            pydantic_schema=ExtractionOutput,
             system_prompt=SYSTEM_PROMPT_TEMPLATE
         )
 
@@ -61,9 +104,9 @@ def main():
             print(f"Failed for {pdf_path.name}.")
 
     # 3. Save results
-    print(f"\n--- Saving Results to {OUTPUT_FILENAME} --- ")
+    print(f"\n--- Saving Results to {output_filename} --- ")
     try:
-        output_path = Path(OUTPUT_FILENAME)
+        output_path = Path(output_filename)
         with output_path.open('w', encoding='utf-8') as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         print("Results saved successfully.")

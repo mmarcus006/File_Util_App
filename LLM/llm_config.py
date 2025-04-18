@@ -1,4 +1,8 @@
-"""LLM Configuration: System prompt template."""
+"""LLM Configuration: System prompt template (Import from central config)."""
+
+# This file is kept for backwards compatibility
+# Import all configurations from the central config file
+from LLM.config import SYSTEM_PROMPT_TEMPLATE
 
 # --- System Prompt Template ---
 
@@ -21,4 +25,4 @@ Carefully read this initial part of the document and extract the information req
 Provide ONLY the JSON object containing the extracted data. Do not include any explanations or introductory text outside the JSON structure.
 """
 
-# No schema generation needed here anymore, the SDK handles it via Pydantic model. 
+# No schema generation needed here, the SDK handles it via Pydantic model. 
