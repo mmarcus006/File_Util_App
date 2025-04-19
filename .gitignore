@@ -155,11 +155,5 @@ directory_scan_*.json
 *_FDD_*/images/
 
 
-# Exclude specific large/generated files
-html.md
-full.md
-All_Json_Files.csv
-AllJsonFiles.xlsm
-
 # Keep the .gitignore rules
 !.gitignore 
