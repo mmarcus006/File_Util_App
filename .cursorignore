@@ -1,16 +1,16 @@
 # Large data files - avoid indexing
-directory_scan_*.json
-*_content_list.json
-layout.json
-*.pdf
+# directory_scan_*.json
+# *_content_list.json
+# layout.json
+# *.pdf
 
 # Generated documentation
-full.md
+# full.md
 
 # Database files
-*.db
-*.sqlite3
-*.sqlite
+# *.db
+# *.sqlite3
+# *.sqlite
 
 # Data directories
 cache/
@@ -38,7 +38,7 @@ __pycache__/
 .pytest_cache/ 
 
 # Project specific directories
-output/
+# output/
 
 # Large directories to exclude from Cursor indexing
 data/

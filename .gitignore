@@ -112,12 +112,12 @@ dmypy.json
 .pyre/
 
 # SQLite database
-*.db
-*.sqlite3
-*.sqlite
+# *.db
+# *.sqlite3
+# *.sqlite
 
 # JSON files (LFS will handle these)
-*.json
+# *.json
 
 # Image Files
 *.jpg
@@ -129,8 +129,8 @@ dmypy.json
 *.ico
 
 # PDF Files (LFS will handle these)
-*.pdf
-*PDF
+# *.pdf
+# *PDF
 
 # VS Code
 .vscode/
@@ -154,10 +154,9 @@ samples/
 New_Samples/
 *_FDD_*/images/
 
-
 # Exclude specific large/generated files
-html.md
-full.md
+# html.md
+# full.md
 All_Json_Files.csv
 AllJsonFiles.xlsm
 
