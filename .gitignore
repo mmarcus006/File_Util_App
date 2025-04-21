@@ -112,12 +112,21 @@ dmypy.json
 .pyre/
 
 # SQLite database
+<<<<<<< HEAD
 # *.db
 # *.sqlite3
 # *.sqlite
 
 # JSON files (LFS will handle these)
 # *.json
+=======
+*.db
+*.sqlite3
+*.sqlite
+
+# JSON files (LFS will handle these)
+*.json
+>>>>>>> 119bbe205d9d9b47abac2fece90b6f7e081b5cab
 
 # Image Files
 # REMOVED *.jpg
@@ -129,8 +138,13 @@ dmypy.json
 # REMOVED *.ico
 
 # PDF Files (LFS will handle these)
+<<<<<<< HEAD
 # *.pdf
 # *PDF
+=======
+*.pdf
+*PDF
+>>>>>>> 119bbe205d9d9b47abac2fece90b6f7e081b5cab
 
 # VS Code
 .vscode/
