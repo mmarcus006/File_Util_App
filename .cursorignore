@@ -1,0 +1,66 @@
+# Large data files - avoid indexing
+# directory_scan_*.json
+# *_content_list.json
+# layout.json
+# *.pdf
+
+# Generated documentation
+# full.md
+
+# Database files
+# *.db
+# *.sqlite3
+# *.sqlite
+
+# Data directories
+cache/
+cache/extractions/
+samples/
+New_Samples/
+data/processed_outputs/
+data/split_fdds/
+*_FDD_*/images/
+
+# Excel and spreadsheet files
+*.xlsx
+*.xlsm
+*.csv
+
+# Environment and dependencies
+.venv/
+.env
+.roo/
+
+# Generated files
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/ 
+
+# Project specific directories
+# output/
+
+# Large directories to exclude from Cursor indexing
+data/
+logs/
+
+# Large files
+*.csv
+*.pkl
+*.parquet
+*.h5
+*.hdf5
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+
+# Local environment
+venv/
+env/
+.env 

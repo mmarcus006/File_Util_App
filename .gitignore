@@ -112,12 +112,12 @@ dmypy.json
 .pyre/
 
 # SQLite database
-# REMOVED *.db
-# REMOVED *.sqlite3
-# REMOVED *.sqlite
+# *.db
+# *.sqlite3
+# *.sqlite
 
 # JSON files (LFS will handle these)
-# REMOVED *.json
+# *.json
 
 # Image Files
 # REMOVED *.jpg
@@ -129,8 +129,8 @@ dmypy.json
 # REMOVED *.ico
 
 # PDF Files (LFS will handle these)
-# REMOVED *.pdf
-# REMOVED *PDF
+# *.pdf
+# *PDF
 
 # VS Code
 .vscode/
@@ -154,6 +154,12 @@ directory_scan_*.json
 # REMOVED New_Samples/
 *_FDD_*/images/
 
+
+# Exclude specific large/generated files
+html.md
+full.md
+All_Json_Files.csv
+AllJsonFiles.xlsm
 
 # Keep the .gitignore rules
 !.gitignore 
