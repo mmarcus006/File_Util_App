@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, Field
 from google import genai
+from google.genai import types # Import types for configuration
 import os
 from PyPDF2 import PdfReader, PdfWriter
 
@@ -43,9 +44,22 @@ def combine_pdfs(pdf_path1, pdf_path2, output_path):
 def extract_structured_data_api(file_path: str, model: BaseModel, system_prompt: str, user_prompt: str):
     # Upload the file to the File API
     file = client.files.upload(file=file_path, config={'display_name': file_path.split('/')[-1].split('.')[0]})
+    
+    # Define the generation configuration with thinking budget and system instruction
+    generation_config = types.GenerateContentConfig(
+        response_mime_type='application/json',
+        response_schema=model,
+        thinking_config=types.ThinkingConfig(thinking_budget=6000),
+        system_instruction=system_prompt # Add system instruction here
+    )
+    
     # Generate a structured response using the Gemini API
-    prompt = f"Extract the structured data from the following PDF file"
-    response = client.models.generate_content(model=model_id, contents=[prompt, file], config={'response_mime_type': 'application/json', 'response_schema': model})
+    # Use the provided user_prompt and the uploaded file as content
+    response = client.models.generate_content(
+        model=model_id, 
+        contents=[user_prompt, file], # Use user_prompt and file
+        config=generation_config # Use the updated config object with the correct parameter name
+    )
     # Convert the response to the pydantic model and return it
     return response.parsed
 
