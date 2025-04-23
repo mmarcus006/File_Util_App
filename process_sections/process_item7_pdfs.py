@@ -35,7 +35,8 @@ def ensure_directories_exist():
         print(f"Directory exists: {directory} - {directory.exists()}")
 
 def already_processed(folder_id: str) -> bool:
-    """Check if a folder has already been processed by looking for output file.
+    """Check if a folder has already been processed by looking for any output file
+    containing the folder_id in its name within the OUTPUT_DIR.
     
     Args:
         folder_id: ID of the folder to check
@@ -43,8 +44,20 @@ def already_processed(folder_id: str) -> bool:
     Returns:
         bool: True if already processed, False otherwise
     """
-    output_file = OUTPUT_DIR / f"{folder_id}_item7.json"
-    return output_file.exists()
+    # Check if OUTPUT_DIR exists
+    if not OUTPUT_DIR.exists():
+        print(f"Warning: Output directory {OUTPUT_DIR} does not exist.")
+        return False # Or raise an error, depending on desired behavior
+
+    # Iterate through all files in the output directory
+    for output_file in OUTPUT_DIR.glob("*"):
+        # Check if the file is actually a file (not a directory) and if folder_id is in the filename
+        if output_file.is_file() and folder_id in output_file.name:
+            print(f"Found existing output file for {folder_id}: {output_file.name}")
+            return True # Found a matching file, folder is processed
+            
+    # If no matching file was found after checking all files
+    return False
 
 def load_schema_model():
     """Load the Pydantic model from the schema file."""

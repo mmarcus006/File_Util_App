@@ -1,0 +1,5 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+franchise@whichwich.com,/Users/miller/projects/File_Util_App/processed_fdds/2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,1,2025-04-23T17:05:29.229318
+legal@whichwich.com,/Users/miller/projects/File_Util_App/processed_fdds/2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,109,2025-04-23T17:05:34.060902
+legal@whichwich.com,/Users/miller/projects/File_Util_App/processed_fdds/2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,144,2025-04-23T17:05:34.550646
+accounting@whichwich.com,/Users/miller/projects/File_Util_App/processed_fdds/2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,2436fe46-1c3a-4cb8-b43b-510f24ab9f2e_origin.pdf,193,2025-04-23T17:05:35.278467

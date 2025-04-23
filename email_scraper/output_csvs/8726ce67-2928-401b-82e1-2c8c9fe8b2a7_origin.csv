@@ -1,0 +1,5 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+info@kfteausa.com,/Users/miller/projects/File_Util_App/processed_fdds/8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,1,2025-04-23T17:12:33.565275
+billing@kfteausa.com,/Users/miller/projects/File_Util_App/processed_fdds/8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,199,2025-04-23T17:12:36.537682
+sales@kfteausa.com,/Users/miller/projects/File_Util_App/processed_fdds/8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,232,2025-04-23T17:12:36.932990
+sales@kfteausa.com,/Users/miller/projects/File_Util_App/processed_fdds/8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,8726ce67-2928-401b-82e1-2c8c9fe8b2a7_origin.pdf,233,2025-04-23T17:12:37.004128
