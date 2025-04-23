@@ -7,6 +7,7 @@ import glob # Added for finding PDF files
 from datetime import datetime # Added for consistent timestamping
 from PyPDF2 import PdfReader
 from PyPDF2.errors import PdfReadError
+from sqlalchemy.engine import Engine # Import Engine type for hinting
 
 # Project specific imports
 import config
@@ -16,20 +17,40 @@ import ocr_handler
 import email_extractor
 import csv_writer # Added for CSV output
 
-# --- Basic Logging Setup ---
-# Configure once at the start
+# --- Corrected Logging Setup using Handlers ---
 log_format = '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
-logging.basicConfig(level=logging.INFO, format=log_format)
-# You might want to configure file logging as well for persistent logs
-# logging.basicConfig(filename='scraper.log', level=logging.INFO, format=log_format)
-# --- --- --- --- --- --- ---
+log_level = logging.DEBUG # Set desired level here
 
-def process_single_pdf(pdf_path: str, db_path: str, output_csv_dir: str) -> None:
-    """Processes a single PDF document for email extraction, saving to CSV and DB.
+# Get root logger
+logger = logging.getLogger()
+logger.setLevel(log_level) # Set root logger level
+
+# Create formatter
+formatter = logging.Formatter(log_format)
+
+# Create console handler and set level
+ch = logging.StreamHandler() # Default is sys.stderr, use logging.StreamHandler(sys.stdout) for stdout
+ch.setLevel(log_level)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+# Create file handler and set level
+fh = logging.FileHandler('scraper.log', mode='a') # Append mode
+fh.setLevel(log_level)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
+# Prevent duplicate logging if script is reloaded in interactive session (optional but good practice)
+logger.propagate = False 
+
+# --- --- --- --- --- --- --- --- --- --- --- ---
+
+def process_single_pdf(pdf_path: str, engine: Engine, output_csv_dir: str) -> None:
+    """Processes a single PDF document for email extraction, saving to CSV and DB using SQLAlchemy.
 
     Args:
         pdf_path: Path to the input PDF file.
-        db_path: Path to the SQLite database file.
+        engine: SQLAlchemy Engine instance for database interaction.
         output_csv_dir: Path to the directory where CSV output should be saved.
     """
     logging.info(f"Starting processing for PDF: {pdf_path}")
@@ -91,8 +112,8 @@ def process_single_pdf(pdf_path: str, db_path: str, output_csv_dir: str) -> None
                             }
                             # Write to CSV first
                             csv_writer.write_email_to_csv(csv_path, email_data)
-                            # Then write to Database
-                            inserted = database_manager.insert_email(db_path, email_data)
+                            # Then write to Database using the engine
+                            inserted = database_manager.insert_email(engine, email_data)
                     else:
                         logging.info(f"No emails found on page {page_num + 1}.")
                 # else: Handled by the continue statement above
@@ -107,14 +128,21 @@ def process_single_pdf(pdf_path: str, db_path: str, output_csv_dir: str) -> None
         logging.info(f"Finished processing PDF: {pdf_filename}")
 
 if __name__ == "__main__":
-    # --- Configuration --- 
+    # --- Configuration ---
     input_folder = config.INPUT_FOLDER_PATH
-    db_file = config.DATABASE_PATH
-    csv_dir_name = config.OUTPUT_CSV_DIR # Relative dir name from config
+    db_file = config.DATABASE_PATH # Still need the file name for the URL
+    csv_dir_name = config.OUTPUT_CSV_DIR
     # --- ---------------
 
-    # Get absolute path for CSV output directory relative to this script's location
+    # --- Construct Database URL ---
+    # Assuming db_file is just the filename, place it in the script directory
+    # Adjust this logic if DATABASE_PATH is an absolute path or elsewhere
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    db_file_abs = os.path.join(script_dir, db_file)
+    db_url = f"sqlite:///{db_file_abs}" # Create SQLite URL
+    # --- ---------------------- ---
+
+    # Get absolute path for CSV output directory relative to this script's location
     output_csv_dir_abs = os.path.join(script_dir, csv_dir_name)
 
     # 1. Ensure CSV output directory exists
@@ -124,13 +152,15 @@ if __name__ == "__main__":
         logging.critical(f"Failed to create output CSV directory {output_csv_dir_abs}. Exiting. Error: {e}")
         sys.exit(1)
 
-    # 2. Ensure Database is initialized (do this once before processing files)
+    # 2. Initialize Database using SQLAlchemy and get the engine
+    engine: Engine | None = None # Initialize engine variable
     try:
-        database_manager.init_db(db_file)
-        logging.info(f"Ensured database is initialized at {db_file}")
+        engine = database_manager.init_db(db_url) # Call SQLAlchemy init_db
+        logging.info(f"SQLAlchemy engine created and schema ensured for {db_url}")
     except Exception as e:
-        logging.critical(f"Failed to initialize database at {db_file}. Cannot proceed. Error: {e}")
+        logging.critical(f"Failed to initialize database via SQLAlchemy at {db_url}. Cannot proceed. Error: {e}")
         sys.exit(1)
+    # --- Removed check: if engine is None: sys.exit(1) --- # init_db raises on failure
 
     # 3. Find PDF files in the input folder
     if not os.path.isdir(input_folder):
@@ -144,8 +174,8 @@ if __name__ == "__main__":
 
     logging.info(f"Found {len(pdf_files)} PDF files to process in {input_folder}.")
 
-    # 4. Process each PDF file
+    # 4. Process each PDF file, passing the engine
     for pdf_file_path in pdf_files:
-        process_single_pdf(pdf_file_path, db_file, output_csv_dir_abs)
+        process_single_pdf(pdf_file_path, engine, output_csv_dir_abs) # Pass engine
 
     logging.info("--- All PDF processing complete ---") 

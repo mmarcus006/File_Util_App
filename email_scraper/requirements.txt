@@ -1,4 +1,8 @@
 PyPDF2
 pdf2image
 pytesseract
-spacy 
+# poppler - requires system install
+# tesseract - requires system install
+SQLAlchemy
+spacy
+logging
