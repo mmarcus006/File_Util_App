@@ -1,0 +1,4 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+jcampbell@proforma.com,/Users/miller/projects/File_Util_App/processed_fdds/ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,1,2025-04-23T21:30:41.736371
+teri.tolmack@proforma.com,/Users/miller/projects/File_Util_App/processed_fdds/ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,55,2025-04-23T21:30:42.373697
+invoice.sp@proforma.com,/Users/miller/projects/File_Util_App/processed_fdds/ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,ea89b1f5-34dd-46b8-b95c-25e4d1625d4b_origin.pdf,146,2025-04-23T21:30:42.849147

@@ -1,0 +1,4 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+customerservice@americanfreight.com,/Users/miller/projects/File_Util_App/processed_fdds/6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,2,2025-04-23T19:09:06.083186
+aaron.granger@americanfreight.us,/Users/miller/projects/File_Util_App/processed_fdds/6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,44,2025-04-23T19:09:06.596398
+legalnotices@americanfreight.us,/Users/miller/projects/File_Util_App/processed_fdds/6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,6a46e8d5-e133-4da2-aabd-b8b232b61c97_origin.pdf,150,2025-04-23T19:09:10.036133

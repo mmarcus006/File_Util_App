@@ -1,0 +1,4 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+legal@nursenextdoor.com,/Users/miller/projects/File_Util_App/processed_fdds/72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,69,2025-04-23T21:47:39.648869
+bizintel@nursenextdoor.ca,/Users/miller/projects/File_Util_App/processed_fdds/72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,187,2025-04-23T21:47:40.121593
+bizintelunit@nursenextdoor.com,/Users/miller/projects/File_Util_App/processed_fdds/72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,72ff20a8-4e6d-4d8e-b73a-0e3cd025961b_origin.pdf,211,2025-04-23T21:47:40.359652

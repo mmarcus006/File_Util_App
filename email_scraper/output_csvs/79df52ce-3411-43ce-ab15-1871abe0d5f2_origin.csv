@@ -1,0 +1,4 @@
+email_address,source_document_path,source_document_filename,page_number,extraction_timestamp
+se.legal@jackinthebox.com,/Users/miller/projects/File_Util_App/processed_fdds/79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,1,2025-04-23T20:32:28.787509
+ask.dfpi@dfpi.ca.gov,/Users/miller/projects/File_Util_App/processed_fdds/79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,161,2025-04-23T20:32:30.572405
+ask.dfpi@dfpi.ca.gov,/Users/miller/projects/File_Util_App/processed_fdds/79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,79df52ce-3411-43ce-ab15-1871abe0d5f2_origin.pdf,163,2025-04-23T20:32:30.643404
