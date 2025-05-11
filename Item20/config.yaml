@@ -1,0 +1,95 @@
+# --- General Settings ---
+# Directory containing the input FDD JSON files
+json_files_directory: "/Users/miller/projects/File_Util_App/output/sections/item_20/"
+item_20_file_pattern: "*_ITEM_20.json"
+
+# --- Mapping Generation Settings ---
+# Directory where Excel mapping files will be stored/read from
+mapping_files_directory: "./mapping_files/"
+# Fuzzy match confidence threshold (0-100) for auto-suggesting mappings
+match_threshold: 50
+# Column names to be used in the Excel mapping files
+excel_mapping_columns:
+  observed: "Observed Header (Source)"
+  standardized_user: "Standardized Header (User Input)"
+  standardized_suggested: "Suggested Standardized Header (Auto)"
+  confidence_score: "Confidence Score (Auto)"
+  notes: "Notes (User Input)"
+
+
+# --- Output CSV Settings ---
+# Directory where the final merged CSV files will be saved
+output_csv_directory: "./output_csvs/"
+
+# --- Table Definitions & Standardized Headers ---
+# This defines which tables to process (t1-t5) and their target standardized headers.
+# The keys (e.g., 't1') must match the keys in your FDD JSONs.
+tables_to_process:
+  t1:
+    output_csv_filename: "merged_t1_systemwide_summary.csv"
+    standardized_headers:
+      - 'Outlet Type'
+      - 'Year'
+      - 'Outlets at Start of Year'
+      - 'Outlets at End of Year'
+      - 'Net Change'
+  t2:
+    output_csv_filename: "merged_t2_transfers.csv"
+    standardized_headers:
+      - 'State'
+      - 'Year'
+      - 'Number of Transfers'
+  t3:
+    output_csv_filename: "merged_t3_franchised_status.csv"
+    standardized_headers:
+      - 'State'
+      - 'Year'
+      - 'Outlets at Start of Year'
+      - 'Outlets Opened'
+      - 'Terminations'
+      - 'Non-Renewals'
+      - 'Reacquired by Franchisor'
+      - 'Ceased Operations - Other Reasons'
+      - 'Outlets at End of the Year'
+  t4:
+    output_csv_filename: "merged_t4_company_owned_status.csv"
+    standardized_headers:
+      - 'State'
+      - 'Year'
+      - 'Outlets at Start of Year'
+      - 'Outlets Opened'
+      - 'Outlets Reacquired From Franchisee'
+      - 'Outlets Closed'
+      - 'Outlets Sold to Franchisee'
+      - 'Outlets at End of Year'
+  t5:
+    output_csv_filename: "merged_t5_projected_openings.csv"
+    standardized_headers:
+      - 'State'
+      - 'Franchise Agreements Signed But Outlet Not Open'
+      - 'Projected New Franchised Outlets in the Next Fiscal Year'
+      - 'Projected New Company-Owned Outlets in the Next Fiscal Year'
+
+# --- Data Type Coercion Rules for Processing Script ---
+# Specify target data types for specific standardized headers.
+# This helps in cleaning the data during the final CSV generation.
+# Supported types: 'int', 'str', 'float' (add more if needed)
+# If a header is not listed, it defaults to 'str'.
+data_type_rules:
+  'Year': 'int'
+  'Outlets at Start of Year': 'int'
+  'Outlets at End of Year': 'int'
+  'Number of Transfers': 'int'
+  'Outlets Opened': 'int'
+  'Terminations': 'int'
+  'Non-Renewals': 'int'
+  'Reacquired by Franchisor': 'int'
+  'Ceased Operations - Other Reasons': 'int'
+  'Outlets Reacquired From Franchisee': 'int'
+  'Outlets Closed': 'int'
+  'Outlets Sold to Franchisee': 'int'
+  'Franchise Agreements Signed But Outlet Not Open': 'int'
+  'Projected New Franchised Outlets in the Next Fiscal Year': 'int'
+  'Projected New Company-Owned Outlets in the Next Fiscal Year': 'int'
+  'Net Change': 'int'
+  # 'Net Change' is often a string like '+12', so keep as 'str' or handle specifically

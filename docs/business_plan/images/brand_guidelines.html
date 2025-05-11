@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>FDDSearch Brand Style Guide</title>
+    <style>
+        :root {
+            --primary-900: #0B2D45;
+            --primary-700: #15466A;
+            --primary-300: #6E93B3;
+            --accent-500: #F57C00;
+            --accent-400: #FF9D33;
+            --neutral-50: #FAFBFC;
+            --neutral-200: #E5E9ED;
+            --neutral-700: #2F3B48;
+            --success-500: #2BA753;
+            --error-500: #D84035;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 700;
+            color: var(--primary-900);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin: 1.5rem 0 .5rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin: 1.5rem 0 .25rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin: 1rem 0 .25rem;
+        }
+
+        section {
+            padding: 2rem 3rem;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: .6rem 1rem;
+            border: 1px solid var(--neutral-200);
+        }
+
+        th {
+            background: var(--neutral-200);
+            text-align: left;
+        }
+
+        code {
+            background: var(--neutral-200);
+            padding: .15rem .35rem;
+            border-radius: 4px;
+            font-size: .85rem;
+        }
+
+        img.logo {
+            max-width: 340px;
+            height: auto;
+            display: block;
+            margin: 1rem 0;
+        }
+
+        ul {
+            margin: .5rem 0 .5rem 1.25rem;
+        }
+
+        li {
+            margin: .25rem 0;
+        }
+
+        figure {
+            margin: 1rem 0;
+        }
+
+        figcaption {
+            font-size: .85rem;
+            color: var(--neutral-700);
+        }
+
+        .swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .swatch {
+            width: 140px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: .8rem;
+            padding: .7rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .lighttxt {
+            color: var(--neutral-700);
+        }
+
+        .do-dont {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .do-dont div {
+            flex: 1 1 240px;
+            background: #fff;
+            border: 1px solid var(--neutral-200);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .do-dont h4 {
+            margin: 0 0 .5rem;
+            font-size: 1rem;
+            color: var(--primary-700);
+        }
+
+        /* sample button styles */
+        .btn-primary {
+            background: var(--accent-500);
+            color: #fff;
+            padding: .6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            color: var(--primary-700);
+            border: 2px solid var(--primary-700);
+            padding: .55rem 1.2rem;
+            border-radius: 6px;
+            background: transparent;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-400);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(21, 70, 106, 0.05);
+        }
+
+        .card {
+            padding: 1rem 1.5rem;
+            border: 1px solid var(--neutral-200);
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(11, 45, 69, .06);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header style="background:#fff;border-bottom:4px solid var(--primary-900);padding:1rem 3rem;">
+        <h1>FDDSearch Brand Style Guide</h1>
+    </header>
+
+    <section id="overview">
+        <h2>Brand Overview</h2>
+        <p><strong>Mission statement:</strong> <br>FDDSearch.com is the definitive source for franchise disclosure
+            documents, providing comprehensive access to thousands of franchise opportunities. We empower potential
+            franchisees with the data they need to make informed investment decisions.</p>
+        <p><strong>Brand personality:</strong> Authoritative, transparent, data‑driven — yet approachable and modern.
+        </p>
+        <p><strong>Voice &amp; tone:</strong> Clear and concise. Jargon‑free explanations backed by facts. Encouraging
+            action with confidence.</p>
+    </section>
+
+    <section id="logo">
+        <h2>Logo Usage</h2>
+        <figure>
+            <img class="logo" src="Logo.png" alt="FDDSearch primary logo" />
+            <figcaption>Primary logo — navy document outline + orange action arrow.</figcaption>
+        </figure>
+
+        <div class="do-dont">
+            <div>
+                <h4>Do</h4>
+                <ul>
+                    <li>Maintain clear space at least the height of the orange circle around the mark.</li>
+                    <li>Use primary navy <code>#0B2D45</code> for document &amp; wordmark on light backgrounds.</li>
+                    <li>Use a white logo reversed out of <code>#0B2D45</code> background for dark contexts.</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Don't</h4>
+                <ul>
+                    <li>Change colors of the mark elements.</li>
+                    <li>Squash, stretch, rotate, or apply drop shadows.</li>
+                    <li>Place over busy photography without sufficient contrast.</li>
+                </ul>
+            </div>
+        </div>
+        <p><strong>Minimum size:</strong> 64&nbsp;px wide in digital contexts to preserve legibility.</p>
+    </section>
+
+    <section id="colors">
+        <h2>Color Palette</h2>
+        <p>All colors meet or exceed WCAG AA contrast guidelines for their intended usage. Use the accent sparingly to
+            draw attention to key actions.</p>
+        <div class="swatches">
+            <div class="swatch" style="background:var(--primary-900)">primary‑900<br>#0B2D45</div>
+            <div class="swatch" style="background:var(--primary-700)">primary‑700<br>#15466A</div>
+            <div class="swatch" style="background:var(--primary-300)">primary‑300<br>#6E93B3</div>
+            <div class="swatch" style="background:var(--accent-500)">accent‑500<br>#F57C00</div>
+            <div class="swatch" style="background:var(--accent-400)">accent‑400<br>#FF9D33</div>
+            <div class="swatch lighttxt" style="background:var(--neutral-50);border:1px solid var(--neutral-200)">
+                neutral‑50<br>#FAFBFC</div>
+            <div class="swatch lighttxt" style="background:var(--neutral-200)">neutral‑200<br>#E5E9ED</div>
+            <div class="swatch" style="background:var(--neutral-700)">neutral‑700<br>#2F3B48</div>
+            <div class="swatch" style="background:var(--success-500)">success‑500<br>#2BA753</div>
+            <div class="swatch" style="background:var(--error-500)">error‑500<br>#D84035</div>
+        </div>
+    </section>
+
+    <section id="typography">
+        <h2>Typography</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Style</th>
+                    <th>Font</th>
+                    <th>Usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Headlines (H1‑H3)</td>
+                    <td>system-ui / Inter, 600‑700 weight</td>
+                    <td>Page &amp; card titles; keeps strong hierarchy in data‑heavy layouts.</td>
+                </tr>
+                <tr>
+                    <td>Body copy</td>
+                    <td>system-ui / Inter, 400‑500</td>
+                    <td>Paragraph text, table cells.</td>
+                </tr>
+                <tr>
+                    <td>Code &amp; numbers</td>
+                    <td>monospace, 500</td>
+                    <td>Data points, HEX codes, schema snippets.</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Use sentence‑case headings and keep line‑length ≤ 70&nbsp;ch for optimal readability.</p>
+    </section>
+
+    <section id="components">
+        <h2>UI Components &amp; States</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Buttons</h3>
+                <button class="btn-primary">Primary action</button>
+                <button class="btn-secondary" style="margin-left:1rem">Secondary</button>
+            </div>
+            <div class="card">
+                <h3>Card + Table</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Franchise</th>
+                            <th>Fee</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CoffeeCo</td>
+                            <td>$30k</td>
+                            <td style="color:var(--success-500)">Available</td>
+                        </tr>
+                        <tr>
+                            <td>BurgerMax</td>
+                            <td>$45k</td>
+                            <td style="color:var(--error-500)">Updating</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="iconography">
+        <h2>Iconography &amp; Illustration</h2>
+        <p>Use simple, 2‑stroke line icons set at 1.5&nbsp;px. Primary color should be <code>#15466A</code>. Use
+            <code>#F57C00</code> only for actionable icons (download, alert).</p>
+    </section>
+
+    <section id="imagery">
+        <h2>Photography &amp; Imagery</h2>
+        <ul>
+            <li>Prefer clean, well‑lit imagery of real franchise storefronts or entrepreneurs.</li>
+            <li>Avoid stock photos that feel overly staged or clichéd.</li>
+            <li>Apply a 10&nbsp;% navy overlay (#0B2D45) on hero images for legible headline contrast.</li>
+        </ul>
+    </section>
+
+    <section id="accessibility">
+        <h2>Accessibility Checklist</h2>
+        <ul>
+            <li>All text/background combos ≥ WCAG AA contrast.</li>
+            <li>Focus indicators use <code>#F57C00</code>.</li>
+            <li>Buttons ≥ 44&nbsp;px touch target.</li>
+            <li>ARIA labels for all interactive icons.</li>
+        </ul>
+    </section>
+
+    <footer style="padding:1rem 3rem;background:#fff;text-align:center;font-size:.85rem;color:var(--neutral-700)">
+        © <span id="year"></span> FDDSearch.com — Internal brand guidelines
+    </footer>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+
+</html>
