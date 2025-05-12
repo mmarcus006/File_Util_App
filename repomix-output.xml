@@ -1,0 +1,586 @@
+<repomix>This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+The content has been processed where empty lines have been removed, line numbers have been added, content has been formatted for parsing in xml style.<file_summary>This section contains a summary of this file.<purpose>This file contains a packed representation of the entire repository&apos;s contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.</purpose><file_format>The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+4. Repository files, each consisting of:
+  - File path as an attribute
+  - Full contents of the file</file_format><usage_guidelines>- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.</usage_guidelines><notes>- Some files may have been excluded based on .gitignore rules and Repomix&apos;s configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: *.py
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Empty lines have been removed from all files
+- Line numbers have been added to the beginning of each line
+- Content has been formatted for parsing in xml style
+- Files are sorted by Git change count (files with more changes are at the bottom)</notes><additional_info></additional_info></file_summary><directory_structure>directory_scanner.py
+find_unprocessed_pdfs.py
+main.py
+populate_fdd_index.py</directory_structure><files>This section contains the contents of the repository&apos;s files.<file path="directory_scanner.py">  1: #!/usr/bin/env python3
+  2: &quot;&quot;&quot;Script to scan a directory and output file paths in JSON/CSV format with extracted IDs.&quot;&quot;&quot;
+  3: import os
+  4: import json
+  5: import csv
+  6: import re
+  7: from pathlib import Path
+  8: from typing import Dict, List, Optional, Tuple, Union, Any
+  9: from datetime import datetime
+ 10: def scan_directory(root_path: str) -&gt; List[str]:
+ 11:     &quot;&quot;&quot;
+ 12:     Recursively scan a directory and return all file paths.
+ 13:     Args:
+ 14:         root_path: Path to the directory to scan
+ 15:     Returns:
+ 16:         List of absolute file paths
+ 17:     &quot;&quot;&quot;
+ 18:     all_paths: List[str] = []
+ 19:     # Walk through the directory tree
+ 20:     for dir_path, _, files in os.walk(root_path):
+ 21:         # Add all directories
+ 22:         all_paths.append(dir_path)
+ 23:         # Add all files with their full paths
+ 24:         for file in files:
+ 25:             file_path = os.path.join(dir_path, file)
+ 26:             all_paths.append(file_path)
+ 27:     return all_paths
+ 28: def extract_id(path: str) -&gt; Optional[str]:
+ 29:     &quot;&quot;&quot;
+ 30:     Extract ID from path using pattern matching.
+ 31:     Args:
+ 32:         path: File path to extract ID from
+ 33:     Returns:
+ 34:         Extracted ID or None if no ID is found
+ 35:     &quot;&quot;&quot;
+ 36:     # Pattern looks for ID followed by digits at the end of the filename
+ 37:     id_match = re.search(r&apos;ID(\d+)&apos;, path)
+ 38:     if id_match:
+ 39:         return id_match.group(1)
+ 40:     return None
+ 41: def parse_paths(paths: List[str]) -&gt; List[Dict[str, Any]]:
+ 42:     &quot;&quot;&quot;
+ 43:     Parse paths and extract relevant information.
+ 44:     Args:
+ 45:         paths: List of file paths to parse
+ 46:     Returns:
+ 47:         List of dictionaries with path information
+ 48:     &quot;&quot;&quot;
+ 49:     result = []
+ 50:     for path in paths:
+ 51:         path_data = {
+ 52:             &quot;full_path&quot;: path,
+ 53:             &quot;is_directory&quot;: os.path.isdir(path),
+ 54:             &quot;name&quot;: os.path.basename(path),
+ 55:             &quot;id&quot;: extract_id(path)
+ 56:         }
+ 57:         result.append(path_data)
+ 58:     return result
+ 59: def save_to_json(data: List[Dict[str, Any]], output_file: str) -&gt; None:
+ 60:     &quot;&quot;&quot;
+ 61:     Save data to a JSON file.
+ 62:     Args:
+ 63:         data: List of dictionaries to save
+ 64:         output_file: Path to output file
+ 65:     &quot;&quot;&quot;
+ 66:     with open(output_file, &apos;w&apos;, encoding=&apos;utf-8&apos;) as f:
+ 67:         json.dump(data, f, indent=2)
+ 68: def save_to_csv(data: List[Dict[str, Any]], output_file: str) -&gt; None:
+ 69:     &quot;&quot;&quot;
+ 70:     Save data to a CSV file.
+ 71:     Args:
+ 72:         data: List of dictionaries to save
+ 73:         output_file: Path to output file
+ 74:     &quot;&quot;&quot;
+ 75:     if not data:
+ 76:         return
+ 77:     # Get fieldnames from the first item
+ 78:     fieldnames = data[0].keys()
+ 79:     with open(output_file, &apos;w&apos;, newline=&apos;&apos;, encoding=&apos;utf-8&apos;) as f:
+ 80:         writer = csv.DictWriter(f, fieldnames=fieldnames)
+ 81:         writer.writeheader()
+ 82:         writer.writerows(data)
+ 83: def main(root_path: str, output_format: str = &quot;json&quot;) -&gt; None:
+ 84:     &quot;&quot;&quot;
+ 85:     Main function to scan directory and save results.
+ 86:     Args:
+ 87:         root_path: Directory to scan
+ 88:         output_format: Output format (json or csv)
+ 89:     &quot;&quot;&quot;
+ 90:     if not os.path.exists(root_path):
+ 91:         print(f&quot;Error: Directory {root_path} does not exist.&quot;)
+ 92:         return
+ 93:     # Scan directory
+ 94:     print(f&quot;Scanning directory: {root_path}&quot;)
+ 95:     paths = scan_directory(root_path)
+ 96:     # Parse paths
+ 97:     parsed_data = parse_paths(paths)
+ 98:     # Generate timestamp for output filename
+ 99:     timestamp = datetime.now().strftime(&quot;%Y%m%d_%H%M%S&quot;)
+100:     # Determine output file
+101:     output_dir = os.getcwd()
+102:     output_basename = f&quot;directory_scan_{Path(root_path).name}_{timestamp}&quot;
+103:     if output_format.lower() == &quot;json&quot;:
+104:         output_file = os.path.join(output_dir, f&quot;{output_basename}.json&quot;)
+105:         save_to_json(parsed_data, output_file)
+106:     else:
+107:         output_file = os.path.join(output_dir, f&quot;{output_basename}.csv&quot;)
+108:         save_to_csv(parsed_data, output_file)
+109:     print(f&quot;Scan completed! Output saved to {output_file}&quot;)
+110:     print(f&quot;Found {len(parsed_data)} items ({sum(1 for item in parsed_data if item[&apos;is_directory&apos;])} directories, &quot;
+111:           f&quot;{sum(1 for item in parsed_data if not item[&apos;is_directory&apos;])} files)&quot;)
+112: if __name__ == &quot;__main__&quot;:
+113:     # Default directory from example
+114:     DEFAULT_DIR = r&quot;C:\Users\mille\MinerU&quot;
+115:     # Use a timestamp-based filename to avoid overwriting previous runs
+116:     target_dir = DEFAULT_DIR
+117:     output_format = &quot;json&quot;
+118:     main(target_dir, output_format)</file><file path="find_unprocessed_pdfs.py">  1: import csv
+  2: import json
+  3: import os
+  4: import pathlib
+  5: import typing
+  6: from glob import glob
+  7: # --- Constants ---
+  8: CSV_FILE_PATH: typing.Final[str] = &quot;db_replica/fdd.csv&quot;
+  9: OUTPUT_JSON_PATH: typing.Final[str] = &quot;pdf_processing_status.json&quot;
+ 10: UNPROCESSED_OUTPUT_PATH: typing.Final[str] = &quot;unprocessed_pdfs.json&quot;
+ 11: HURIDOC_OUTPUT_DIR: typing.Final[str] = r&quot;C:\Projects\File_Util_App\data\huridoc_analysis_output&quot;
+ 12: # Column indices (0-based) in the CSV file
+ 13: ORIGINAL_PDF_PATH_IDX: typing.Final[int] = 4
+ 14: LAYOUT_ANALYSIS_JSON_PATH_IDX: typing.Final[int] = 12
+ 15: # --- Helper Functions ---
+ 16: def extract_id_from_path(pdf_path_str: str) -&gt; typing.Optional[str]:
+ 17:     &quot;&quot;&quot;
+ 18:     Extracts the ID from the PDF filename.
+ 19:     Assumes the format is &apos;&lt;ID&gt;_origin.pdf&apos;.
+ 20:     Args:
+ 21:         pdf_path_str: The full path to the original PDF file.
+ 22:     Returns:
+ 23:         The extracted ID string, or None if the format is incorrect.
+ 24:     &quot;&quot;&quot;
+ 25:     try:
+ 26:         pdf_path = pathlib.Path(pdf_path_str)
+ 27:         filename = pdf_path.name
+ 28:         if filename.endswith(&quot;_origin.pdf&quot;):
+ 29:             return filename[:-len(&quot;_origin.pdf&quot;)]
+ 30:     except Exception: # Catch potential errors during path parsing
+ 31:         # TODO: Consider logging this error for debugging malformed paths
+ 32:         pass
+ 33:     return None
+ 34: def find_processed_ids() -&gt; set[str]:
+ 35:     &quot;&quot;&quot;
+ 36:     Scans the HURIDOC_OUTPUT_DIR for analysis JSON files and extracts their IDs.
+ 37:     Returns:
+ 38:         A set of IDs for which analysis files exist.
+ 39:     &quot;&quot;&quot;
+ 40:     processed_ids = set()
+ 41:     # Ensure directory exists
+ 42:     if not os.path.exists(HURIDOC_OUTPUT_DIR):
+ 43:         print(f&quot;Warning: Huridoc output directory not found: {HURIDOC_OUTPUT_DIR}&quot;)
+ 44:         return processed_ids
+ 45:     # Find all JSON files in the huridoc output directory
+ 46:     json_pattern = os.path.join(HURIDOC_OUTPUT_DIR, &quot;*.json&quot;)
+ 47:     json_files = glob(json_pattern)
+ 48:     for json_file in json_files:
+ 49:         # Extract the ID part from the filename
+ 50:         filename = os.path.basename(json_file)
+ 51:         if &quot;_huridocs_analysis.json&quot; in filename:
+ 52:             # Remove the suffix &quot;_huridocs_analysis.json&quot;
+ 53:             pdf_id = filename.replace(&quot;_huridocs_analysis.json&quot;, &quot;&quot;)
+ 54:             # Also remove &quot;_origin&quot; suffix if present (to match CSV IDs)
+ 55:             if pdf_id.endswith(&quot;_origin&quot;):
+ 56:                 pdf_id = pdf_id[:-len(&quot;_origin&quot;)]
+ 57:             if pdf_id:
+ 58:                 processed_ids.add(pdf_id)
+ 59:     # Debug: Print some example IDs found in the output directory
+ 60:     print(f&quot;Found {len(processed_ids)} already processed files in {HURIDOC_OUTPUT_DIR}&quot;)
+ 61:     print(&quot;Examples of processed IDs (first 5):&quot;)
+ 62:     for i, id_value in enumerate(list(processed_ids)[:5]):
+ 63:         print(f&quot;  {i+1}. {id_value}&quot;)
+ 64:     return processed_ids
+ 65: def get_pdf_records_from_csv(
+ 66:     csv_filepath: str,
+ 67:     original_pdf_idx: int
+ 68: ) -&gt; list[dict[str, typing.Any]]:
+ 69:     &quot;&quot;&quot;
+ 70:     Reads the CSV and extracts information about all PDF files.
+ 71:     Args:
+ 72:         csv_filepath: Path to the input CSV file.
+ 73:         original_pdf_idx: Index of the original PDF path column.
+ 74:     Returns:
+ 75:         A list of dictionaries, each representing a PDF file.
+ 76:     Raises:
+ 77:         FileNotFoundError: If the csv_filepath does not exist.
+ 78:     &quot;&quot;&quot;
+ 79:     csv_path = pathlib.Path(csv_filepath)
+ 80:     if not csv_path.is_file():
+ 81:         raise FileNotFoundError(f&quot;CSV file not found: {csv_filepath}&quot;)
+ 82:     pdf_records: list[dict[str, typing.Any]] = []
+ 83:     with csv_path.open(&apos;r&apos;, newline=&apos;&apos;, encoding=&apos;utf-8&apos;) as csvfile:
+ 84:         reader = csv.reader(csvfile, delimiter=&apos;|&apos;)
+ 85:         header = next(reader) # Skip header row
+ 86:         for i, row in enumerate(reader):
+ 87:             try:
+ 88:                 original_pdf_path = row[original_pdf_idx]
+ 89:             except IndexError:
+ 90:                 # Skip malformed rows
+ 91:                 print(f&quot;Skipping row {i+2}: Incorrect number of columns.&quot;)
+ 92:                 continue 
+ 93:             extracted_id = extract_id_from_path(original_pdf_path)
+ 94:             if not extracted_id:
+ 95:                 print(f&quot;Skipping row {i+2}: Could not extract ID from path &apos;{original_pdf_path}&apos;.&quot;)
+ 96:                 continue # Skip rows where ID couldn&apos;t be extracted
+ 97:             # Add entry for this PDF
+ 98:             pdf_records.append({
+ 99:                 &quot;id&quot;: extracted_id,
+100:                 &quot;original_pdf_path&quot;: original_pdf_path,
+101:                 &quot;original_pdf_filename&quot;: pathlib.Path(original_pdf_path).name
+102:             })
+103:     print(f&quot;Found {len(pdf_records)} PDF records in CSV file.&quot;)
+104:     # Debug: Print some example IDs found in the CSV
+105:     print(&quot;Examples of IDs in CSV (first 5):&quot;)
+106:     for i, record in enumerate(pdf_records[:5]):
+107:         print(f&quot;  {i+1}. {record[&apos;id&apos;]}&quot;)
+108:     return pdf_records
+109: def analyze_pdf_status() -&gt; tuple[list[dict[str, typing.Any]], int, int]:
+110:     &quot;&quot;&quot;
+111:     Analyzes the processing status of all PDFs by cross-referencing
+112:     CSV records with the processed files.
+113:     Returns:
+114:         A tuple containing:
+115:         - A list of dictionaries with PDF info and processing status
+116:         - Count of processed PDFs
+117:         - Count of unprocessed PDFs
+118:     &quot;&quot;&quot;
+119:     # First, get the set of IDs that already have analysis files
+120:     processed_ids = find_processed_ids()
+121:     # Get all PDF records from the CSV
+122:     pdf_records = get_pdf_records_from_csv(CSV_FILE_PATH, ORIGINAL_PDF_PATH_IDX)
+123:     # Debug: Look for example matching IDs
+124:     print(&quot;\nChecking for ID matches between CSV and processed files...&quot;)
+125:     example_found = False
+126:     for i, record in enumerate(pdf_records[:20]):  # Check first 20 records
+127:         if record[&quot;id&quot;] in processed_ids:
+128:             print(f&quot;  Match found! ID: {record[&apos;id&apos;]}&quot;)
+129:             example_found = True
+130:     if not example_found:
+131:         print(&quot;  No matches found in first 20 records.&quot;)
+132:         # Check if any of the processed IDs exist in the CSV records at all
+133:         csv_id_set = {record[&quot;id&quot;] for record in pdf_records}
+134:         common_ids = processed_ids.intersection(csv_id_set)
+135:         print(f&quot;  Total common IDs between CSV and processed files: {len(common_ids)}&quot;)
+136:         if common_ids:
+137:             print(&quot;  Examples of common IDs (max 5):&quot;)
+138:             for i, id_val in enumerate(list(common_ids)[:5]):
+139:                 print(f&quot;    {i+1}. {id_val}&quot;)
+140:     # Add processing status to each record
+141:     processed_count = 0
+142:     unprocessed_count = 0
+143:     for record in pdf_records:
+144:         # Check if this PDF has been processed
+145:         is_processed = record[&quot;id&quot;] in processed_ids
+146:         record[&quot;processed&quot;] = is_processed
+147:         if is_processed:
+148:             processed_count += 1
+149:         else:
+150:             unprocessed_count += 1
+151:     return pdf_records, processed_count, unprocessed_count
+152: def save_results_to_json(data: list[dict[str, typing.Any]], output_filepath: str) -&gt; None:
+153:     &quot;&quot;&quot;
+154:     Saves the provided data list to a JSON file.
+155:     Args:
+156:         data: The list of dictionaries to save.
+157:         output_filepath: The path where the JSON file will be saved.
+158:     &quot;&quot;&quot;
+159:     output_path = pathlib.Path(output_filepath)
+160:     # Ensure the parent directory exists
+161:     output_path.parent.mkdir(parents=True, exist_ok=True)
+162:     with output_path.open(&apos;w&apos;, encoding=&apos;utf-8&apos;) as f:
+163:         json.dump(data, f, indent=4)
+164: def save_unprocessed_to_json(data: list[dict[str, typing.Any]], output_filepath: str) -&gt; int:
+165:     &quot;&quot;&quot;
+166:     Saves only the unprocessed PDF records to a JSON file.
+167:     Args:
+168:         data: The list of dictionaries to filter and save.
+169:         output_filepath: The path where the JSON file will be saved.
+170:     Returns:
+171:         The number of unprocessed records saved.
+172:     &quot;&quot;&quot;
+173:     unprocessed_records = [record for record in data if not record[&quot;processed&quot;]]
+174:     output_path = pathlib.Path(output_filepath)
+175:     # Ensure the parent directory exists
+176:     output_path.parent.mkdir(parents=True, exist_ok=True)
+177:     with output_path.open(&apos;w&apos;, encoding=&apos;utf-8&apos;) as f:
+178:         json.dump(unprocessed_records, f, indent=4)
+179:     return len(unprocessed_records)
+180: # --- Main Execution ---
+181: if __name__ == &quot;__main__&quot;:
+182:     print(f&quot;Starting script: Analyzing PDF processing status...&quot;)
+183:     try:
+184:         pdf_status_list, processed_count, unprocessed_count = analyze_pdf_status()
+185:         # Save the full list with processing status
+186:         save_results_to_json(pdf_status_list, OUTPUT_JSON_PATH)
+187:         # Save just the unprocessed files to a separate file
+188:         unprocessed_count = save_unprocessed_to_json(pdf_status_list, UNPROCESSED_OUTPUT_PATH)
+189:         print(f&quot;\nProcessing complete.&quot;)
+190:         print(f&quot;Results: {processed_count} processed, {unprocessed_count} unprocessed&quot;)
+191:         print(f&quot;Total PDFs analyzed: {len(pdf_status_list)}&quot;)
+192:         print(f&quot;All files saved to: &apos;{OUTPUT_JSON_PATH}&apos;&quot;)
+193:         print(f&quot;Unprocessed files only saved to: &apos;{UNPROCESSED_OUTPUT_PATH}&apos;&quot;)
+194:     except FileNotFoundError as e:
+195:         print(f&quot;Error: {e}&quot;)
+196:     except Exception as e:
+197:         print(f&quot;An unexpected error occurred: {e}&quot;)
+198:         # TODO: Add more specific error handling or logging</file><file path="main.py"> 1: &quot;&quot;&quot;Main script to process FDD introduction PDFs using Gemini.&quot;&quot;&quot;
+ 2: import os
+ 3: import json
+ 4: from pathlib import Path
+ 5: from dotenv import load_dotenv
+ 6: # Import components from our modules
+ 7: from LLM.schemas import ExtractionOutput
+ 8: from LLM.config import (
+ 9:     SYSTEM_PROMPT_TEMPLATE,
+10:     PDF_SEARCH_DIRECTORIES,
+11:     PDF_KEYWORDS,
+12:     OUTPUT_FILENAMES,
+13:     PROMPT_DIR,
+14:     SCHEMA_DIR,
+15:     OUTPUT_DIR
+16: )
+17: from LLM.pdf_processor import (
+18:     find_fdd_intro_pdfs,
+19:     extract_fdd_data_with_gemini,
+20:     output_file_exists
+21: )
+22: # --- Configuration --- #
+23: # Load environment variables (especially API keys)
+24: load_dotenv()
+25: # --- Helper Functions --- #
+26: def ensure_directories_exist():
+27:     &quot;&quot;&quot;Create necessary directories if they don&apos;t exist.&quot;&quot;&quot;
+28:     # Create directories defined in config
+29:     for directory in [PROMPT_DIR, SCHEMA_DIR, OUTPUT_DIR]:
+30:         directory.mkdir(parents=True, exist_ok=True)
+31:     # Create PDF search directories if they&apos;re local to the project
+32:     for directory in PDF_SEARCH_DIRECTORIES:
+33:         dir_path = Path(directory)
+34:         # Only create directories that are within our project
+35:         if str(dir_path).startswith(str(Path.cwd())):
+36:             dir_path.mkdir(parents=True, exist_ok=True)
+37:             print(f&quot;Created directory: {dir_path}&quot;)
+38: # --- Main Logic --- #
+39: def main():
+40:     &quot;&quot;&quot;Orchestrates the PDF finding and extraction process.&quot;&quot;&quot;
+41:     print(&quot;Starting FDD Introduction Extraction Process...&quot;)
+42:     # Ensure necessary directories exist
+43:     ensure_directories_exist()
+44:     # Debug: Print out configuration
+45:     print(&quot;\n--- Configuration ---&quot;)
+46:     print(f&quot;PDF search directories: {PDF_SEARCH_DIRECTORIES}&quot;)
+47:     print(f&quot;PDF keywords: {PDF_KEYWORDS[&apos;intro&apos;]}&quot;)
+48:     print(f&quot;Output filename: {OUTPUT_FILENAMES[&apos;intro&apos;]}&quot;)
+49:     # Determine output filename from config
+50:     output_filename = OUTPUT_FILENAMES[&quot;intro&quot;]
+51:     # Check if output file already exists
+52:     if output_file_exists(output_filename):
+53:         print(f&quot;Output file {output_filename} already exists. To reprocess, delete or rename this file.&quot;)
+54:         user_response = input(&quot;Do you want to continue anyway? (y/n): &quot;).strip().lower()
+55:         if user_response != &apos;y&apos;:
+56:             print(&quot;Exiting without processing.&quot;)
+57:             return
+58:     # 1. Find relevant PDF files
+59:     print(&quot;\nSearching for PDF files...&quot;)
+60:     target_pdfs = find_fdd_intro_pdfs(PDF_SEARCH_DIRECTORIES, PDF_KEYWORDS[&quot;intro&quot;])
+61:     if not target_pdfs:
+62:         print(&quot;No relevant PDF files found.&quot;)
+63:         print(&quot;\nTo add PDF files for processing:&quot;)
+64:         for directory in PDF_SEARCH_DIRECTORIES:
+65:             print(f&quot;1. Place PDF files in: {directory}&quot;)
+66:             print(f&quot;2. Ensure filenames contain one of these keywords: {PDF_KEYWORDS[&apos;intro&apos;]}&quot;)
+67:         print(&quot;\nExiting.&quot;)
+68:         return
+69:     print(f&quot;\nFound {len(target_pdfs)} target PDFs to process.&quot;)
+70:     # 2. Process each PDF
+71:     results = {}
+72:     for pdf_path in target_pdfs:
+73:         print(f&quot;\n--- Processing: {pdf_path.name} ---&quot;)
+74:         # Perform extraction using Gemini
+75:         extracted_data = extract_fdd_data_with_gemini(
+76:             pdf_path=pdf_path,
+77:             pydantic_schema=ExtractionOutput,
+78:             system_prompt=SYSTEM_PROMPT_TEMPLATE
+79:         )
+80:         if extracted_data:
+81:             results[pdf_path.name] = extracted_data
+82:             print(f&quot;Success for {pdf_path.name}.&quot;)
+83:         else:
+84:             results[pdf_path.name] = None # Mark as failed
+85:             print(f&quot;Failed for {pdf_path.name}.&quot;)
+86:     # 3. Save results
+87:     print(f&quot;\n--- Saving Results to {output_filename} --- &quot;)
+88:     try:
+89:         output_path = Path(output_filename)
+90:         with output_path.open(&apos;w&apos;, encoding=&apos;utf-8&apos;) as f:
+91:             json.dump(results, f, indent=2, ensure_ascii=False)
+92:         print(&quot;Results saved successfully.&quot;)
+93:     except Exception as e:
+94:         print(f&quot;Error saving results: {e}&quot;)
+95:     print(&quot;\nExtraction process finished.&quot;)
+96: if __name__ == &quot;__main__&quot;:
+97:     main()</file><file path="populate_fdd_index.py">  1: #!/usr/bin/env python3
+  2: &quot;&quot;&quot;
+  3: Scans a directory containing split FDD PDFs, extracts metadata from filenames,
+  4: and populates the FDDFileIndex table in the franchise_directory database.
+  5: &quot;&quot;&quot;
+  6: import os
+  7: import re
+  8: from pathlib import Path
+  9: from sqlalchemy import create_engine, select
+ 10: from sqlalchemy.orm import Session
+ 11: from sqlalchemy.exc import IntegrityError
+ 12: import logging
+ 13: # Assuming the schema definitions are in LLM.franchise_directory_schema relative to project root
+ 14: # Adjust the import path if your project structure is different
+ 15: try:
+ 16:     from LLM.franchise_directory_schema import Base, FDDFileIndex, _enable_sqlite_fk, State # Import necessary items
+ 17: except ImportError:
+ 18:     print(&quot;Error: Could not import schema definitions. Make sure LLM/franchise_directory_schema.py is accessible.&quot;)
+ 19:     print(&quot;Attempting import from parent directory...&quot;)
+ 20:     # This is a common fallback if the script is run from a different location
+ 21:     import sys
+ 22:     sys.path.append(str(Path(__file__).parent.parent))
+ 23:     from LLM.franchise_directory_schema import Base, FDDFileIndex, _enable_sqlite_fk, State
+ 24: # --- Configuration ---
+ 25: DEFAULT_DB_PATH = &quot;franchise_directory.sqlite&quot;
+ 26: # IMPORTANT: Update this path to the actual location of your split PDFs
+ 27: DEFAULT_PDF_SPLIT_DIR = &quot;/Users/miller/Library/CloudStorage/OneDrive-Personal/FDD_PDFS/split_pdfs&quot;
+ 28: logging.basicConfig(level=logging.INFO, format=&apos;%(asctime)s - %(levelname)s - %(message)s&apos;)
+ 29: # --- Helper Functions ---
+ 30: def check_db_exists(db_path: str) -&gt; bool:
+ 31:     &quot;&quot;&quot;Checks if the SQLite database file exists.&quot;&quot;&quot;
+ 32:     return Path(db_path).is_file()
+ 33: def extract_section_info(filename: str) -&gt; tuple[str | None, str | None, int | None]:
+ 34:     &quot;&quot;&quot;
+ 35:     Extracts section information from a filename.
+ 36:     Handles patterns like &apos;ITEM_XX.pdf&apos;, &apos;intro.pdf&apos;, etc.
+ 37:     Returns: (section_identifier, section_type, extracted_item_number)
+ 38:     &quot;&quot;&quot;
+ 39:     name_part = Path(filename).stem.lower() # Use lowercase for consistency
+ 40:     identifier = Path(filename).stem # Keep original case for identifier if needed
+ 41:     item_match = re.match(r&quot;item_?(\d+)&quot;, name_part)
+ 42:     intro_match = name_part == &quot;intro&quot;
+ 43:     # Add more patterns here if needed (e.g., exhibits)
+ 44:     # exhibit_match = re.match(r&quot;exhibit_?([a-z0-9]+)&quot;, name_part)
+ 45:     if item_match:
+ 46:         item_number = int(item_match.group(1))
+ 47:         return identifier, &quot;ITEM&quot;, item_number
+ 48:     elif intro_match:
+ 49:         return identifier, &quot;INTRO&quot;, None
+ 50:     # elif exhibit_match:
+ 51:     #     exhibit_id = exhibit_match.group(1)
+ 52:     #     return identifier, &quot;EXHIBIT&quot;, None # Or parse exhibit_id further if needed
+ 53:     else:
+ 54:         # Default for unrecognized patterns
+ 55:         return identifier, &quot;OTHER&quot;, None
+ 56: # --- Main Population Logic ---
+ 57: def populate_fdd_index(db_path: str, pdf_split_dir: str):
+ 58:     &quot;&quot;&quot;
+ 59:     Scans the pdf_split_dir, extracts info, and populates the FDDFileIndex table.
+ 60:     Verifies the presence of &apos;intro.pdf&apos; for each filing_id.
+ 61:     &quot;&quot;&quot;
+ 62:     logging.info(f&quot;Starting FDD file indexing process.&quot;)
+ 63:     logging.info(f&quot;Database path: {db_path}&quot;)
+ 64:     logging.info(f&quot;Scanning directory: {pdf_split_dir}&quot;)
+ 65:     if not check_db_exists(db_path):
+ 66:         logging.error(f&quot;Database file not found at {db_path}. Please create it first (e.g., by running franchise_directory_schema.py).&quot;)
+ 67:         return
+ 68:     pdf_dir = Path(pdf_split_dir)
+ 69:     if not pdf_dir.is_dir():
+ 70:         logging.error(f&quot;PDF split directory not found or is not a directory: {pdf_split_dir}&quot;)
+ 71:         return
+ 72:     db_url = f&quot;sqlite:///{Path(db_path).resolve()}&quot;
+ 73:     engine = create_engine(db_url, echo=False, future=True)
+ 74:     processed_filings = 0
+ 75:     processed_files = 0
+ 76:     filings_with_intro = 0
+ 77:     filings_missing_intro = 0
+ 78:     with Session(engine) as session:
+ 79:         # Get existing file paths to avoid duplicates efficiently
+ 80:         existing_paths = set(row[0] for row in session.execute(select(FDDFileIndex.file_path)).all())
+ 81:         logging.info(f&quot;Found {len(existing_paths)} existing file paths in the index.&quot;)
+ 82:         for filing_dir in pdf_dir.iterdir():
+ 83:             if filing_dir.is_dir(): # Process only directories
+ 84:                 filing_id = filing_dir.name
+ 85:                 logging.debug(f&quot;Processing filing ID: {filing_id}&quot;)
+ 86:                 # Basic UUID format check (optional, but good practice)
+ 87:                 if not re.match(r&quot;^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$&quot;, filing_id.lower()):
+ 88:                     logging.warning(f&quot;Skipping directory &apos;{filing_id}&apos; - name does not look like a UUID.&quot;)
+ 89:                     continue
+ 90:                 processed_filings += 1
+ 91:                 has_intro = False
+ 92:                 files_in_filing = 0
+ 93:                 new_files_added = 0
+ 94:                 for file_path in filing_dir.glob(&apos;*.pdf&apos;): # Look specifically for PDFs
+ 95:                     files_in_filing += 1
+ 96:                     abs_file_path_str = str(file_path.resolve())
+ 97:                     # Skip if already processed
+ 98:                     if abs_file_path_str in existing_paths:
+ 99:                         logging.debug(f&quot;Skipping already indexed file: {abs_file_path_str}&quot;)
+100:                         # Still check for intro even if files are skipped
+101:                         if file_path.name.lower() == &apos;intro.pdf&apos;:
+102:                             has_intro = True
+103:                         continue
+104:                     identifier, section_type, item_number = extract_section_info(file_path.name)
+105:                     if file_path.name.lower() == &apos;intro.pdf&apos;:
+106:                         has_intro = True
+107:                     index_entry = FDDFileIndex(
+108:                         filing_id=filing_id,
+109:                         file_path=abs_file_path_str,
+110:                         section_identifier=identifier,
+111:                         section_type=section_type,
+112:                         extracted_item_number=item_number
+113:                     )
+114:                     session.add(index_entry)
+115:                     existing_paths.add(abs_file_path_str) # Add to set to prevent re-adding in this run
+116:                     processed_files += 1
+117:                     new_files_added += 1
+118:                 if files_in_filing &gt; 0:
+119:                     logging.info(f&quot;Filing &apos;{filing_id}&apos;: Found {files_in_filing} PDFs, added {new_files_added} new index entries.&quot;)
+120:                     if has_intro:
+121:                         logging.info(f&quot;  -&gt; Confirmed &apos;intro.pdf&apos; is present.&quot;)
+122:                         filings_with_intro += 1
+123:                     else:
+124:                         logging.warning(f&quot;  -&gt; &apos;intro.pdf&apos; NOT found in this filing directory.&quot;)
+125:                         filings_missing_intro += 1
+126:                 else:
+127:                      logging.debug(f&quot;No PDF files found in directory: {filing_dir}&quot;)
+128:         try:
+129:             session.commit()
+130:             logging.info(&quot;Successfully committed changes to the database.&quot;)
+131:         except IntegrityError as e:
+132:             logging.error(f&quot;Database integrity error during commit: {e}&quot;)
+133:             logging.error(&quot;Rolling back changes for this batch.&quot;)
+134:             session.rollback()
+135:         except Exception as e:
+136:             logging.error(f&quot;An unexpected error occurred during commit: {e}&quot;)
+137:             logging.error(&quot;Rolling back changes.&quot;)
+138:             session.rollback()
+139:     logging.info(&quot;--- Indexing Summary ---&quot;)
+140:     logging.info(f&quot;Total filing directories processed: {processed_filings}&quot;)
+141:     logging.info(f&quot;Total new file index entries added: {processed_files}&quot;)
+142:     logging.info(f&quot;Filings confirmed with &apos;intro.pdf&apos;: {filings_with_intro}&quot;)
+143:     logging.info(f&quot;Filings missing &apos;intro.pdf&apos;: {filings_missing_intro}&quot;)
+144:     logging.info(&quot;FDD file indexing process finished.&quot;)
+145: # --- Entrypoint ---
+146: if __name__ == &quot;__main__&quot;:
+147:     # In a real application, consider using argparse for command-line arguments
+148:     db_path = os.getenv(&quot;FRANCHISE_DB_PATH&quot;, DEFAULT_DB_PATH)
+149:     pdf_dir = os.getenv(&quot;PDF_SPLIT_DIR&quot;, DEFAULT_PDF_SPLIT_DIR)
+150:     populate_fdd_index(db_path=db_path, pdf_split_dir=pdf_dir)</file></files></repomix>
