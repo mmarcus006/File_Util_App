@@ -1,0 +1,4801 @@
+TITLE: Creating and Activating Python Virtual Environment
+DESCRIPTION: Commands to create and activate a Python virtual environment for isolated package installation
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/quickstart.rst#2025-04-23_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+$ python -m venv .venv
+...
+$ source .venv/bin/activate
+```
+
+----------------------------------------
+
+TITLE: Configuring Shared Credentials File (INI)
+DESCRIPTION: Examples of how to set up the shared credentials file (~/.aws/credentials). It shows both a minimal configuration and a multi-profile configuration.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_7
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+aws_access_key_id=foo
+aws_secret_access_key=bar
+aws_session_token=baz
+```
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+aws_access_key_id=foo
+aws_secret_access_key=bar
+
+[dev]
+aws_access_key_id=foo2
+aws_secret_access_key=bar2
+
+[prod]
+aws_access_key_id=foo3
+aws_secret_access_key=bar3
+```
+
+----------------------------------------
+
+TITLE: Using AWS CLI to Configure Credentials Interactively
+DESCRIPTION: Run the interactive AWS CLI command to set up credentials and default region, which will generate configuration files in the correct locations.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+aws configure
+```
+
+----------------------------------------
+
+TITLE: Configuring AWS Credentials
+DESCRIPTION: Sets up AWS credentials in the ~/.aws/credentials file. This configuration is necessary for Boto3 to authenticate with AWS services.
+SOURCE: https://github.com/boto/boto3/blob/develop/README.rst#2025-04-23_snippet_2
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+aws_access_key_id = YOUR_KEY
+aws_secret_access_key = YOUR_SECRET
+```
+
+----------------------------------------
+
+TITLE: AWS Credentials Configuration Files
+DESCRIPTION: Example AWS credentials and config file contents for authentication setup
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/quickstart.rst#2025-04-23_snippet_3
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+aws_access_key_id = YOUR_ACCESS_KEY
+aws_secret_access_key = YOUR_SECRET_KEY
+```
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+region=us-east-1
+```
+
+----------------------------------------
+
+TITLE: Setting AWS Credentials and Account ID via Environment Variables in Shell
+DESCRIPTION: Demonstrates how to set AWS credentials and account ID using environment variables, which Boto3 can use to automatically construct account ID-based endpoints.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/configuration.rst#2025-04-21_snippet_9
+
+LANGUAGE: shell
+CODE:
+```
+export AWS_ACCESS_KEY_ID=<ACCESS_KEY>
+export AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
+export AWS_ACCOUNT_ID=<ACCOUNT_ID>
+```
+
+----------------------------------------
+
+TITLE: Basic Boto3 S3 Usage Examples
+DESCRIPTION: Python code demonstrating basic S3 operations using Boto3, including listing buckets and uploading files
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/quickstart.rst#2025-04-23_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Let's use Amazon S3
+s3 = boto3.resource('s3')
+
+# Print out bucket names
+for bucket in s3.buckets.all():
+    print(bucket.name)
+
+# Upload a new file
+with open('test.jpg', 'rb') as data:
+    s3.Bucket('amzn-s3-demo-bucket').put_object(Key='test.jpg', Body=data)
+```
+
+----------------------------------------
+
+TITLE: Configuring AWS Config File (INI)
+DESCRIPTION: Demonstrates the format for the AWS config file (~/.aws/config). It shows how to set up multiple profiles, noting the required 'profile' prefix for non-default profiles.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_9
+
+LANGUAGE: ini
+CODE:
+```
+[default]
+aws_access_key_id=foo
+aws_secret_access_key=bar
+
+[profile dev]
+aws_access_key_id=foo2
+aws_secret_access_key=bar2
+
+[profile prod]
+aws_access_key_id=foo3
+aws_secret_access_key=bar3
+```
+
+----------------------------------------
+
+TITLE: Installing Boto3 in a Python Virtual Environment
+DESCRIPTION: Sets up a Python virtual environment and installs Boto3 from PyPI. This is the recommended way to install Boto3 for most users.
+SOURCE: https://github.com/boto/boto3/blob/develop/README.rst#2025-04-23_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+$ python -m venv .venv
+...
+$ . .venv/bin/activate
+
+$ python -m pip install boto3
+```
+
+----------------------------------------
+
+TITLE: Sending Messages to SQS Queue
+DESCRIPTION: Illustrates different ways to send messages to an SQS queue, including single messages, messages with attributes, and batch sending.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# Get the service resource
+sqs = boto3.resource('sqs')
+
+# Get the queue
+queue = sqs.get_queue_by_name(QueueName='test')
+
+# Create a new message
+response = queue.send_message(MessageBody='world')
+
+# Send message with attributes
+queue.send_message(MessageBody='boto3', MessageAttributes={
+    'Author': {
+        'StringValue': 'Daniel',
+        'DataType': 'String'
+    }
+})
+
+# Send messages in batch
+response = queue.send_messages(Entries=[
+    {
+        'Id': '1',
+        'MessageBody': 'world'
+    },
+    {
+        'Id': '2',
+        'MessageBody': 'boto3',
+        'MessageAttributes': {
+            'Author': {
+                'StringValue': 'Daniel',
+                'DataType': 'String'
+            }
+        }
+    }
+])
+```
+
+----------------------------------------
+
+TITLE: Creating Default Session with Boto3
+DESCRIPTION: Demonstrates how to use the default session to create AWS service clients and resources. This is the simplest way to interact with AWS services using Boto3.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/session.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Using the default session
+sqs = boto3.client('sqs')
+s3 = boto3.resource('s3')
+```
+
+----------------------------------------
+
+TITLE: Catching Generic Botocore Exceptions in Python
+DESCRIPTION: This snippet demonstrates how to catch common Botocore exceptions like ClientError and ParamValidationError when making API calls using a Boto3 client. It shows a basic try-except block structure for handling these errors.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import botocore
+import boto3
+
+client = boto3.client('aws_service_name')
+
+try:
+    client.some_api_call(SomeParam='some_param')
+
+except botocore.exceptions.ClientError as error:
+    # Put your error handling logic here
+    raise error
+
+except botocore.exceptions.ParamValidationError as error:
+    raise ValueError('The parameters you provided are incorrect: {}'.format(error))
+```
+
+----------------------------------------
+
+TITLE: Downloading a file from S3 using download_file method
+DESCRIPTION: This snippet demonstrates how to download a file from an S3 bucket to a local file using the download_file method from the boto3 S3 client. It requires specifying the bucket name, object name in the bucket, and the local file name.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-download-file.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+s3 = boto3.client('s3')
+s3.download_file('amzn-s3-demo-bucket', 'OBJECT_NAME', 'FILE_NAME')
+```
+
+----------------------------------------
+
+TITLE: Basic Boto3 Usage Example
+DESCRIPTION: Demonstrates how to use Boto3 to interact with AWS services. This example lists all S3 buckets in the account.
+SOURCE: https://github.com/boto/boto3/blob/develop/README.rst#2025-04-23_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+>>> import boto3
+>>> s3 = boto3.resource('s3')
+>>> for bucket in s3.buckets.all():
+        print(bucket.name)
+```
+
+----------------------------------------
+
+TITLE: Creating S3 Bucket and Handling Existing Bucket Error (Python)
+DESCRIPTION: This code attempts to create an S3 bucket using the boto3 S3 resource client. It includes error handling to catch the BucketAlreadyExists exception, printing a message and re-raising the error if the bucket already exists. It requires the boto3 library.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+import botocore
+import boto3
+
+client = boto3.resource('s3')
+
+try:
+    client.create_bucket(BucketName='amzn-s3-demo-bucket')
+
+except client.meta.client.exceptions.BucketAlreadyExists as err:
+    print("Bucket {} already exists!".format(err.response['Error']['BucketName']))
+    raise err
+```
+
+----------------------------------------
+
+TITLE: Listing S3 Bucket Objects with Boto3
+DESCRIPTION: Demonstrates how to list all objects in an S3 bucket using the Boto3 resource interface. Uses the bucket.objects.all() method to iterate through bucket contents.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+s3 = boto3.resource('s3')
+bucket = s3.Bucket('amzn-s3-demo-bucket')
+for obj in bucket.objects.all():
+    print(obj.key)
+```
+
+----------------------------------------
+
+TITLE: Creating Boto3 Session with Profile (Python)
+DESCRIPTION: Shows how to create a Boto3 Session using a specific profile from the shared credentials file. This allows for easy switching between different sets of credentials.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+session = boto3.Session(profile_name='dev')
+dev_s3_client = session.client('s3')
+```
+
+----------------------------------------
+
+TITLE: Configuring AWS Credentials in a Boto3 Session Object
+DESCRIPTION: Initialize a Boto3 Session object with AWS credentials passed as parameters. This creates a session with specific credentials that can be used to create multiple client instances.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+session = boto3.Session(
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+)
+```
+
+----------------------------------------
+
+TITLE: Catching AWS Service Exceptions by Parsing ClientError in Python
+DESCRIPTION: This example shows how to catch a generic botocore.exceptions.ClientError and then inspect the error response dictionary to identify and handle specific AWS service exceptions, such as 'LimitExceededException' from Kinesis. This method is recommended for catching all service-side errors.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import botocore
+import boto3
+import logging
+
+# Set up our logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+
+client = boto3.client('kinesis')
+
+try:
+    logger.info('Calling DescribeStream API on myDataStream')
+    client.describe_stream(StreamName='myDataStream')
+
+except botocore.exceptions.ClientError as error:
+    if error.response['Error']['Code'] == 'LimitExceededException':
+        logger.warn('API call limit exceeded; backing off and retrying...')
+    else:
+        raise error
+```
+
+----------------------------------------
+
+TITLE: Uploading File-like Object to S3 Using upload_fileobj
+DESCRIPTION: Example of uploading a file-like object to S3 using boto3's upload_fileobj method. The file must be opened in binary mode.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+s3 = boto3.client('s3')
+with open("FILE_NAME", "rb") as f:
+    s3.upload_fileobj(f, "amzn-s3-demo-bucket", "OBJECT_NAME")
+```
+
+----------------------------------------
+
+TITLE: DynamoDB Item Operations
+DESCRIPTION: Demonstrates basic CRUD operations (Create, Read, Update, Delete) on DynamoDB items using the Table resource.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+table.put_item(
+   Item={
+        'username': 'janedoe',
+        'first_name': 'Jane',
+        'last_name': 'Doe',
+        'age': 25,
+        'account_type': 'standard_user',
+    }
+)
+```
+
+LANGUAGE: python
+CODE:
+```
+response = table.get_item(
+    Key={
+        'username': 'janedoe',
+        'last_name': 'Doe'
+    }
+)
+```
+
+LANGUAGE: python
+CODE:
+```
+table.update_item(
+    Key={
+        'username': 'janedoe',
+        'last_name': 'Doe'
+    },
+    UpdateExpression='SET age = :val1',
+    ExpressionAttributeValues={
+        ':val1': 26
+    }
+)
+```
+
+LANGUAGE: python
+CODE:
+```
+table.delete_item(
+    Key={
+        'username': 'janedoe',
+        'last_name': 'Doe'
+    }
+)
+```
+
+----------------------------------------
+
+TITLE: Configuring AWS Credentials as Client Parameters in Python
+DESCRIPTION: Initialize an AWS S3 client by passing AWS credentials directly as parameters. This approach is useful for retrieving temporary credentials or loading credentials from external locations.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+client = boto3.client(
+    's3',
+    aws_access_key_id=ACCESS_KEY,
+    aws_secret_access_key=SECRET_KEY,
+    aws_session_token=SESSION_TOKEN
+)
+```
+
+----------------------------------------
+
+TITLE: Catching AWS Service Exceptions Directly via Client Exceptions Property in Python
+DESCRIPTION: This snippet demonstrates an alternative method to catch specific AWS service exceptions by accessing them directly from the client's exceptions property (e.g., client.exceptions.LimitExceedException). This provides a more direct way to catch known service exceptions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+except client.exceptions.LimitExceedException as error:
+    logger.warn('API call limit exceeded; backing off and retrying...')
+```
+
+----------------------------------------
+
+TITLE: Receiving and Deleting Messages from Amazon SQS Queue using Boto3
+DESCRIPTION: Shows how to receive a message from an SQS queue with specific attributes and parameters, and then delete it using the receipt handle. The code retrieves one message at a time and includes options for visibility timeout and wait time.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-sending-receiving-msgs.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SQS_QUEUE_URL'
+
+# Receive message from SQS queue
+response = sqs.receive_message(
+    QueueUrl=queue_url,
+    AttributeNames=[
+        'SentTimestamp'
+    ],
+    MaxNumberOfMessages=1,
+    MessageAttributeNames=[
+        'All'
+    ],
+    VisibilityTimeout=0,
+    WaitTimeSeconds=0
+)
+
+message = response['Messages'][0]
+receipt_handle = message['ReceiptHandle']
+
+# Delete received message from queue
+sqs.delete_message(
+    QueueUrl=queue_url,
+    ReceiptHandle=receipt_handle
+)
+print('Received and deleted message: %s' % message)
+```
+
+----------------------------------------
+
+TITLE: Creating Basic S3 Presigned URL with Python
+DESCRIPTION: Generates a presigned URL to share an S3 object with temporary access. Takes bucket name, object name, and expiration time as parameters, returning the presigned URL or None on error.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-presigned-urls.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+
+def create_presigned_url(bucket_name, object_name, expiration=3600):
+    """Generate a presigned URL to share an S3 object
+
+    :param bucket_name: string
+    :param object_name: string
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :return: Presigned URL as string. If error, returns None.
+    """
+
+    # Generate a presigned URL for the S3 object
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': object_name},
+            ExpiresIn=expiration,
+        )
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL
+    return response
+```
+
+----------------------------------------
+
+TITLE: Implementing Thread-Safe Sessions in Boto3
+DESCRIPTION: Demonstrates the recommended approach for using sessions in a multithreaded environment. Creates a new session per thread to ensure thread safety.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/session.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+import boto3.session
+import threading
+
+class MyTask(threading.Thread):
+    def run(self):
+        # Here we create a new session per thread
+        session = boto3.session.Session()
+
+        # Next, we create a resource client using our thread's session object
+        s3 = session.resource('s3')
+
+        # Put your thread-safe code here
+```
+
+----------------------------------------
+
+TITLE: Retrieving Decrypted Secret Value from AWS Secrets Manager using Python
+DESCRIPTION: This code snippet demonstrates how to retrieve a secret value from AWS Secrets Manager using boto3. It initializes a Secrets Manager client, attempts to get the secret value, and handles various potential errors. The retrieved secret can be either a string or binary data.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/secrets-manager.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+
+def get_secret():
+    secret_name = "MySecretName"
+    region_name = "us-west-2"
+
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name,
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            print("The requested secret " + secret_name + " was not found")
+        elif e.response['Error']['Code'] == 'InvalidRequestException':
+            print("The request was invalid due to:", e)
+        elif e.response['Error']['Code'] == 'InvalidParameterException':
+            print("The request had invalid params:", e)
+        elif e.response['Error']['Code'] == 'DecryptionFailure':
+            print("The requested secret can't be decrypted using the provided KMS key:", e)
+        elif e.response['Error']['Code'] == 'InternalServiceError':
+            print("An error occurred on service side:", e)
+    else:
+        # Secrets Manager decrypts the secret value using the associated KMS CMK
+        # Depending on whether the secret was a string or binary, only one of these fields will be populated
+        if 'SecretString' in get_secret_value_response:
+            text_secret_data = get_secret_value_response['SecretString']
+        else:
+            binary_secret_data = get_secret_value_response['SecretBinary']
+            
+        # Your code goes here. 
+```
+
+----------------------------------------
+
+TITLE: Accessing Existing DynamoDB Table
+DESCRIPTION: Creates a reference to an existing DynamoDB table using lazy-loading to avoid unnecessary API calls.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Get the service resource.
+dynamodb = boto3.resource('dynamodb')
+
+# Instantiate a table resource object without actually
+# creating a DynamoDB table. Note that the attributes of this table
+# are lazy-loaded: a request is not made nor are the attribute
+# values populated until the attributes
+# on the table resource are accessed or its load() method is called.
+table = dynamodb.Table('users')
+
+# Print out some data about the table.
+# This will cause a request to be made to DynamoDB and its attribute
+# values will be set based on the response.
+print(table.creation_date_time)
+```
+
+----------------------------------------
+
+TITLE: Getting SQS Queue URL with Boto3
+DESCRIPTION: Shows how to retrieve the URL for an existing SQS queue by its name using the get_queue_url API.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-using-queues.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+# Get URL for SQS queue
+response = sqs.get_queue_url(QueueName='SQS_QUEUE_NAME')
+
+print(response['QueueUrl'])
+```
+
+----------------------------------------
+
+TITLE: Processing SQS Messages
+DESCRIPTION: Shows how to receive and process messages from an SQS queue, including handling message attributes and cleanup after processing.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# Get the service resource
+sqs = boto3.resource('sqs')
+
+# Get the queue
+queue = sqs.get_queue_by_name(QueueName='test')
+
+# Process messages by printing out body and optional author name
+for message in queue.receive_messages(MessageAttributeNames=['Author']):
+    # Get the custom author message attribute if it was set
+    author_text = ''
+    if message.message_attributes is not None:
+        author_name = message.message_attributes.get('Author').get('StringValue')
+        if author_name:
+            author_text = ' ({0})'.format(author_name)
+
+    # Print out the body and author (if set)
+    print('Hello, {0}!{1}'.format(message.body, author_text))
+
+    # Let the queue know that the message is processed
+    message.delete()
+```
+
+----------------------------------------
+
+TITLE: Creating S3 Bucket with Boto3
+DESCRIPTION: Creates an Amazon S3 bucket in a specified region using Boto3. If no region is specified, the bucket is created in the default us-east-1 region. Includes error handling and region-specific configuration.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-creating-buckets.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+
+def create_bucket(bucket_name, region=None):
+    """Create an S3 bucket in a specified region
+
+    If a region is not specified, the bucket is created in the S3 default
+    region (us-east-1).
+
+    :param bucket_name: Bucket to create
+    :param region: String region to create bucket in, e.g., 'us-west-2'
+    :return: True if bucket created, else False
+    """
+
+    # Create bucket
+    try:
+        if region is None:
+            s3_client = boto3.client('s3')
+            s3_client.create_bucket(Bucket=bucket_name)
+        else:
+            s3_client = boto3.client('s3', region_name=region)
+            location = {'LocationConstraint': region}
+            s3_client.create_bucket(Bucket=bucket_name,
+                                    CreateBucketConfiguration=location)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+```
+
+----------------------------------------
+
+TITLE: Listing SQS Queues with Boto3
+DESCRIPTION: Shows how to list all existing SQS queues in your AWS account using the Boto3 list_queues API. Returns a list of queue URLs.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-using-queues.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+# List SQS queues
+response = sqs.list_queues()
+
+print(response['QueueUrls'])
+```
+
+----------------------------------------
+
+TITLE: Retrieving and Using Specific Waiters in Boto3
+DESCRIPTION: Example demonstrating how to obtain and use a specific waiter from a boto3 client to wait for an AWS resource to reach a desired state.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+# Retrieve waiter instance that will wait till a specified
+# S3 bucket exists
+s3_bucket_exists_waiter = s3.get_waiter('bucket_exists')
+
+# Begin waiting for the S3 bucket, amzn-s3-demo-bucket, to exist
+s3_bucket_exists_waiter.wait(Bucket='amzn-s3-demo-bucket')
+```
+
+----------------------------------------
+
+TITLE: Uploading File to S3 Bucket Using upload_file Method
+DESCRIPTION: Function to upload a file to an S3 bucket using boto3's upload_file method. Handles error checking and allows custom object naming.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+import os
+
+
+def upload_file(file_name, bucket, object_name=None):
+    """Upload a file to an S3 bucket
+
+    :param file_name: File to upload
+    :param bucket: Bucket to upload to
+    :param object_name: S3 object name. If not specified then file_name is used
+    :return: True if file was uploaded, else False
+    """
+
+    # If S3 object_name was not specified, use file_name
+    if object_name is None:
+        object_name = os.path.basename(file_name)
+
+    # Upload the file
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.upload_file(file_name, bucket, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+```
+
+----------------------------------------
+
+TITLE: Creating S3 Connection in Boto 2.x vs Boto3
+DESCRIPTION: Compares how to establish a connection to Amazon S3 in Boto 2.x using connect_s3() versus Boto3 using the resource interface.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+import boto
+s3_connection = boto.connect_s3()
+
+# Boto3
+import boto3
+s3 = boto3.resource('s3')
+```
+
+----------------------------------------
+
+TITLE: Creating a CloudWatch Metric Alarm using Boto3
+DESCRIPTION: Shows how to create or update a CloudWatch metric alarm with specific thresholds and conditions. This example creates an alarm that monitors CPU utilization for an EC2 instance, triggering when the average CPU exceeds 70% over a 60-second period.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-creating-alarms.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# Create alarm
+cloudwatch.put_metric_alarm(
+    AlarmName='Web_Server_CPU_Utilization',
+    ComparisonOperator='GreaterThanThreshold',
+    EvaluationPeriods=1,
+    MetricName='CPUUtilization',
+    Namespace='AWS/EC2',
+    Period=60,
+    Statistic='Average',
+    Threshold=70.0,
+    ActionsEnabled=False,
+    AlarmDescription='Alarm when server CPU exceeds 70%',
+    Dimensions=[
+        {
+          'Name': 'InstanceId',
+          'Value': 'INSTANCE_ID'
+        },
+    ],
+    Unit='Seconds'
+)
+```
+
+----------------------------------------
+
+TITLE: Starting and Stopping EC2 Instances using Boto3
+DESCRIPTION: Demonstrates starting and stopping EBS-backed EC2 instances with dry run permission checks. Uses start_instances and stop_instances API calls with error handling.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-managing-instances.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import sys
+import boto3
+from botocore.exceptions import ClientError
+
+instance_id = sys.argv[2]
+action = sys.argv[1].upper()
+
+ec2 = boto3.client('ec2')
+
+
+if action == 'ON':
+    # Do a dryrun first to verify permissions
+    try:
+        ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
+    except ClientError as e:
+        if 'DryRunOperation' not in str(e):
+            raise
+
+    # Dry run succeeded, run start_instances without dryrun
+    try:
+        response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
+        print(response)
+    except ClientError as e:
+        print(e)
+else:
+    # Do a dryrun first to verify permissions
+    try:
+        ec2.stop_instances(InstanceIds=[instance_id], DryRun=True)
+    except ClientError as e:
+        if 'DryRunOperation' not in str(e):
+            raise
+
+    # Dry run succeeded, call stop_instances without dryrun
+    try:
+        response = ec2.stop_instances(InstanceIds=[instance_id], DryRun=False)
+        print(response)
+    except ClientError as e:
+        print(e)
+```
+
+----------------------------------------
+
+TITLE: Creating IAM Access Keys with Boto3
+DESCRIPTION: Creates a new AWS secret access key and corresponding access key ID for a specified IAM user. The keys are created with Active status by default.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-access-keys.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Create an access key
+response = iam.create_access_key(
+    UserName='IAM_USER_NAME'
+)
+
+print(response['AccessKey'])
+```
+
+----------------------------------------
+
+TITLE: Initializing Resources in Boto3
+DESCRIPTION: Demonstrates how to get resource objects from the default session. Resources provide a higher-level abstraction for interacting with AWS services compared to the lower-level client interface.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+# Get resources from the default session
+sqs = boto3.resource('sqs')
+s3 = boto3.resource('s3')
+```
+
+----------------------------------------
+
+TITLE: Accessing Existing SQS Queue
+DESCRIPTION: Shows how to look up and access an existing SQS queue by name, plus how to list all available queues.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Get the service resource
+sqs = boto3.resource('sqs')
+
+# Get the queue. This returns an SQS.Queue instance
+queue = sqs.get_queue_by_name(QueueName='test')
+
+# You can now access identifiers and attributes
+print(queue.url)
+print(queue.attributes.get('DelaySeconds'))
+
+# Print out each queue name, which is part of its ARN
+for queue in sqs.queues.all():
+    print(queue.url)
+```
+
+----------------------------------------
+
+TITLE: Multithreading with Boto3 Clients Example
+DESCRIPTION: A complete example showing how to properly use boto3 clients in a multithreading scenario with ThreadPoolExecutor. This demonstrates the thread-safe pattern for boto3 client usage.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+import boto3.session
+from concurrent.futures import ThreadPoolExecutor
+
+def do_s3_task(client, task_definition):
+    # Put your thread-safe code here
+
+def my_workflow():
+    # Create a session and use it to make our client
+    session = boto3.session.Session()
+    s3_client = session.client('s3')
+
+    # Define some work to be done, this can be anything
+    my_tasks = [ ... ]
+
+    # Dispatch work tasks with our s3_client
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(do_s3_task, s3_client, task) for task in my_tasks]
+```
+
+----------------------------------------
+
+TITLE: Configuring Retry Behavior with Config Object in Boto3
+DESCRIPTION: Example showing how to create a Config object to set retry behavior for AWS clients. This snippet demonstrates setting max_attempts to 10 and using the standard retry mode.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/retries.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+config = Config(
+   retries = {
+      'max_attempts': 10,
+      'mode': 'standard'
+   }
+)
+```
+
+----------------------------------------
+
+TITLE: Handling Response Data from Boto3 Client
+DESCRIPTION: Example of processing response data returned by a boto3 client operation. This demonstrates safely accessing data from the response dictionary.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# List all your queues
+response = sqs.list_queues()
+for url in response.get('QueueUrls', []):
+    print(url)
+```
+
+----------------------------------------
+
+TITLE: Using Presigned URL with Python Requests
+DESCRIPTION: Demonstrates how to use a presigned URL to download an S3 object using the Python requests library.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-presigned-urls.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import requests  # To install: pip install requests
+
+url = create_presigned_url('amzn-s3-demo-bucket', 'OBJECT_NAME')
+if url is not None:
+    response = requests.get(url)
+```
+
+----------------------------------------
+
+TITLE: Sending Messages to Amazon SQS Queue using Boto3
+DESCRIPTION: Demonstrates how to send a message to an Amazon SQS queue with message attributes including Title, Author, and WeeksOn. The message includes a 10-second delay and custom attributes with different data types.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-sending-receiving-msgs.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SQS_QUEUE_URL'
+
+# Send message to SQS queue
+response = sqs.send_message(
+    QueueUrl=queue_url,
+    DelaySeconds=10,
+    MessageAttributes={
+        'Title': {
+            'DataType': 'String',
+            'StringValue': 'The Whistler'
+        },
+        'Author': {
+            'DataType': 'String',
+            'StringValue': 'John Grisham'
+        },
+        'WeeksOn': {
+            'DataType': 'Number',
+            'StringValue': '6'
+        }
+    },
+    MessageBody=(
+        'Information about current NY Times fiction bestseller for '
+        'week of 12/11/2016.'
+    )
+)
+
+print(response['MessageId'])
+```
+
+----------------------------------------
+
+TITLE: Listing S3 Buckets with Boto3
+DESCRIPTION: Retrieves and displays a list of all existing S3 buckets in the AWS account using the Boto3 client. The code demonstrates basic bucket listing and response handling.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-creating-buckets.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Retrieve the list of existing buckets
+s3 = boto3.client('s3')
+response = s3.list_buckets()
+
+# Output the bucket names
+print('Existing buckets:')
+for bucket in response['Buckets']:
+    print(f'  {bucket["Name"]}')
+```
+
+----------------------------------------
+
+TITLE: Enabling Long Polling on Message Receipt in SQS using Boto3
+DESCRIPTION: This snippet illustrates how to enable long polling when receiving messages from an Amazon SQS queue using the Boto3 receive_message method. It sets the WaitTimeSeconds parameter to 20 seconds for the message receipt operation.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-long-polling.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SQS_QUEUE_URL'
+
+# Long poll for message on provided SQS queue
+response = sqs.receive_message(
+    QueueUrl=queue_url,
+    AttributeNames=[
+        'SentTimestamp'
+    ],
+    MaxNumberOfMessages=1,
+    MessageAttributeNames=[
+        'All'
+    ],
+    WaitTimeSeconds=20
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Creating Boto3 Low-Level Clients
+DESCRIPTION: Examples of creating low-level clients in boto3, either directly or from an existing resource. These clients provide 1:1 mapping with service APIs.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create a low-level client with the service name
+sqs = boto3.client('sqs')
+```
+
+----------------------------------------
+
+TITLE: Creating Expanded S3 Presigned URL with Python
+DESCRIPTION: Generates presigned URLs for various S3 operations beyond basic object access. Supports different client methods and custom parameters.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-presigned-urls.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+
+def create_presigned_url_expanded(
+    client_method_name, method_parameters=None, expiration=3600, http_method=None
+):
+    """Generate a presigned URL to invoke an S3.Client method
+
+    Not all the client methods provided in the AWS Python SDK are supported.
+
+    :param client_method_name: Name of the S3.Client method, e.g., 'list_buckets'
+    :param method_parameters: Dictionary of parameters to send to the method
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :param http_method: HTTP method to use (GET, etc.)
+    :return: Presigned URL as string. If error, returns None.
+    """
+
+    # Generate a presigned URL for the S3 client method
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.generate_presigned_url(
+            ClientMethod=client_method_name,
+            Params=method_parameters,
+            ExpiresIn=expiration,
+            HttpMethod=http_method,
+        )
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL
+    return response
+```
+
+----------------------------------------
+
+TITLE: Filtering S3 Objects with Server-Side Parameters in Python
+DESCRIPTION: This snippet demonstrates how to apply server-side filtering to paginated results by passing operation parameters like 'Prefix' to the underlying API calls.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/paginators.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+client = boto3.client('s3', region_name='us-west-2')
+paginator = client.get_paginator('list_objects_v2')
+operation_parameters = {'Bucket': 'amzn-s3-demo-bucket',
+                        'Prefix': 'foo/baz'}
+page_iterator = paginator.paginate(**operation_parameters)
+for page in page_iterator:
+    print(page['Contents'])
+```
+
+----------------------------------------
+
+TITLE: Downloading a file from S3 using download_fileobj method with file-like object
+DESCRIPTION: This snippet shows how to download a file from an S3 bucket to a file-like object using the download_fileobj method. It requires opening a local file in binary mode ('wb') and passing the file object to the method along with the bucket and object names.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-download-file.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+s3 = boto3.client('s3')
+with open('FILE_NAME', 'wb') as f:
+    s3.download_fileobj('amzn-s3-demo-bucket', 'OBJECT_NAME', f)
+```
+
+----------------------------------------
+
+TITLE: Configuring Assume Role with Web Identity in Config File
+DESCRIPTION: Configure an assume role with web identity profile in the AWS config file. This allows Boto3 to automatically make AssumeRoleWithWebIdentity calls to AWS STS for authentication using OAuth 2.0 or OpenID Connect tokens.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_4
+
+LANGUAGE: ini
+CODE:
+```
+# In ~/.aws/config
+[profile web-identity]
+role_arn=arn:aws:iam:...
+web_identity_token_file=/path/to/a/token
+```
+
+----------------------------------------
+
+TITLE: Working with Sub-resources in Boto3
+DESCRIPTION: Demonstrates how to work with sub-resources, which share identifiers with their parent in a strict parent-child relationship. Examples show SQS Queue-Message and S3 Bucket-Object relationships.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+# SQS
+queue = sqs.Queue(url='...')
+message = queue.Message(receipt_handle='...')
+print(queue.url == message.queue_url)
+print(message.receipt_handle)
+
+# S3
+obj = bucket.Object(key='new_file.txt')
+print(obj.bucket_name)
+print(obj.key)
+```
+
+----------------------------------------
+
+TITLE: Enabling Long Polling on Existing SQS Queue using Boto3
+DESCRIPTION: This example shows how to enable long polling on an existing Amazon SQS queue using the Boto3 set_queue_attributes method. It sets the ReceiveMessageWaitTimeSeconds attribute to 20 seconds for the specified queue URL.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-long-polling.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SQS_QUEUE_URL'
+
+# Enable long polling on an existing SQS queue
+sqs.set_queue_attributes(
+    QueueUrl=queue_url,
+    Attributes={'ReceiveMessageWaitTimeSeconds': '20'}
+)
+```
+
+----------------------------------------
+
+TITLE: Rebooting EC2 Instances using Boto3
+DESCRIPTION: Shows how to reboot EC2 instances with permission verification using dry run. Implements the reboot_instances API call with error handling.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-managing-instances.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+
+ec2 = boto3.client('ec2')
+
+try:
+    ec2.reboot_instances(InstanceIds=['INSTANCE_ID'], DryRun=True)
+except ClientError as e:
+    if 'DryRunOperation' not in str(e):
+        print("You don't have permission to reboot instances.")
+        raise
+
+try:
+    response = ec2.reboot_instances(InstanceIds=['INSTANCE_ID'], DryRun=False)
+    print('Success', response)
+except ClientError as e:
+    print('Error', e)
+```
+
+----------------------------------------
+
+TITLE: Configuring Proxy Servers for Boto3 Clients in Python
+DESCRIPTION: This example shows how to set up proxy servers for HTTP and HTTPS protocols when creating a Boto3 client using a Config object.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/configuration.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.config import Config
+
+proxy_definitions = {
+    'http': 'http://proxy.amazon.com:6502',
+    'https': 'https://proxy.amazon.org:2010'
+}
+
+my_config = Config(
+    region_name='us-east-2',
+    signature_version='v4',
+    proxies=proxy_definitions
+)
+
+client = boto3.client('kinesis', config=my_config)
+```
+
+----------------------------------------
+
+TITLE: Performing Resource Actions in Boto3
+DESCRIPTION: Shows how to call actions (methods that make service calls) on resource instances. Actions may return low-level responses, new resource instances, or lists of resource instances.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+# SQS Queue
+messages = queue.receive_messages()
+
+# SQS Message
+for message in messages:
+    message.delete()
+
+# S3 Object
+obj = s3.Object(bucket_name='amzn-s3-demo-bucket', key='test.py')
+response = obj.get()
+data = response['Body'].read()
+```
+
+----------------------------------------
+
+TITLE: Verifying Domain Identity with Amazon SES using Boto3
+DESCRIPTION: Creates an SES client and verifies a domain identity by generating a verification token that must be added to the domain's DNS configuration.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-verify.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.verify_domain_identity(
+  Domain='DOMAIN_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Using Waiters with Boto3 Resources
+DESCRIPTION: Shows how to use waiters to poll for resource state changes. Waiters suspend execution until a resource reaches the target state or a failure occurs during polling.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_9
+
+LANGUAGE: python
+CODE:
+```
+# S3: Wait for a bucket to exist.
+bucket.wait_until_exists()
+
+# EC2: Wait for an instance to reach the running state.
+instance.wait_until_running()
+```
+
+----------------------------------------
+
+TITLE: Working with Resource Identifiers using Named Parameters
+DESCRIPTION: Shows how to initialize resources with identifiers using named parameters. Identifiers are unique values required to call actions on specific resources. This example demonstrates initializing SQS Queue and S3 Object resources.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# SQS Queue (url is an identifier)
+queue = sqs.Queue(url='http://...')
+print(queue.url)
+
+# S3 Object (bucket_name and key are identifiers)
+obj = s3.Object(bucket_name='amzn-s3-demo-bucket', key='test.py')
+print(obj.bucket_name)
+print(obj.key)
+
+# Raises exception, missing identifier: key!
+obj = s3.Object(bucket_name='amzn-s3-demo-bucket')
+```
+
+----------------------------------------
+
+TITLE: Iterating Over SQS Queues Using Boto3 Collection in Python
+DESCRIPTION: This snippet demonstrates how to use a Boto3 collection to iterate over all SQS queues. It creates an SQS resource and uses the 'all()' method to retrieve and print the URL of each queue.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+# SQS list all queues
+sqs = boto3.resource('sqs')
+for queue in sqs.queues.all():
+    print(queue.url)
+```
+
+----------------------------------------
+
+TITLE: Sending Custom Events to CloudWatch Events
+DESCRIPTION: Publishes a custom event to CloudWatch Events with specific detail, type, and source information using the put_events method.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-events.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import json
+
+import boto3
+
+
+# Create CloudWatchEvents client
+cloudwatch_events = boto3.client('events')
+
+# Put an event
+response = cloudwatch_events.put_events(
+    Entries=[
+        {
+            'Detail': json.dumps({'key1': 'value1', 'key2': 'value2'}),
+            'DetailType': 'appRequestSubmitted',
+            'Resources': [
+                'RESOURCE_ARN',
+            ],
+            'Source': 'com.company.myapp'
+        }
+    ]
+)
+print(response['Entries'])
+```
+
+----------------------------------------
+
+TITLE: Querying DynamoDB Table by Username
+DESCRIPTION: Demonstrates querying a DynamoDB table using KeyConditionExpression to find items by username.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+response = table.query(
+    KeyConditionExpression=Key('username').eq('johndoe')
+)
+items = response['Items']
+print(items)
+```
+
+----------------------------------------
+
+TITLE: Setting an S3 Bucket Policy with Boto3
+DESCRIPTION: This snippet shows how to create and set a policy for an S3 bucket using the put_bucket_policy method. The example creates a policy that allows public read access to all objects in the bucket.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-bucket-policies.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import json
+
+# Create a bucket policy
+bucket_name = 'amzn-s3-demo-bucket'
+bucket_policy = {
+    'Version': '2012-10-17',
+    'Statement': [{
+        'Sid': 'AddPerm',
+        'Effect': 'Allow',
+        'Principal': '*',
+        'Action': ['s3:GetObject'],
+        'Resource': f'arn:aws:s3:::{bucket_name}/*'
+    }]
+}
+
+# Convert the policy from JSON dict to string
+bucket_policy = json.dumps(bucket_policy)
+
+# Set the new policy
+s3 = boto3.client('s3')
+s3.put_bucket_policy(Bucket=bucket_name, Policy=bucket_policy)
+```
+
+----------------------------------------
+
+TITLE: Configuring Source Queue for Dead-Letter Queue in Amazon SQS using Boto3
+DESCRIPTION: This code snippet demonstrates how to configure a source queue to send unprocessed messages to a dead-letter queue in Amazon SQS. It uses the set_queue_attributes method of the AWS.SQS client class to set the RedrivePolicy attribute, specifying the dead-letter queue ARN and the maximum number of receives before a message is sent to the dead-letter queue.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-dead-letter-queue.rst#2025-04-21_snippet_0
+
+LANGUAGE: Python
+CODE:
+```
+import json
+
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SOURCE_QUEUE_URL'
+dead_letter_queue_arn = 'DEAD_LETTER_QUEUE_ARN'
+
+redrive_policy = {
+    'deadLetterTargetArn': dead_letter_queue_arn,
+    'maxReceiveCount': '10'
+}
+
+
+# Configure queue to send messages to dead letter queue
+sqs.set_queue_attributes(
+    QueueUrl=queue_url,
+    Attributes={
+        'RedrivePolicy': json.dumps(redrive_policy)
+    }
+)
+```
+
+----------------------------------------
+
+TITLE: Basic Boto3 S3 Bucket Listing Example
+DESCRIPTION: Shows how to list all S3 buckets using Boto3's resource interface. Demonstrates the basic usage pattern after configuration.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migration.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+for bucket in boto3.resource('s3').buckets.all():
+    print(bucket.name)
+```
+
+----------------------------------------
+
+TITLE: IAM Role Policy for CloudWatch Logs and Lambda
+DESCRIPTION: IAM policy document that grants permissions to create log groups/streams, put log events, and invoke Lambda functions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-subscription-filters.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Action": [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+         ],
+         "Resource": "arn:aws:logs:*:*:*"
+      },
+      {
+         "Effect": "Allow",
+         "Action": [
+            "lambda:InvokeFunction"
+         ],
+         "Resource": [
+            "*"
+         ]
+      }
+   ]
+}
+```
+
+----------------------------------------
+
+TITLE: Listing Running EC2 Instances in Boto 2.x and Boto3
+DESCRIPTION: This code shows how to list all running EC2 instances. Boto3 uses the filter() method of the instances collection, which allows passing additional parameters to the underlying service API operation.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+reservations = ec2_connection.get_all_reservations(
+    filters={'instance-state-name': 'running'})
+for reservation in reservations:
+    for instance in reservation.instances:
+        print(instance.instance_id, instance.instance_type)
+
+# Boto3
+# Use the filter() method of the instances collection to retrieve
+# all running EC2 instances.
+instances = ec2.instances.filter(
+    Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
+for instance in instances:
+    print(instance.id, instance.instance_type)
+```
+
+----------------------------------------
+
+TITLE: DynamoDB Batch Writing
+DESCRIPTION: Demonstrates batch writing capabilities for efficiently adding multiple items to a DynamoDB table, including deduplication functionality.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+with table.batch_writer() as batch:
+    batch.put_item(
+        Item={
+            'account_type': 'standard_user',
+            'username': 'johndoe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'age': 25,
+            'address': {
+                'road': '1 Jefferson Street',
+                'city': 'Los Angeles',
+                'state': 'CA',
+                'zipcode': 90001
+            }
+        }
+    )
+    # ... additional batch operations ...
+```
+
+----------------------------------------
+
+TITLE: Using S3 Presigned POST URL with Python Requests
+DESCRIPTION: Demonstrates how to use a presigned POST URL to upload a file to S3 using the Python requests library.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-presigned-urls.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import requests  # To install: pip install requests
+
+# Generate a presigned S3 POST URL
+object_name = 'OBJECT_NAME'
+response = create_presigned_post('amzn-s3-demo-bucket', object_name)
+if response is None:
+    exit(1)
+
+# Demonstrate how another Python program can use the presigned URL to upload a file
+with open(object_name, 'rb') as f:
+    files = {'file': (object_name, f)}
+    http_response = requests.post(response['url'], data=response['fields'], files=files)
+# If successful, returns HTTP status code 204
+logging.info(f'File upload HTTP status code: {http_response.status_code}')
+```
+
+----------------------------------------
+
+TITLE: Creating KMS Customer Master Key in Python
+DESCRIPTION: Function to create a new AWS KMS Customer Master Key (CMK) with a specified description. It returns the key ID and ARN of the created CMK.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+def create_cmk(desc='Customer Master Key'):
+    """Create a KMS Customer Master Key
+
+    The created CMK is a Customer-managed key stored in AWS KMS.
+
+    :param desc: key description
+    :return Tuple(KeyId, KeyArn) where:
+        KeyId: AWS globally-unique string ID
+        KeyArn: Amazon Resource Name of the CMK
+    :return Tuple(None, None) if error
+    """
+
+    # Create CMK
+    kms_client = boto3.client('kms')
+    try:
+        response = kms_client.create_key(Description=desc)
+    except ClientError as e:
+        logging.error(e)
+        return None, None
+
+    # Return the key ID and ARN
+    return response['KeyMetadata']['KeyId'], response['KeyMetadata']['Arn']
+```
+
+----------------------------------------
+
+TITLE: Publishing Custom Metrics to CloudWatch using Boto3
+DESCRIPTION: This snippet shows how to publish custom metric data points to Amazon CloudWatch using the put_metric_data method. It creates a custom metric named 'PAGES_VISITED' with a dimension 'UNIQUE_PAGES' in the 'SITE/TRAFFIC' namespace.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-metrics.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# Put custom metrics
+cloudwatch.put_metric_data(
+    MetricData=[
+        {
+            'MetricName': 'PAGES_VISITED',
+            'Dimensions': [
+                {
+                    'Name': 'UNIQUE_PAGES',
+                    'Value': 'URLS'
+                },
+            ],
+            'Unit': 'None',
+            'Value': 1.0
+        },
+    ],
+    Namespace='SITE/TRAFFIC'
+)
+```
+
+----------------------------------------
+
+TITLE: Creating an EC2 Client with Custom Retry Configuration in Boto3
+DESCRIPTION: Complete example showing how to import the necessary modules, create a Config object with custom retry settings, and instantiate an EC2 client with those settings.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/retries.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.config import Config
+
+config = Config(
+   retries = {
+      'max_attempts': 10,
+      'mode': 'standard'
+   }
+)
+
+ec2 = boto3.client('ec2', config=config)
+```
+
+----------------------------------------
+
+TITLE: Controlling Page Size for S3 Objects Using Boto3 Collection in Python
+DESCRIPTION: This code demonstrates how to control the page size when iterating over S3 objects. It uses the 'page_size()' method to process objects in smaller batches of 100 items at a time.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+# S3 iterate over all objects 100 at a time
+for obj in bucket.objects.page_size(100):
+    print(obj.key)
+```
+
+----------------------------------------
+
+TITLE: Creating CloudWatch Alarm with Actions Enabled using Boto3
+DESCRIPTION: This snippet demonstrates how to create a CloudWatch alarm with actions enabled using the put_metric_alarm method. It sets up an alarm that triggers when CPU utilization exceeds 70% and initiates a reboot action on an EC2 instance.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-using-alarms.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# Create alarm with actions enabled
+cloudwatch.put_metric_alarm(
+    AlarmName='Web_Server_CPU_Utilization',
+    ComparisonOperator='GreaterThanThreshold',
+    EvaluationPeriods=1,
+    MetricName='CPUUtilization',
+    Namespace='AWS/EC2',
+    Period=60,
+    Statistic='Average',
+    Threshold=70.0,
+    ActionsEnabled=True,
+    AlarmActions=[
+      'arn:aws:swf:us-west-2:{CUSTOMER_ACCOUNT}:action/actions/AWS_EC2.InstanceId.Reboot/1.0'
+    ],
+    AlarmDescription='Alarm when server CPU exceeds 70%',
+    Dimensions=[
+        {
+          'Name': 'InstanceId',
+          'Value': 'INSTANCE_ID'
+        },
+    ],
+    Unit='Seconds'
+)
+```
+
+----------------------------------------
+
+TITLE: Retrieving an S3 Bucket Policy with Boto3
+DESCRIPTION: This snippet demonstrates how to retrieve the policy of an S3 bucket using the get_bucket_policy method from the Boto3 S3 client. It returns the policy in JSON format.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-bucket-policies.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Retrieve the policy of the specified bucket
+s3 = boto3.client('s3')
+result = s3.get_bucket_policy(Bucket='amzn-s3-demo-bucket')
+print(result['Policy'])
+```
+
+----------------------------------------
+
+TITLE: Configuring Multipart Transfers for S3 Upload in Python using Boto3
+DESCRIPTION: This snippet demonstrates how to configure a multipart transfer for uploading a file to S3 using boto3. It sets a custom multipart threshold of 5GB using the TransferConfig object.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from boto3.s3.transfer import TransferConfig
+
+# Set the desired multipart threshold value (5GB)
+GB = 1024 ** 3
+config = TransferConfig(multipart_threshold=5*GB)
+
+# Perform the transfer
+s3 = boto3.client('s3')
+s3.upload_file('FILE_NAME', 'amzn-s3-demo-bucket', 'OBJECT_NAME', Config=config)
+```
+
+----------------------------------------
+
+TITLE: Creating IAM Managed Policy with Boto3
+DESCRIPTION: Creates a new managed IAM policy with DynamoDB and CloudWatch Logs permissions. Uses the create_policy API to establish a policy with version v1 as default.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-policies.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import json
+
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Create a policy
+my_managed_policy = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": "RESOURCE_ARN"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:Scan",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": "RESOURCE_ARN"
+        }
+    ]
+}
+response = iam.create_policy(
+  PolicyName='myDynamoDBPolicy',
+  PolicyDocument=json.dumps(my_managed_policy)
+)
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Deleting an IAM User with Boto3 in Python
+DESCRIPTION: This snippet shows how to delete an IAM user using the delete_user method of the IAM client in Boto3. The user must not belong to any groups or have any access keys, signing certificates, or attached policies.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-users.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Delete a user
+iam.delete_user(
+    UserName='IAM_USER_NAME'
+)
+```
+
+----------------------------------------
+
+TITLE: Creating Custom Session in Boto3
+DESCRIPTION: Shows how to create and manage a custom session for more control over AWS credentials and configuration. Custom sessions allow for different credentials and settings per session instance.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/session.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+import boto3.session
+
+# Create your own session
+my_session = boto3.session.Session()
+
+# Now we can create low-level clients or resource clients from our custom session
+sqs = my_session.client('sqs')
+s3 = my_session.resource('s3')
+```
+
+----------------------------------------
+
+TITLE: Creating Boto3 Session with SSO Profile (Python)
+DESCRIPTION: Demonstrates how to create a Boto3 Session using an SSO profile. This allows clients created from the session to use the specified SSO credentials.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+session = boto3.Session(profile_name='my-sso-profile')
+s3_client = session.client('s3')
+```
+
+----------------------------------------
+
+TITLE: Chaining EC2 Instance Filters Using Boto3 Collection in Python
+DESCRIPTION: This example demonstrates the chainability of collection methods in Boto3. It creates multiple filtered collections of EC2 instances based on different criteria such as tenancy and instance type.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# EC2 find instances
+ec2 = boto3.resource('ec2')
+base = ec2.instances.filter(InstanceIds=['id1', 'id2', 'id3'])
+
+filters = [{
+    'Name': 'tenancy',
+    'Values': ['dedicated']
+}]
+filtered1 = base.filter(Filters=filters)
+
+# Note, this does NOT modify the filters in ``filtered1``!
+filters.append({'name': 'instance-type', 'value': 't1.micro'})
+filtered2 = base.filter(Filters=filters)
+
+print('All instances:')
+for instance in base:
+    print(instance.id)
+
+print('Dedicated instances:')
+for instance in filtered1:
+    print(instance.id)
+
+print('Dedicated micro instances:')
+for instance in filtered2:
+    print(instance.id)
+```
+
+----------------------------------------
+
+TITLE: Listing S3 Common Prefixes with Boto3
+DESCRIPTION: Shows how to list top-level common prefixes in an S3 bucket using pagination. Uses the list_objects paginator with a delimiter to get folder-like hierarchy.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+client = boto3.client('s3')
+paginator = client.get_paginator('list_objects')
+result = paginator.paginate(Bucket='amzn-s3-demo-bucket', Delimiter='/')
+for prefix in result.search('CommonPrefixes'):
+    print(prefix.get('Prefix'))
+```
+
+----------------------------------------
+
+TITLE: Sending a Templated Email with Amazon SES in Python
+DESCRIPTION: This snippet demonstrates how to send an email using a template with the SES send_templated_email() method. It specifies the source, destination, reply-to addresses, template name, and template data for personalization.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-template.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.send_templated_email(
+  Source='EMAIL_ADDRESS',
+  Destination={
+    'ToAddresses': [
+      'EMAIL_ADDRESS',
+    ],
+    'CcAddresses': [
+      'EMAIL_ADDRESS',
+    ]
+  },
+  ReplyToAddresses=[
+    'EMAIL_ADDRESS',
+  ],
+  Template='TEMPLATE_NAME',
+  TemplateData='{ \"REPLACEMENT_TAG_NAME\":\"REPLACEMENT_VALUE\" }'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: S3 Upload/Download with SSE-KMS Encryption
+DESCRIPTION: Shows how to upload and download objects using server-side encryption with AWS KMS. Demonstrates using both default and custom KMS keys for encryption.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+import os
+
+BUCKET = 'amzn-s3-demo-bucket'
+s3 = boto3.client('s3')
+keyid = '<the key id>'
+
+print("Uploading S3 object with SSE-KMS")
+s3.put_object(Bucket=BUCKET,
+              Key='encrypt-key',
+              Body=b'foobar',
+              ServerSideEncryption='aws:kms',
+              # Optional: SSEKMSKeyId
+              SSEKMSKeyId=keyid)
+print("Done")
+
+# Getting the object:
+print("Getting S3 object...")
+response = s3.get_object(Bucket=BUCKET,
+                         Key='encrypt-key')
+print("Done, response body:")
+print(response['Body'].read())
+```
+
+----------------------------------------
+
+TITLE: Creating SQS Queue with Boto3
+DESCRIPTION: Demonstrates how to create a new SQS queue with specified attributes using Boto3. The example creates a queue named 'test' with a 5-second delay.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+# Get the service resource
+sqs = boto3.resource('sqs')
+
+# Create the queue. This returns an SQS.Queue instance
+queue = sqs.create_queue(QueueName='test', Attributes={'DelaySeconds': '5'})
+
+# You can now access identifiers and attributes
+print(queue.url)
+print(queue.attributes.get('DelaySeconds'))
+```
+
+----------------------------------------
+
+TITLE: Adding Lambda Function Target to CloudWatch Events Rule
+DESCRIPTION: Configures a Lambda function as a target for the CloudWatch Events rule using the put_targets method.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-events.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatchEvents client
+cloudwatch_events = boto3.client('events')
+
+# Put target for rule
+response = cloudwatch_events.put_targets(
+    Rule='DEMO_EVENT',
+    Targets=[
+        {
+            'Arn': 'LAMBDA_FUNCTION_ARN',
+            'Id': 'myCloudWatchEventsTarget',
+        }
+    ]
+)
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Performing Batch Delete on S3 Objects Using Boto3 Collection in Python
+DESCRIPTION: This snippet shows how to perform a batch action on S3 objects. It deletes all objects in a specified bucket using the 'delete()' method on the objects collection.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+# S3 delete everything in `amzn-s3-demo-bucket`
+s3 = boto3.resource('s3')
+s3.Bucket('amzn-s3-demo-bucket').objects.delete()
+```
+
+----------------------------------------
+
+TITLE: Setting Client Context Parameters for Boto3 Clients in Python
+DESCRIPTION: This example shows how to set client-specific context parameters when creating a Boto3 client using a Config object.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/configuration.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.config import Config
+
+my_config = Config(
+    region_name='us-east-2',
+    client_context_params={
+        'my_great_context_param': 'foo'
+    }
+)
+
+client = boto3.client('kinesis', config=my_config)
+```
+
+----------------------------------------
+
+TITLE: Retrieving S3 Bucket ACL with Boto3
+DESCRIPTION: Demonstrates how to retrieve the current access control list (ACL) for an S3 bucket using the AWS Boto3 SDK. The code uses the S3 client's get_bucket_acl method to fetch ACL information for a specified bucket.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-access-permissions.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Retrieve a bucket's ACL
+s3 = boto3.client('s3')
+result = s3.get_bucket_acl(Bucket='amzn-s3-demo-bucket')
+print(result)
+```
+
+----------------------------------------
+
+TITLE: Attaching IAM Role Policy with Boto3
+DESCRIPTION: Attaches a managed policy to an IAM role using the attach_role_policy API. This adds the managed policy's permissions to the role's access policy.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-policies.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Attach a role policy
+iam.attach_role_policy(
+    PolicyArn='arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+    RoleName='AmazonDynamoDBFullAccess'
+)
+```
+
+----------------------------------------
+
+TITLE: Allocating and Associating EC2 Elastic IP Address using Boto3
+DESCRIPTION: Shows how to allocate a new Elastic IP address and associate it with an EC2 instance. Includes error handling for potential failures during allocation or association.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-elastic-ip-addresses.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+ec2 = boto3.client('ec2')
+
+try:
+    allocation = ec2.allocate_address(Domain='vpc')
+    response = ec2.associate_address(AllocationId=allocation['AllocationId'],
+                                     InstanceId='INSTANCE_ID')
+    print(response)
+except ClientError as e:
+    print(e)
+```
+
+----------------------------------------
+
+TITLE: Creating S3 Presigned POST URL with Python
+DESCRIPTION: Generates a presigned POST URL for file uploads to S3. Returns both the URL and required form fields for the POST request.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-presigned-urls.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+
+def create_presigned_post(
+    bucket_name, object_name, fields=None, conditions=None, expiration=3600
+):
+    """Generate a presigned URL S3 POST request to upload a file
+
+    :param bucket_name: string
+    :param object_name: string
+    :param fields: Dictionary of prefilled form fields
+    :param conditions: List of conditions to include in the policy
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :return: Dictionary with the following keys:
+        url: URL to post to
+        fields: Dictionary of form fields and values to submit with the POST
+    :return: None if error.
+    """
+
+    # Generate a presigned S3 POST URL
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.generate_presigned_post(
+            bucket_name,
+            object_name,
+            Fields=fields,
+            Conditions=conditions,
+            ExpiresIn=expiration,
+        )
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL and required fields
+    return response
+```
+
+----------------------------------------
+
+TITLE: Configuring IAM Trust Relationship for CloudWatch Events
+DESCRIPTION: Trust relationship configuration for the IAM role that allows the events.amazonaws.com service to assume the role.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-events.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Principal": {
+            "Service": "events.amazonaws.com"
+         },
+         "Action": "sts:AssumeRole"
+      }      
+   ]
+}
+```
+
+----------------------------------------
+
+TITLE: Detaching IAM Role Policy with Boto3
+DESCRIPTION: Detaches a managed policy from an IAM role using the detach_role_policy API. This removes the managed policy's permissions from the role.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-policies.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Detach a role policy
+iam.detach_role_policy(
+    PolicyArn='arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess',
+    RoleName='AmazonDynamoDBFullAccess'
+)
+```
+
+----------------------------------------
+
+TITLE: Updating IAM Access Key Status with Boto3
+DESCRIPTION: Changes the status of a specified access key between Active and Inactive states. Used as part of key rotation workflows.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-access-keys.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Update access key to be active
+iam.update_access_key(
+    AccessKeyId='ACCESS_KEY_ID',
+    Status='Active',
+    UserName='IAM_USER_NAME'
+)
+```
+
+----------------------------------------
+
+TITLE: Listing IAM Access Keys with Boto3
+DESCRIPTION: Lists all access key IDs associated with a specified IAM user using pagination. Returns an empty list if no keys exist.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-access-keys.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# List access keys through the pagination interface.
+paginator = iam.get_paginator('list_access_keys')
+for response in paginator.paginate(UserName='IAM_USER_NAME'):
+    print(response)
+```
+
+----------------------------------------
+
+TITLE: S3 Upload with Progress Callback
+DESCRIPTION: Example of uploading a file to S3 with a progress callback to track upload status.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+s3.upload_file(
+    'FILE_NAME', 'amzn-s3-demo-bucket', 'OBJECT_NAME',
+    Callback=ProgressPercentage('FILE_NAME')
+)
+```
+
+----------------------------------------
+
+TITLE: Storing Data to S3 in Boto 2.x vs Boto3
+DESCRIPTION: Demonstrates how to upload file content to S3 using the Key object in Boto 2.x compared to using the Object resource in Boto3.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+from boto.s3.key import Key
+key = Key('hello.txt')
+key.set_contents_from_file('/tmp/hello.txt')
+
+# Boto3
+s3.Object('amzn-s3-demo-bucket', 'hello.txt').put(Body=open('/tmp/hello.txt', 'rb'))
+```
+
+----------------------------------------
+
+TITLE: Creating SQS Queue with Boto3
+DESCRIPTION: Demonstrates creating a new SQS queue with specified attributes including delay seconds and message retention period. Returns the URL of the newly created queue.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-using-queues.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+# Create a SQS queue
+response = sqs.create_queue(
+    QueueName='SQS_QUEUE_NAME',
+    Attributes={
+        'DelaySeconds': '60',
+        'MessageRetentionPeriod': '86400'
+    }
+)
+
+print(response['QueueUrl'])
+```
+
+----------------------------------------
+
+TITLE: Accessing Resource Attributes in Boto3
+DESCRIPTION: Demonstrates how to access lazy-loaded attributes on resource instances. These attributes may trigger a service call when first accessed, potentially introducing latency.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+# SQS Message
+message.body
+
+# S3 Object
+obj.last_modified
+obj.e_tag
+```
+
+----------------------------------------
+
+TITLE: Working with EBS Snapshots in Boto 2.x and Boto3
+DESCRIPTION: This code illustrates how to create an EBS snapshot, create a volume from the snapshot, attach it to an instance, and delete the snapshot. Boto3 uses resource objects for more intuitive operations.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+snapshot = ec2_connection.create_snapshot('volume-id', 'Description')
+volume = snapshot.create_volume('us-west-2')
+ec2_connection.attach_volume(volume.id, 'instance-id', '/dev/sdy')
+ec2_connection.delete_snapshot(snapshot.id)
+
+# Boto3
+snapshot = ec2.create_snapshot(VolumeId='volume-id', Description='description')
+volume = ec2.create_volume(SnapshotId=snapshot.id, AvailabilityZone='us-west-2a')
+ec2.Instance('instance-id').attach_volume(VolumeId=volume.id, Device='/dev/sdy')
+snapshot.delete()
+```
+
+----------------------------------------
+
+TITLE: Generating Signed CloudFront URLs with RSA Signing in Python
+DESCRIPTION: This code demonstrates the complete process of generating a signed URL for Amazon CloudFront. It uses the cryptography library to implement RSA signing, loads a private key from a PEM file, and creates a CloudFrontSigner to generate a presigned URL with an expiration date.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/cloudfront.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import datetime
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from botocore.signers import CloudFrontSigner
+
+
+def rsa_signer(message):
+    with open('path/to/key.pem', 'rb') as key_file:
+        private_key = serialization.load_pem_private_key(
+            key_file.read(),
+            password=None,
+            backend=default_backend()
+        )
+    return private_key.sign(message, padding.PKCS1v15(), hashes.SHA1())
+
+key_id = 'AKIAIOSFODNN7EXAMPLE'
+url = 'http://d2949o5mkkp72v.cloudfront.net/hello.txt'
+expire_date = datetime.datetime(2017, 1, 1)
+
+cloudfront_signer = CloudFrontSigner(key_id, rsa_signer)
+
+# Create a signed url that will be valid until the specific expiry date
+# provided using a canned policy.
+signed_url = cloudfront_signer.generate_presigned_url(
+    url, date_less_than=expire_date)
+print(signed_url)
+```
+
+----------------------------------------
+
+TITLE: Retrieving S3 Bucket CORS Configuration with Boto3
+DESCRIPTION: This function retrieves the CORS configuration rules of an Amazon S3 bucket. It handles the case where no CORS configuration exists by returning an empty list, and returns None if an error occurs.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-configuring-buckets.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+
+def get_bucket_cors(bucket_name):
+    """Retrieve the CORS configuration rules of an Amazon S3 bucket
+
+    :param bucket_name: string
+    :return: List of the bucket's CORS configuration rules. If no CORS
+    configuration exists, return empty list. If error, return None.
+    """
+
+    # Retrieve the CORS configuration
+    s3 = boto3.client('s3')
+    try:
+        response = s3.get_bucket_cors(Bucket=bucket_name)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchCORSConfiguration':
+            return []
+        else:
+            # AllAccessDisabled error == bucket not found
+            logging.error(e)
+            return None
+    return response['CORSRules']
+```
+
+----------------------------------------
+
+TITLE: Resource Instance Equality Comparison in Boto3
+DESCRIPTION: Shows how resource instance equality works in Boto3. Two instances of a resource are considered equal only if all of their identifiers are equal, regardless of region or other attributes.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+>>> bucket1 = s3.Bucket('amzn-s3-demo-bucket1')
+>>> bucket2 = s3.Bucket('amzn-s3-demo-bucket1')
+>>> bucket3 = s3.Bucket('amzn-s3-demo-bucket3')
+
+>>> bucket1 == bucket2
+True
+>>> bucket1 == bucket3
+False
+```
+
+----------------------------------------
+
+TITLE: Decrypting File with KMS and Fernet in Python
+DESCRIPTION: This function decrypts a file that was encrypted using a corresponding encrypt_file function. It reads the encrypted file, extracts and decrypts the data key using KMS, then uses the Fernet class from the cryptography package to decrypt the file contents. The decrypted contents are written to a new file with a '.decrypted' extension.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+def decrypt_file(filename):
+    """Decrypt a file encrypted by encrypt_file()
+
+    The encrypted file is read from <filename>.encrypted
+    The decrypted file is written to <filename>.decrypted
+
+    :param filename: File to decrypt
+    :return: True if file was decrypted. Otherwise, False.
+    """
+
+    # Read the encrypted file into memory
+    try:
+        with open(filename + '.encrypted', 'rb') as file:
+            file_contents = file.read()
+    except IOError as e:
+        logging.error(e)
+        return False
+
+    # The first NUM_BYTES_FOR_LEN bytes contain the integer length of the
+    # encrypted data key.
+    # Add NUM_BYTES_FOR_LEN to get index of end of encrypted data key/start
+    # of encrypted data.
+    data_key_encrypted_len = int.from_bytes(file_contents[:NUM_BYTES_FOR_LEN],
+                                            byteorder='big') \
+                             + NUM_BYTES_FOR_LEN
+    data_key_encrypted = file_contents[NUM_BYTES_FOR_LEN:data_key_encrypted_len]
+
+    # Decrypt the data key before using it
+    data_key_plaintext = decrypt_data_key(data_key_encrypted)
+    if data_key_plaintext is None:
+        return False
+
+    # Decrypt the rest of the file
+    f = Fernet(data_key_plaintext)
+    file_contents_decrypted = f.decrypt(file_contents[data_key_encrypted_len:])
+
+    # Write the decrypted file contents
+    try:
+        with open(filename + '.decrypted', 'wb') as file_decrypted:
+            file_decrypted.write(file_contents_decrypted)
+    except IOError as e:
+        logging.error(e)
+        return False
+
+    # The same security issue described at the end of encrypt_file() exists
+    # here, too, i.e., the wish to wipe the data_key_plaintext value from
+    # memory.
+    return True
+```
+
+----------------------------------------
+
+TITLE: Launching EC2 Instances in Boto 2.x and Boto3
+DESCRIPTION: This code demonstrates how to launch new EC2 instances using both Boto 2.x and Boto3. Boto3 allows specifying the minimum and maximum number of instances to launch in a single call.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+ec2_connection.run_instances('<ami-image-id>')
+
+# Boto3
+ec2.create_instances(ImageId='<ami-image-id>', MinCount=1, MaxCount=5)
+```
+
+----------------------------------------
+
+TITLE: Filtering by Nested Attributes
+DESCRIPTION: Demonstrates scanning a DynamoDB table using nested attribute filtering to find users by state.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+response = table.scan(
+    FilterExpression=Attr('address.state').eq('CA')
+)
+items = response['Items']
+print(items)
+```
+
+----------------------------------------
+
+TITLE: Creating an Email Template with Amazon SES in Python
+DESCRIPTION: This snippet demonstrates how to create an email template using the SES create_template() method. It sets the template name, subject line, text content, and HTML content.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-template.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.create_template(
+  Template = {
+    'TemplateName' : 'TEMPLATE_NAME',
+    'SubjectPart'  : 'SUBJECT_LINE',
+    'TextPart'     : 'TEXT_CONTENT',
+    'HtmlPart'     : 'HTML_CONTENT'
+  }
+)
+
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Filtering S3 Objects by Last Modified Time
+DESCRIPTION: Demonstrates how to filter S3 objects based on their last modified timestamp using JMESPath expressions with the S3 paginator.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+s3 = boto3.client("s3")
+
+s3_paginator = s3.get_paginator('list_objects_v2')
+s3_iterator = s3_paginator.paginate(Bucket='amzn-s3-demo-bucket')
+
+filtered_iterator = s3_iterator.search(
+    "Contents[?to_string(LastModified)>='\"2022-01-05 08:05:37+00:00\"'].Key"
+)
+
+for key_data in filtered_iterator:
+    print(key_data)
+```
+
+----------------------------------------
+
+TITLE: Deleting DynamoDB Table
+DESCRIPTION: Shows how to delete a DynamoDB table using the Table.delete() method.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+table.delete()
+```
+
+----------------------------------------
+
+TITLE: Getting IAM Policy Information with Boto3
+DESCRIPTION: Retrieves information about a specified managed policy including its default version and attachment counts using the get_policy API.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-policies.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Get a policy
+response = iam.get_policy(
+    PolicyArn='arn:aws:iam::aws:policy/AWSLambdaExecute'
+)
+print(response['Policy'])
+```
+
+----------------------------------------
+
+TITLE: Chaining Multiple Filter Conditions
+DESCRIPTION: Example of using multiple conditions in a FilterExpression with logical operators to find specific users.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+response = table.scan(
+    FilterExpression=Attr('first_name').begins_with('J') & Attr('account_type').eq('super_user')
+)
+items = response['Items']
+print(items)
+```
+
+----------------------------------------
+
+TITLE: Managing S3 Access Controls in Boto 2.x vs Boto3
+DESCRIPTION: Demonstrates setting canned ACLs and retrieving grant information, showing how Boto3 uses a dedicated ACL resource object.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+bucket.set_acl('public-read')
+key.set_acl('public-read')
+
+# Boto3
+bucket.Acl().put(ACL='public-read')
+obj.Acl().put(ACL='public-read')
+```
+
+----------------------------------------
+
+TITLE: Encrypting File Using KMS Data Key in Python
+DESCRIPTION: Function to encrypt a file using a data key generated with AWS KMS. It creates a data key, encrypts the file contents, and saves the encrypted data key with the encrypted file.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+def encrypt_file(filename, cmk_id):
+    """Encrypt a file using an AWS KMS CMK
+
+    A data key is generated and associated with the CMK.
+    The encrypted data key is saved with the encrypted file. This enables the
+    file to be decrypted at any time in the future and by any program that
+    has the credentials to decrypt the data key.
+    The encrypted file is saved to <filename>.encrypted
+    Limitation: The contents of filename must fit in memory.
+
+    :param filename: File to encrypt
+    :param cmk_id: AWS KMS CMK ID or ARN
+    :return: True if file was encrypted. Otherwise, False.
+    """
+
+    # Read the entire file into memory
+    try:
+        with open(filename, 'rb') as file:
+            file_contents = file.read()
+    except IOError as e:
+        logging.error(e)
+        return False
+
+    # Generate a data key associated with the CMK
+    # The data key is used to encrypt the file. Each file can use its own
+    # data key or data keys can be shared among files.
+    # Specify either the CMK ID or ARN
+    data_key_encrypted, data_key_plaintext = create_data_key(cmk_id)
+    if data_key_encrypted is None:
+        return False
+    logging.info('Created new AWS KMS data key')
+
+    # Encrypt the file
+    f = Fernet(data_key_plaintext)
+    file_contents_encrypted = f.encrypt(file_contents)
+
+    # Write the encrypted data key and encrypted file contents together
+    try:
+        with open(filename + '.encrypted', 'wb') as file_encrypted:
+            file_encrypted.write(len(data_key_encrypted).to_bytes(NUM_BYTES_FOR_LEN,
+                                                                  byteorder='big'))
+            file_encrypted.write(data_key_encrypted)
+            file_encrypted.write(file_contents_encrypted)
+    except IOError as e:
+        logging.error(e)
+        return False
+
+    # For the highest security, the data_key_plaintext value should be wiped
+    # from memory. Unfortunately, this is not possible in Python. However,
+    # storing the value in a local variable makes it available for garbage
+    # collection.
+    return True
+```
+
+----------------------------------------
+
+TITLE: Setting S3 Bucket CORS Configuration with Boto3
+DESCRIPTION: This code demonstrates how to set a CORS configuration for an Amazon S3 bucket. It defines configuration rules specifying allowed headers, methods, origins, exposed headers, and cache duration before applying them to the bucket.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-configuring-buckets.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Define the configuration rules
+cors_configuration = {
+    'CORSRules': [{
+        'AllowedHeaders': ['Authorization'],
+        'AllowedMethods': ['GET', 'PUT'],
+        'AllowedOrigins': ['*'],
+        'ExposeHeaders': ['ETag', 'x-amz-request-id'],
+        'MaxAgeSeconds': 3000
+    }]
+}
+
+# Set the CORS configuration
+s3 = boto3.client('s3')
+s3.put_bucket_cors(Bucket='amzn-s3-demo-bucket',
+                   CORSConfiguration=cors_configuration)
+```
+
+----------------------------------------
+
+TITLE: Getting IAM Access Key Last Usage with Boto3
+DESCRIPTION: Retrieves information about when a specified access key was last used, including date, time, AWS service, and region of last use.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-access-keys.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Get last use of access key
+response = iam.get_access_key_last_used(
+    AccessKeyId='ACCESS_KEY_ID'
+)
+
+print(response['AccessKeyLastUsed'])
+```
+
+----------------------------------------
+
+TITLE: Deleting an S3 Bucket Policy with Boto3
+DESCRIPTION: This snippet demonstrates how to delete a policy from an S3 bucket using the delete_bucket_policy method from the Boto3 S3 client.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-bucket-policies.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# Delete a bucket's policy
+s3 = boto3.client('s3')
+s3.delete_bucket_policy(Bucket='BUCKET_NAME')
+```
+
+----------------------------------------
+
+TITLE: Accessing Client from Resource in Boto3
+DESCRIPTION: Example showing how to access the low-level client from an existing boto3 resource object.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Create the resource
+sqs_resource = boto3.resource('sqs')
+
+# Get the client from the resource
+sqs = sqs_resource.meta.client
+```
+
+----------------------------------------
+
+TITLE: Configuring SSO Profile in AWS Config File (INI)
+DESCRIPTION: Example of how to set up an SSO profile in the AWS config file (~/.aws/config). It includes settings for SSO start URL, region, account ID, and role name.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_5
+
+LANGUAGE: ini
+CODE:
+```
+# In ~/.aws/config
+[profile my-sso-profile]
+sso_start_url = https://my-sso-portal.awsapps.com/start
+sso_region = us-east-1
+sso_account_id = 123456789011
+sso_role_name = readOnly
+```
+
+----------------------------------------
+
+TITLE: Listing IAM Server Certificates with Boto3
+DESCRIPTION: Uses the IAM client's paginator to list all server certificates stored in IAM. Returns an empty list if no certificates exist.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-server-certificates.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# List server certificates through the pagination interface
+paginator = iam.get_paginator('list_server_certificates')
+for response in paginator.paginate():
+    print(response['ServerCertificateMetadataList'])
+```
+
+----------------------------------------
+
+TITLE: Retrieving S3 Bucket Website Configuration using Boto3
+DESCRIPTION: Demonstrates how to retrieve the website configuration from an S3 bucket using the get_bucket_website method. This code initializes an S3 client and fetches the website configuration for a specified bucket.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-static-web-host.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Retrieve the website configuration
+s3 = boto3.client('s3')
+result = s3.get_bucket_website(Bucket='amzn-s3-demo-website-bucket')
+```
+
+----------------------------------------
+
+TITLE: Creating EC2 Connection in Boto 2.x and Boto3
+DESCRIPTION: This snippet shows how to establish a connection to Amazon EC2 using both Boto 2.x and Boto3. In Boto3, the resource interface is used, which provides a higher-level abstraction similar to Boto 2.x's ec2 and vpc modules.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+import boto
+ec2_connection = boto.connect_ec2()
+vpc_connection = boto.connect_vpc()
+
+# Boto3
+import boto3
+ec2 = boto3.resource('ec2')
+```
+
+----------------------------------------
+
+TITLE: Progress Percentage Implementation for S3 Upload
+DESCRIPTION: Implementation of a progress tracking class that can be used as a callback during S3 file uploads.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-uploading-files.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+import os
+import sys
+import threading
+
+class ProgressPercentage(object):
+
+    def __init__(self, filename):
+        self._filename = filename
+        self._size = float(os.path.getsize(filename))
+        self._seen_so_far = 0
+        self._lock = threading.Lock()
+
+    def __call__(self, bytes_amount):
+        # To simplify, assume this is hooked up to a single filename
+        with self._lock:
+            self._seen_so_far += bytes_amount
+            percentage = (self._seen_so_far / self._size) * 100
+            sys.stdout.write(
+                "\r%s  %s / %s  (%.2f%%)" % (
+                    self._filename, self._seen_so_far, self._size,
+                    percentage))
+            sys.stdout.flush()
+```
+
+----------------------------------------
+
+TITLE: Creating an IAM User with Boto3 in Python
+DESCRIPTION: This snippet demonstrates how to create a new IAM user using the create_user method of the IAM client in Boto3. It requires the Boto3 library and valid AWS credentials.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-users.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Create user
+response = iam.create_user(
+    UserName='IAM_USER_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Updating an Email Template with Amazon SES in Python
+DESCRIPTION: This snippet shows how to update an existing email template using the SES update_template() method. It allows changing the subject line, HTML body, and plain text content of the template.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-template.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.update_template(
+  Template={
+    'TemplateName': 'TEMPLATE_NAME',
+    'SubjectPart' : 'SUBJECT_LINE',
+    'TextPart'    : 'TEXT_CONTENT',
+    'HtmlPart'    : 'HTML_CONTENT'
+  }
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Creating EC2 Security Group with Ingress Rules using Boto3
+DESCRIPTION: This snippet shows how to create a new EC2 security group within a VPC and configure it with HTTP and SSH ingress rules. It first retrieves the VPC ID, creates the security group, and then adds the ingress permissions for ports 80 and 22.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-security-group.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+ec2 = boto3.client('ec2')
+
+response = ec2.describe_vpcs()
+vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
+
+try:
+    response = ec2.create_security_group(GroupName='SECURITY_GROUP_NAME',
+                                         Description='DESCRIPTION',
+                                         VpcId=vpc_id)
+    security_group_id = response['GroupId']
+    print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+
+    data = ec2.authorize_security_group_ingress(
+        GroupId=security_group_id,
+        IpPermissions=[
+            {'IpProtocol': 'tcp',
+             'FromPort': 80,
+             'ToPort': 80,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+            {'IpProtocol': 'tcp',
+             'FromPort': 22,
+             'ToPort': 22,
+             'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
+        ])
+    print('Ingress Successfully Set %s' % data)
+except ClientError as e:
+    print(e)
+```
+
+----------------------------------------
+
+TITLE: Deleting IAM Access Keys with Boto3
+DESCRIPTION: Deletes an access key pair associated with a specified IAM user. Can manage root credentials if no username is specified.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-access-keys.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Delete access key
+iam.delete_access_key(
+    AccessKeyId='ACCESS_KEY_ID',
+    UserName='IAM_USER_NAME'
+)
+```
+
+----------------------------------------
+
+TITLE: Adding S3 ACL Grantees in Boto 2.x vs Boto3
+DESCRIPTION: Demonstrates how to add specific grantees to an S3 bucket's ACL, showing that Boto3 lacks shortcut methods but offers a simplified approach.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+bucket.add_email_grant('READ', 'user@domain.tld')
+
+# Boto3
+bucket.Acl.put(GrantRead='emailAddress=user@domain.tld')
+```
+
+----------------------------------------
+
+TITLE: Releasing EC2 Elastic IP Address using Boto3
+DESCRIPTION: Demonstrates how to release an Elastic IP address back to the AWS IP address pool. Includes error handling for cases where the address may have already been released.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-elastic-ip-addresses.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+
+ec2 = boto3.client('ec2')
+
+try:
+    response = ec2.release_address(AllocationId='ALLOCATION_ID')
+    print('Address released')
+except ClientError as e:
+    print(e)
+```
+
+----------------------------------------
+
+TITLE: Retrieving Existing KMS Customer Master Key in Python
+DESCRIPTION: Function to retrieve an existing AWS KMS Customer Master Key (CMK) based on its description. It searches through existing CMKs and returns the key ID and ARN if found.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+def retrieve_cmk(desc):
+    """Retrieve an existing KMS CMK based on its description
+
+    :param desc: Description of CMK specified when the CMK was created
+    :return Tuple(KeyId, KeyArn) where:
+        KeyId: CMK ID
+        KeyArn: Amazon Resource Name of CMK
+    :return Tuple(None, None) if a CMK with the specified description was
+    not found
+    """
+
+    # Retrieve a list of existing CMKs
+    # If more than 100 keys exist, retrieve and process them in batches
+    kms_client = boto3.client('kms')
+    try:
+        response = kms_client.list_keys()
+    except ClientError as e:
+        logging.error(e)
+        return None, None
+
+    done = False
+    while not done:
+        for cmk in response['Keys']:
+            # Get info about the key, including its description
+            try:
+                key_info = kms_client.describe_key(KeyId=cmk['KeyArn'])
+            except ClientError as e:
+                logging.error(e)
+                return None, None
+
+            # Is this the key we're looking for?
+            if key_info['KeyMetadata']['Description'] == desc:
+                return cmk['KeyId'], cmk['KeyArn']
+
+        # Are there more keys to retrieve?
+        if not response['Truncated']:
+            # No, the CMK was not found
+            logging.debug('A CMK with the specified description was not found')
+            done = True
+        else:
+            # Yes, retrieve another batch
+            try:
+                response = kms_client.list_keys(Marker=response['NextMarker'])
+            except ClientError as e:
+                logging.error(e)
+                return None, None
+
+    # All existing CMKs were checked and the desired key was not found
+    return None, None
+```
+
+----------------------------------------
+
+TITLE: Deleting a CloudWatch Alarm using Boto3
+DESCRIPTION: Demonstrates how to delete a CloudWatch alarm by name. This example creates a CloudWatch client and uses the delete_alarms method to remove the specified alarm from CloudWatch.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-creating-alarms.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# Delete alarm
+cloudwatch.delete_alarms(
+  AlarmNames=['Web_Server_CPU_Utilization'],
+)
+```
+
+----------------------------------------
+
+TITLE: Sending SQS Message and Parsing Generic ClientError (Python)
+DESCRIPTION: This example uses the boto3 SQS client to send a message to a specified queue URL. It catches a generic botocore.exceptions.ClientError and checks if the error code is 'InternalError'. If it is, it extracts and prints the error message, request ID, and HTTP status code from the error response for debugging or support purposes. It requires the boto3 library and a valid SQS queue URL.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+import botocore
+import boto3
+
+client = boto3.client('sqs')
+queue_url = 'SQS_QUEUE_URL'
+
+try:
+    client.send_message(QueueUrl=queue_url, MessageBody=('some_message'))
+
+except botocore.exceptions.ClientError as err:
+    if err.response['Error']['Code'] == 'InternalError': # Generic error
+        # We grab the message, request ID, and HTTP code to give to customer support
+        print('Error Message: {}'.format(err.response['Error']['Message']))
+        print('Request ID: {}'.format(err.response['ResponseMetadata']['RequestId']))
+        print('Http code: {}'.format(err.response['ResponseMetadata']['HTTPStatusCode']))
+    else:
+        raise err
+```
+
+----------------------------------------
+
+TITLE: Setting S3 Bucket Website Configuration using Boto3
+DESCRIPTION: Shows how to set a website configuration for an S3 bucket using put_bucket_website method. The configuration specifies the index document and error document for the static website.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-static-web-host.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Define the website configuration
+website_configuration = {
+    'ErrorDocument': {'Key': 'error.html'},
+    'IndexDocument': {'Suffix': 'index.html'},
+}
+
+# Set the website configuration
+s3 = boto3.client('s3')
+s3.put_bucket_website(Bucket='amzn-s3-demo-website-bucket',
+                      WebsiteConfiguration=website_configuration)
+```
+
+----------------------------------------
+
+TITLE: Verifying Email Address with Amazon SES using Boto3
+DESCRIPTION: Creates an SES client and verifies an email address by sending a verification email to the specified address. The address becomes verified when the recipient clicks the link in the email.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-verify.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.verify_email_identity(
+  EmailAddress = 'EMAIL_ADDRESS'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Deleting EC2 Key Pair with Boto3
+DESCRIPTION: Demonstrates how to delete an existing key pair from EC2 by removing the public key. This operation cannot be undone, and the private key file should be deleted as well.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-key-pairs.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+ec2 = boto3.client('ec2')
+response = ec2.delete_key_pair(KeyName='KEY_PAIR_NAME')
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Passing Additional Parameters to Resource Actions
+DESCRIPTION: Demonstrates how to pass additional parameters to resource actions using keyword arguments. Resource identifiers are automatically included as parameters.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+# SQS Service
+queue = sqs.get_queue_by_name(QueueName='test')
+
+# SQS Queue
+queue.send_message(MessageBody='hello')
+```
+
+----------------------------------------
+
+TITLE: Retrieving EC2 Regions and Availability Zones with Boto3
+DESCRIPTION: This code initializes an EC2 client and retrieves information about available regions and availability zones. It first uses describe_regions() to get all regions that work with EC2, then calls describe_availability_zones() to retrieve availability zones for the current region of the EC2 client.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-regions-avail-zones.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+ec2 = boto3.client('ec2')
+
+# Retrieves all regions/endpoints that work with EC2
+response = ec2.describe_regions()
+print('Regions:', response['Regions'])
+
+# Retrieves availability zones only for region of the ec2 object
+response = ec2.describe_availability_zones()
+print('Availability Zones:', response['AvailabilityZones'])
+```
+
+----------------------------------------
+
+TITLE: Deleting SQS Queue with Boto3
+DESCRIPTION: Demonstrates how to delete an existing SQS queue using its URL with the delete_queue API.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-using-queues.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+# Delete SQS queue
+sqs.delete_queue(QueueUrl='SQS_QUEUE_URL')
+```
+
+----------------------------------------
+
+TITLE: Deleting Domain Identity from Amazon SES using Boto3
+DESCRIPTION: Removes a verified domain from the list of verified identities in Amazon SES using the DeleteIdentity operation.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-verify.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.delete_identity(
+  Identity = 'DOMAIN_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Disabling CloudWatch Alarm Actions using Boto3
+DESCRIPTION: This snippet shows how to disable actions for specified CloudWatch alarms using the disable_alarm_actions method. When an alarm's actions are disabled, they won't execute when the alarm state changes.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-using-alarms.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# Disable alarm
+cloudwatch.disable_alarm_actions(
+  AlarmNames=['Web_Server_CPU_Utilization'],
+)
+```
+
+----------------------------------------
+
+TITLE: Installing Boto3 in AWS Cloud9 Environment
+DESCRIPTION: Command to install the latest version of Boto3 in an AWS Cloud9 environment using pip. This needs to be run in the AWS Cloud9 terminal to set up the Python SDK for AWS.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cloud9.rst#2025-04-21_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+sudo pip install boto3
+```
+
+----------------------------------------
+
+TITLE: Creating Email Filter in Amazon SES using Boto3
+DESCRIPTION: Creates an IP address filter to allow or block emails from specific IP addresses. Requires specifying a unique filter name and IP address range (CIDR) along with the policy (Allow/Block).
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-filters.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+# Create receipt filter
+response = ses.create_receipt_filter(
+  Filter = {
+    'NAME'     : 'NAME',
+    'IpFilter' : {
+      'Cidr'   : 'IP_ADDRESS_OR_RANGE',
+      'Policy' : 'Allow' 
+    }
+  }
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Deleting S3 Bucket Website Configuration using Boto3
+DESCRIPTION: Demonstrates how to remove the website configuration from an S3 bucket using the delete_bucket_website method. This operation completely removes the website hosting configuration from the specified bucket.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-static-web-host.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# Delete the website configuration
+s3 = boto3.client('s3')
+s3.delete_bucket_website(Bucket='amzn-s3-demo-website-bucket')
+```
+
+----------------------------------------
+
+TITLE: Creating SES Receipt Rule with Boto3
+DESCRIPTION: Creates a receipt rule that sends incoming emails to an Amazon S3 bucket. The rule is added to an existing rule set and can be configured with recipients, TLS policy, and various actions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-rules.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.create_receipt_rule(
+  RuleSetName   = 'RULE_SET_NAME',
+  Rule          = {
+    'Name'      : 'RULE_NAME',
+    'Enabled'   : True,
+    'TlsPolicy' : 'Optional',
+    'Recipients': [
+      'EMAIL_ADDRESS',
+    ],
+    'Actions'   : [
+      {
+        'S3Action'         : {
+          'BucketName'     : 'amzn-s3-demo-bucket',
+          'ObjectKeyPrefix': 'SES_email'
+        }
+      }
+    ],
+  }
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Creating CloudWatch Logs Subscription Filter
+DESCRIPTION: Python code to create or update a subscription filter and associate it with a specified log group, directing matched logs to a Lambda function.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-subscription-filters.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatchLogs client
+cloudwatch_logs = boto3.client('logs')
+
+# Create a subscription filter
+cloudwatch_logs.put_subscription_filter(
+    destinationArn='LAMBDA_FUNCTION_ARN',
+    filterName='FILTER_NAME',
+    filterPattern='ERROR',
+    logGroupName='LOG_GROUP',
+)
+```
+
+----------------------------------------
+
+TITLE: Thread-safe Resource Usage with Boto3
+DESCRIPTION: Demonstrates how to safely use Boto3 resources in a multithreaded environment. Resource instances are not thread-safe and should be created separately for each thread or process.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_10
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+import boto3.session
+import threading
+
+class MyTask(threading.Thread):
+    def run(self):
+        # Here we create a new session per thread
+        session = boto3.session.Session()
+
+        # Next, we create a resource client using our thread's session object
+        s3 = session.resource('s3')
+
+        # Put your thread-safe code here
+```
+
+----------------------------------------
+
+TITLE: Listing CloudWatch Logs Subscription Filters
+DESCRIPTION: Python code to list existing subscription filters for a specified log group using the CloudWatch Logs paginator interface.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-subscription-filters.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatchLogs client
+cloudwatch_logs = boto3.client('logs')
+
+# List subscription filters through the pagination interface
+paginator = cloudwatch_logs.get_paginator('describe_subscription_filters')
+for response in paginator.paginate(logGroupName='GROUP_NAME'):
+    print(response['subscriptionFilters'])
+```
+
+----------------------------------------
+
+TITLE: Creating Data Key for Encryption in Python
+DESCRIPTION: Function to generate a data key using AWS KMS for encrypting file contents. It returns both the encrypted and plaintext forms of the data key.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+def create_data_key(cmk_id, key_spec='AES_256'):
+    """Generate a data key to use when encrypting and decrypting data
+
+    :param cmk_id: KMS CMK ID or ARN under which to generate and encrypt the
+    data key.
+    :param key_spec: Length of the data encryption key. Supported values:
+        'AES_128': Generate a 128-bit symmetric key
+        'AES_256': Generate a 256-bit symmetric key
+    :return Tuple(EncryptedDataKey, PlaintextDataKey) where:
+        EncryptedDataKey: Encrypted CiphertextBlob data key as binary string
+        PlaintextDataKey: Plaintext base64-encoded data key as binary string
+    :return Tuple(None, None) if error
+    """
+
+    # Create data key
+    kms_client = boto3.client('kms')
+    try:
+        response = kms_client.generate_data_key(KeyId=cmk_id, KeySpec=key_spec)
+    except ClientError as e:
+        logging.error(e)
+        return None, None
+
+    # Return the encrypted and plaintext data key
+    return response['CiphertextBlob'], base64.b64encode(response['Plaintext'])
+```
+
+----------------------------------------
+
+TITLE: Managing S3 Key Metadata in Boto 2.x vs Boto3
+DESCRIPTION: Shows how to set and retrieve custom metadata on S3 objects in both Boto versions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_9
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+key.set_metadata('meta1', 'This is my metadata value')
+print(key.get_metadata('meta1'))
+
+# Boto3
+key.put(Metadata={'meta1': 'This is my metadata value'})
+print(key.metadata['meta1'])
+```
+
+----------------------------------------
+
+TITLE: Creating SES Receipt Rule Set with Boto3
+DESCRIPTION: Creates a new receipt rule set in Amazon SES by specifying a unique rule set name. A receipt rule set is required before creating individual receipt rules.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-rules.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.create_receipt_rule_set(
+  RuleSetName = 'RULE_SET_NAME',
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Retrieving an Email Template with Amazon SES in Python
+DESCRIPTION: This snippet shows how to retrieve an existing email template using the SES get_template() method. It requires only the template name as a parameter.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-template.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.get_template(
+  TemplateName = 'TEMPLATE_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Changing Message Visibility Timeout in Amazon SQS using Boto3
+DESCRIPTION: This snippet demonstrates how to receive a message from an SQS queue and change its visibility timeout. It uses the boto3 client to interact with SQS, receives a message, and then changes the visibility timeout of that message to 20 seconds.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-visibility-timeout.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+queue_url = 'SQS_QUEUE_URL'
+
+# Receive message from SQS queue
+response = sqs.receive_message(
+    QueueUrl=queue_url,
+    AttributeNames=[
+        'SentTimestamp'
+    ],
+    MaxNumberOfMessages=1,
+    MessageAttributeNames=[
+        'All'
+    ],
+)
+
+message = response['Messages'][0]
+receipt_handle = message['ReceiptHandle']
+
+# Change visibility timeout of message from queue
+sqs.change_message_visibility(
+    QueueUrl=queue_url,
+    ReceiptHandle=receipt_handle,
+    VisibilityTimeout=20
+)
+print('Received and changed visibility timeout of message: %s' % message)
+```
+
+----------------------------------------
+
+TITLE: Filtering Boto3 Paginator Results with JMESPath in Python
+DESCRIPTION: This snippet shows how to use JMESPath expressions for client-side filtering of paginated results, allowing for complex filtering logic like selecting only objects larger than 100 bytes.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/paginators.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+client = boto3.client('s3', region_name='us-west-2')
+paginator = client.get_paginator('list_objects_v2')
+page_iterator = paginator.paginate(Bucket='amzn-s3-demo-bucket')
+filtered_iterator = page_iterator.search("Contents[?Size > `100`][]")
+for key_data in filtered_iterator:
+    print(key_data)
+```
+
+----------------------------------------
+
+TITLE: Configuring Boto3 S3 Client for Access Points via VPC Endpoint
+DESCRIPTION: Creates an S3 client configured to access S3 access points through an interface VPC endpoint. This client configuration is specifically for access point operations and cannot be used for S3 buckets.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3-example-privatelink.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+s3_client = boto3.client(
+    service_name='s3',
+    endpoint_url='https://accesspoint.vpce-abc123-abcdefgh.s3.us-east-1.vpce.amazonaws.com'
+)
+```
+
+----------------------------------------
+
+TITLE: Creating IAM Role Policy for CloudWatch Alarms in Python
+DESCRIPTION: This snippet defines an IAM role policy that grants permissions to describe, reboot, stop, or terminate an Amazon EC2 instance. It's a prerequisite for using CloudWatch alarm actions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-using-alarms.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+{
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Effect": "Allow",
+         "Action": [
+            "cloudwatch:Describe*",
+            "ec2:Describe*",
+            "ec2:RebootInstances",
+            "ec2:StopInstances*",
+            "ec2:TerminateInstances"
+         ],
+         "Resource": [
+            "*"
+         ]
+      }
+   ]
+}
+```
+
+----------------------------------------
+
+TITLE: Creating VPC Resources in Boto 2.x and Boto3
+DESCRIPTION: This snippet shows how to create VPC resources such as a VPC, subnet, and internet gateway. The process is similar in both Boto 2.x and Boto3, with Boto3 using resource objects for a more object-oriented approach.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+vpc = vpc_connection.create_vpc('10.0.0.0/24')
+subnet = vpc_connection.create_subnet(vpc.id, '10.0.0.0/25')
+gateway = vpc_connection.create_internet_gateway()
+
+# Boto3
+vpc = ec2.create_vpc(CidrBlock='10.0.0.0/24')
+subnet = vpc.create_subnet(CidrBlock='10.0.0.0/25')
+gateway = ec2.create_internet_gateway()
+```
+
+----------------------------------------
+
+TITLE: Adjusting Concurrent S3 Transfer Operations in Python using Boto3
+DESCRIPTION: This code snippet shows how to adjust the maximum number of concurrent S3 API transfer operations using boto3. It sets the max_concurrency attribute to 5 to reduce bandwidth usage during a file download.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/s3.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# To consume less downstream bandwidth, decrease the maximum concurrency 
+config = TransferConfig(max_concurrency=5)
+
+# Download an S3 object
+s3 = boto3.client('s3')
+s3.download_file('amzn-s3-demo-bucket', 'OBJECT_NAME', 'FILE_NAME', Config=config)
+```
+
+----------------------------------------
+
+TITLE: Listing Email Templates with Amazon SES in Python
+DESCRIPTION: This snippet demonstrates how to list all email templates associated with your AWS account in the current region using the SES list_templates() method. It limits the results to 10 items.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-template.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.list_templates(
+  MaxItems=10
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Accessing S3 Buckets in Boto 2.x vs Boto3
+DESCRIPTION: Shows how to get a bucket in both versions and check if a bucket exists, noting that Boto3 requires explicit validation using exceptions and the head_bucket method.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+bucket = s3_connection.get_bucket('amzn-s3-demo-bucket', validate=False)
+exists = s3_connection.lookup('amzn-s3-demo-bucket')
+
+# Boto3
+import botocore
+bucket = s3.Bucket('amzn-s3-demo-bucket')
+exists = True
+try:
+    s3.meta.client.head_bucket(Bucket='amzn-s3-demo-bucket')
+except botocore.exceptions.ClientError as e:
+    # If a client error is thrown, then check that it was a 404 error.
+    # If it was a 404 error, then the bucket does not exist.
+    error_code = e.response['Error']['Code']
+    if error_code == '404':
+        exists = False
+```
+
+----------------------------------------
+
+TITLE: Deleting SES Receipt Rule with Boto3
+DESCRIPTION: Removes a specific receipt rule from a rule set by providing the rule name and rule set name to the deletion operation.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-rules.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.delete_receipt_rule(
+  RuleName='RULE_NAME',
+  RuleSetName='RULE_SET_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Listing IAM Account Aliases with Boto3
+DESCRIPTION: This snippet shows how to list AWS account aliases using the IAM client's get_paginator method for list_account_aliases. It uses pagination to handle potentially large result sets.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-account-aliases.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# List account aliases through the pagination interface
+paginator = iam.get_paginator('list_account_aliases')
+for response in paginator.paginate():
+    print(response['AccountAliases'])
+```
+
+----------------------------------------
+
+TITLE: Restoring Glacier Objects with Boto3
+DESCRIPTION: Demonstrates how to restore objects from Glacier storage class, check restoration status, and handle ongoing restoration requests. Uses storage_class and restore attributes to manage the process.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+s3 = boto3.resource('s3')
+bucket = s3.Bucket('amzn-s3-demo-bucket')
+for obj_sum in bucket.objects.all():
+    obj = s3.Object(obj_sum.bucket_name, obj_sum.key)
+    if obj.storage_class == 'GLACIER':
+        if obj.restore is None:
+            print('Submitting restoration request: %s' % obj.key)
+            obj.restore_object(RestoreRequest={'Days': 1})
+        elif 'ongoing-request="true"' in obj.restore:
+            print('Restoration in-progress: %s' % obj.key)
+        elif 'ongoing-request="false"' in obj.restore:
+            print('Restoration complete: %s' % obj.key)
+```
+
+----------------------------------------
+
+TITLE: Managing Elastic IPs and Gateways in Boto 2.x and Boto3
+DESCRIPTION: This code demonstrates how to attach and detach an internet gateway to a VPC, and associate and disassociate an Elastic IP with an instance. Boto3 uses resource objects for these operations, providing a more intuitive interface.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+ec2_connection.attach_internet_gateway(gateway.id, vpc.id)
+ec2_connection.detach_internet_gateway(gateway.id, vpc.id)
+
+from boto.ec2.address import Address
+address = Address()
+address.allocation_id = 'eipalloc-35cf685d'
+address.associate('i-71b2f60b')
+address.disassociate()
+
+# Boto3
+gateway.attach_to_vpc(VpcId=vpc.id)
+gateway.detach_from_vpc(VpcId=vpc.id)
+
+address = ec2.VpcAddress('eipalloc-35cf685d')
+address.associate('i-71b2f60b')
+address.association.delete()
+```
+
+----------------------------------------
+
+TITLE: S3 Upload/Download with Customer-Provided Encryption Keys
+DESCRIPTION: Demonstrates using SSE-C encryption with customer-provided keys for S3 operations. Shows key generation, upload, and download processes with the same encryption key.
+SOURCE: https://github.com/boto/boto3/blob/develop/boto3/examples/s3.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+import os
+
+BUCKET = 'amzn-s3-demo-bucket'
+KEY = os.urandom(32)
+s3 = boto3.client('s3')
+
+print("Uploading S3 object with SSE-C")
+s3.put_object(Bucket=BUCKET,
+              Key='encrypt-key',
+              Body=b'foobar',
+              SSECustomerKey=KEY,
+              SSECustomerAlgorithm='AES256')
+print("Done")
+
+# Getting the object:
+print("Getting S3 object...")
+# Note how we're using the same ``KEY`` we
+# created earlier.
+response = s3.get_object(Bucket=BUCKET,
+                         Key='encrypt-key',
+                         SSECustomerKey=KEY,
+                         SSECustomerAlgorithm='AES256')
+print("Done, response body:")
+print(response['Body'].read())
+```
+
+----------------------------------------
+
+TITLE: Decrypting Data Key with AWS KMS in Python
+DESCRIPTION: This function decrypts an encrypted data key using AWS KMS. It creates a KMS client using boto3, attempts to decrypt the key, and returns the plaintext key encoded in base64. If an error occurs during decryption, it logs the error and returns None.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/kms-example-encrypt-decrypt-file.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+kms_client = boto3.client('kms')
+try:
+    response = kms_client.decrypt(CiphertextBlob=data_key_encrypted)
+except ClientError as e:
+    logging.error(e)
+    return None
+
+# Return plaintext base64-encoded binary data key
+return base64.b64encode((response['Plaintext']))
+```
+
+----------------------------------------
+
+TITLE: Listing CloudWatch Metrics using Boto3 Pagination
+DESCRIPTION: This snippet demonstrates how to list metric alarms of incoming log events using the paginate method of the CloudWatch client. It uses dimensions to filter for LogGroupName and specifies the MetricName and Namespace.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-metrics.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# List metrics through the pagination interface
+paginator = cloudwatch.get_paginator('list_metrics')
+for response in paginator.paginate(Dimensions=[{'Name': 'LogGroupName'}],
+                                   MetricName='IncomingLogEvents',
+                                   Namespace='AWS/Logs'):
+    print(response['Metrics'])
+```
+
+----------------------------------------
+
+TITLE: Accessing References to Related Resources
+DESCRIPTION: Shows how to access references to related resource instances. References represent many-to-one or one-to-one relationships that don't share identifiers with the parent resource.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+# EC2 Instance
+instance.subnet
+instance.vpc
+```
+
+----------------------------------------
+
+TITLE: Listing Email Addresses in Amazon SES using Boto3
+DESCRIPTION: Retrieves a list of email addresses submitted in the current AWS Region using the ListIdentities operation. Returns up to 10 email addresses regardless of verification status.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-verify.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.list_identities(
+  IdentityType = 'EmailAddress',
+  MaxItems=10
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Stopping and Terminating EC2 Instances in Boto 2.x and Boto3
+DESCRIPTION: This snippet illustrates how to stop and terminate multiple EC2 instances given a list of instance IDs. Boto3 uses collection filtering to achieve this, providing a more streamlined approach.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrationec2.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+ids = ['instance-id-1', 'instance-id-2', ...]
+
+# Boto 2.x
+ec2_connection.stop_instances(instance_ids=ids)
+ec2_connection.terminate_instances(instance_ids=ids)
+
+# Boto3
+ec2.instances.filter(InstanceIds=ids).stop()
+ec2.instances.filter(InstanceIds=ids).terminate()
+```
+
+----------------------------------------
+
+TITLE: Mapping Python Types to DynamoDB Types in Boto3
+DESCRIPTION: This table shows the correspondence between Python types and DynamoDB types when using Boto3 Table Resource. It includes basic types like string and integer, as well as more complex types like Binary and sets.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/reference/customizations/dynamodb.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
++----------------------------------------------+-----------------------------+
+| Python Type                                  | DynamoDB Type               |
++==============================================+=============================+
+| string                                       | String (S)                  |
++----------------------------------------------+-----------------------------+
+| integer                                      | Number (N)                  |
++----------------------------------------------+-----------------------------+
+| :py:class:`decimal.Decimal`                  | Number (N)                  |
++----------------------------------------------+-----------------------------+
+| :py:class:`boto3.dynamodb.types.Binary`      | Binary (B)                  |
++----------------------------------------------+-----------------------------+
+| boolean                                      | Boolean (BOOL)              |
++----------------------------------------------+-----------------------------+
+| ``None``                                     | Null (NULL)                 |
++----------------------------------------------+-----------------------------+
+| string set                                   | String Set (SS)             |
++----------------------------------------------+-----------------------------+
+| integer set                                  | Number Set (NS)             |
++----------------------------------------------+-----------------------------+
+| :py:class:`decimal.Decimal` set              | Number Set (NS)             |
++----------------------------------------------+-----------------------------+
+| :py:class:`boto3.dynamodb.types.Binary` set  | Binary Set (BS)             |
++----------------------------------------------+-----------------------------+
+| list                                         | List (L)                    |
++----------------------------------------------+-----------------------------+
+| dict                                         | Map (M)                     |
++----------------------------------------------+-----------------------------+
+```
+
+----------------------------------------
+
+TITLE: Deleting Email Filter in Amazon SES using Boto3
+DESCRIPTION: Removes an existing IP address filter by specifying its unique filter name. This operation is useful when needing to modify the range of filtered IP addresses by deleting and recreating filters.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-filters.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.delete_receipt_filter(
+  FilterName = 'NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Creating DynamoDB Table with Boto3
+DESCRIPTION: Creates a new DynamoDB table with specified hash and range keys, attribute definitions, and provisioned throughput settings.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/dynamodb.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Get the service resource.
+dynamodb = boto3.resource('dynamodb')
+
+# Create the DynamoDB table.
+table = dynamodb.create_table(
+    TableName='users',
+    KeySchema=[
+        {
+            'AttributeName': 'username',
+            'KeyType': 'HASH'
+        },
+        {
+            'AttributeName': 'last_name',
+            'KeyType': 'RANGE'
+        }
+    ],
+    AttributeDefinitions=[
+        {
+            'AttributeName': 'username',
+            'AttributeType': 'S'
+        },
+        {
+            'AttributeName': 'last_name',
+            'AttributeType': 'S'
+        },
+    ],
+    ProvisionedThroughput={
+        'ReadCapacityUnits': 5,
+        'WriteCapacityUnits': 5
+    }
+)
+
+# Wait until the table exists.
+table.wait_until_exists()
+
+# Print out some data about the table.
+print(table.item_count)
+```
+
+----------------------------------------
+
+TITLE: Listing CloudWatch Alarms with Insufficient Data State using Boto3 Pagination
+DESCRIPTION: Demonstrates how to list CloudWatch alarms that are in the 'INSUFFICIENT_DATA' state using the pagination interface. This code creates a CloudWatch client and uses a paginator to retrieve and print all metric alarms with insufficient data.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/cw-example-creating-alarms.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create CloudWatch client
+cloudwatch = boto3.client('cloudwatch')
+
+# List alarms of insufficient data through the pagination interface
+paginator = cloudwatch.get_paginator('describe_alarms')
+for response in paginator.paginate(StateValue='INSUFFICIENT_DATA'):
+    print(response['MetricAlarms'])
+```
+
+----------------------------------------
+
+TITLE: Deleting EC2 Security Group using Boto3
+DESCRIPTION: This snippet demonstrates how to delete an EC2 security group using the delete_security_group method. It handles potential errors that might occur if the security group is still in use by instances or referenced by other security groups.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-security-group.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+# Create EC2 client
+ec2 = boto3.client('ec2')
+
+# Delete security group
+try:
+    response = ec2.delete_security_group(GroupId='SECURITY_GROUP_ID')
+    print('Security Group Deleted')
+except ClientError as e:
+    print(e)
+```
+
+----------------------------------------
+
+TITLE: Comparing Low-level and High-level Connections in Boto2 vs Boto3
+DESCRIPTION: Demonstrates the difference between creating low-level connections and high-level resource objects in both Boto 2.x and Boto3. Shows examples for Elastic Transcoder and S3 services.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migration.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto, boto3
+
+# Low-level connections
+conn = boto.connect_elastictranscoder()
+client = boto3.client('elastictranscoder')
+
+# High-level connections & resource objects
+from boto.s3.bucket import Bucket
+s3_conn = boto.connect_s3()
+boto2_bucket = Bucket('amzn-s3-demo-bucket')
+
+s3 = boto3.resource('s3')
+boto3_bucket = s3.Bucket('amzn-s3-demo-bucket')
+```
+
+----------------------------------------
+
+TITLE: Creating and Using Boto3 Paginators in Python
+DESCRIPTION: This snippet demonstrates how to create a paginator for the S3 list_objects_v2 operation. It shows the complete process from client creation to iterating through paginated results.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/paginators.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create a client
+client = boto3.client('s3', region_name='us-west-2')
+
+# Create a reusable Paginator
+paginator = client.get_paginator('list_objects_v2')
+
+# Create a PageIterator from the Paginator
+page_iterator = paginator.paginate(Bucket='amzn-s3-demo-bucket')
+
+for page in page_iterator:
+    print(page['Contents'])
+```
+
+----------------------------------------
+
+TITLE: Creating an IAM Account Alias with Boto3
+DESCRIPTION: This snippet demonstrates how to create an AWS account alias using the IAM client's create_account_alias method. It requires the Boto3 library and proper AWS credentials configuration.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-account-aliases.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Create an account alias
+iam.create_account_alias(
+    AccountAlias='ALIAS'
+)
+```
+
+----------------------------------------
+
+TITLE: Listing Domain Identities in Amazon SES using Boto3
+DESCRIPTION: Retrieves a list of email domains submitted in the current AWS Region using the ListIdentities operation. Returns up to 10 domains regardless of verification status.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-verify.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.list_identities(
+  IdentityType = 'Domain',
+  MaxItems=10
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Listing Email Filters in Amazon SES using Boto3
+DESCRIPTION: Retrieves a list of all IP address filters associated with the AWS account in the current region using the ListReceiptFilters operation.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-filters.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.list_receipt_filters()
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Filtering S3 Objects with Prefix Using Boto3 Collection in Python
+DESCRIPTION: This code snippet shows how to filter S3 objects using a prefix. It iterates over all buckets and then filters objects within each bucket that have the prefix 'photos/'.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# S3 list all keys with the prefix 'photos/'
+s3 = boto3.resource('s3')
+for bucket in s3.buckets.all():
+    for obj in bucket.objects.filter(Prefix='photos/'):
+        print('{0}:{1}'.format(bucket.name, obj.key))
+```
+
+----------------------------------------
+
+TITLE: Creating S3 Buckets in Boto 2.x vs Boto3
+DESCRIPTION: Shows how to create S3 buckets with both Boto versions, highlighting that Boto3 requires keyword arguments and explicit bucket configuration for locations.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+s3_connection.create_bucket('amzn-s3-demo-bucket')
+s3_connection.create_bucket('amzn-s3-demo-bucket', location=Location.USWest)
+
+# Boto3
+s3.create_bucket(Bucket='amzn-s3-demo-bucket')
+s3.create_bucket(Bucket='amzn-s3-demo-bucket', CreateBucketConfiguration={
+    'LocationConstraint': 'us-west-1'})
+```
+
+----------------------------------------
+
+TITLE: Creating a Config Object for Boto3 Client Configuration in Python
+DESCRIPTION: This snippet demonstrates how to create a Config object with custom options like region, signature version, and retry settings, then use it to initialize a Boto3 client.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/configuration.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.config import Config
+
+my_config = Config(
+    region_name = 'us-west-2',
+    signature_version = 'v4',
+    retries = {
+        'max_attempts': 10,
+        'mode': 'standard'
+    }
+)
+
+client = boto3.client('kinesis', config=my_config)
+```
+
+----------------------------------------
+
+TITLE: Describing EC2 Security Groups using Boto3
+DESCRIPTION: This snippet demonstrates how to retrieve information about an EC2 security group using the describe_security_groups method. It requires a security group ID and handles potential client errors with exception handling.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-security-group.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+from botocore.exceptions import ClientError
+
+ec2 = boto3.client('ec2')
+
+try:
+    response = ec2.describe_security_groups(GroupIds=['SECURITY_GROUP_ID'])
+    print(response)
+except ClientError as e:
+    print(e)
+```
+
+----------------------------------------
+
+TITLE: Using Waiters in Boto3 Clients
+DESCRIPTION: Example showing how to list available waiters for boto3 clients. Waiters are utility methods that poll the status of AWS resources until they reach a specific state.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/clients.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+s3 = boto3.client('s3')
+sqs = boto3.client('sqs')
+
+# List all of the possible waiters for both clients
+print("s3 waiters:")
+s3.waiter_names
+
+print("sqs waiters:")
+sqs.waiter_names
+```
+
+----------------------------------------
+
+TITLE: Listing Botocore Static Exceptions (Python)
+DESCRIPTION: This Python snippet demonstrates how to programmatically list the statically defined exception classes available within the `botocore.exceptions` module. These exceptions represent client-side errors related to configuration, validation, or network issues.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import botocore.exceptions
+
+for key, value in sorted(botocore.exceptions.__dict__.items()):
+    if isinstance(value, type):
+        print(key)
+```
+
+----------------------------------------
+
+TITLE: Setting Up Python Virtual Environment and Installing Boto3
+DESCRIPTION: These commands create a Python virtual environment and install the Boto3 library for testing TLS connections.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/security.rst#2025-04-21_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+python3 -m venv test-env
+source test-env/bin/activate
+pip install botocore
+```
+
+----------------------------------------
+
+TITLE: Deleting SES Receipt Rule Set with Boto3
+DESCRIPTION: Deletes an entire receipt rule set and all rules it contains. The rule set must not be currently disabled for the operation to succeed.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ses-rules.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SES client
+ses = boto3.client('ses')
+
+response = ses.delete_receipt_rule_set(
+  RuleSetName = 'RULE_SET_NAME'
+)
+
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Monitoring EC2 Instances using Boto3
+DESCRIPTION: Shows how to enable or disable detailed monitoring for EC2 instances. Takes a command line argument to toggle monitoring state using monitor_instances and unmonitor_instances API calls.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-managing-instances.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import sys
+import boto3
+
+
+ec2 = boto3.client('ec2')
+if sys.argv[1] == 'ON':
+    response = ec2.monitor_instances(InstanceIds=['INSTANCE_ID'])
+else:
+    response = ec2.unmonitor_instances(InstanceIds=['INSTANCE_ID'])
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Configuring AWS Assume Role Profile in Config File
+DESCRIPTION: Configure an assume role profile in the AWS config file to allow Boto3 to automatically make AssumeRole calls to AWS STS. This example shows minimal configuration needed for cross-account access.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/credentials.rst#2025-04-21_snippet_3
+
+LANGUAGE: ini
+CODE:
+```
+# In ~/.aws/credentials:
+[development]
+aws_access_key_id=foo
+aws_access_key_id=bar
+
+# In ~/.aws/config
+[profile crossaccount]
+role_arn=arn:aws:iam:...
+source_profile=development
+```
+
+----------------------------------------
+
+TITLE: Creating SQS Queue with Long Polling Enabled using Boto3
+DESCRIPTION: This snippet demonstrates how to create an Amazon SQS queue with long polling enabled using the Boto3 create_queue method. It sets the ReceiveMessageWaitTimeSeconds attribute to 20 seconds.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/sqs-example-long-polling.rst#2025-04-21_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create SQS client
+sqs = boto3.client('sqs')
+
+# Create a SQS queue with long polling enabled
+response = sqs.create_queue(
+    QueueName='SQS_QUEUE_NAME',
+    Attributes={'ReceiveMessageWaitTimeSeconds': '20'}
+)
+
+print(response['QueueUrl'])
+```
+
+----------------------------------------
+
+TITLE: Listing IAM Users with Boto3 in Python
+DESCRIPTION: This snippet shows how to list IAM users using the get_paginator method for 'list_users' from the IAM client in Boto3. It uses pagination to handle large numbers of users efficiently.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-users.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# List users with the pagination interface
+paginator = iam.get_paginator('list_users')
+for response in paginator.paginate():
+    print(response)
+```
+
+----------------------------------------
+
+TITLE: Customizing Boto3 Pagination Configuration in Python
+DESCRIPTION: This snippet shows how to customize pagination behavior using the PaginationConfig parameter, which allows control over the maximum number of items, starting position, and page size.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/paginators.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+paginator = client.get_paginator('list_objects_v2')
+page_iterator = paginator.paginate(Bucket='amzn-s3-demo-bucket',
+                               PaginationConfig={'MaxItems': 10})
+```
+
+----------------------------------------
+
+TITLE: Creating EC2 Key Pair with Boto3
+DESCRIPTION: Shows how to create a new 2048-bit RSA key pair in EC2. The method returns the private key which needs to be saved securely. Amazon EC2 stores only the public key.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/ec2-example-key-pairs.rst#2025-04-21_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+ec2 = boto3.client('ec2')
+response = ec2.create_key_pair(KeyName='KEY_PAIR_NAME')
+print(response)
+```
+
+----------------------------------------
+
+TITLE: Retrieving S3 ACL Grant Information in Boto 2.x vs Boto3
+DESCRIPTION: Shows how to retrieve and iterate through ACL grant information in both Boto versions, highlighting the different data structures used.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+acp = bucket.get_acl()
+for grant in acp.acl.grants:
+    print(grant.display_name, grant.permission)
+
+# Boto3
+acl = bucket.Acl()
+for grant in acl.grants:
+    print(grant['Grantee']['DisplayName'], grant['Permission'])
+```
+
+----------------------------------------
+
+TITLE: Installing Boto3 with Package Constraints
+DESCRIPTION: Various pip commands showing how to install Boto3 with specific version constraints
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/quickstart.rst#2025-04-23_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+pip install boto3
+
+# Install Boto3 version 1.0 specifically
+pip install boto3==1.0.0
+
+# Make sure Boto3 is no older than version 1.15.0
+pip install boto3>=1.15.0
+
+# Avoid versions of Boto3 newer than version 1.15.3
+pip install boto3<=1.15.3
+```
+
+----------------------------------------
+
+TITLE: Deleting S3 Buckets in Boto 2.x vs Boto3
+DESCRIPTION: Demonstrates how to delete all objects in a bucket before deleting the bucket itself, which is required in both Boto versions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/migrations3.rst#2025-04-21_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+# Boto 2.x
+for key in bucket:
+    key.delete()
+bucket.delete()
+
+# Boto3
+for key in bucket.objects.all():
+    key.delete()
+bucket.delete()
+```
+
+----------------------------------------
+
+TITLE: Limiting S3 Bucket Results Using Boto3 Collection in Python
+DESCRIPTION: This snippet shows how to limit the number of items returned from a collection using the 'limit()' method. It iterates over the first ten S3 buckets.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/collections.rst#2025-04-21_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# S3 iterate over first ten buckets
+for bucket in s3.buckets.limit(10):
+    print(bucket.name)
+```
+
+----------------------------------------
+
+TITLE: Working with Resource Identifiers using Positional Parameters
+DESCRIPTION: Demonstrates how to initialize resources using positional arguments for identifiers instead of named parameters. All required identifiers must still be provided to avoid exceptions.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/resources.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# SQS Queue
+queue = sqs.Queue('http://...')
+
+# S3 Object
+obj = s3.Object('boto3', 'test.py')
+
+# Raises exception, missing key!
+obj = s3.Object('boto3')
+```
+
+----------------------------------------
+
+TITLE: Adding Custom Class Inheritance to S3 Client
+DESCRIPTION: Example showing how to add a new base class for the S3 client to inherit from using the creating-client-class event.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/events.rst#2025-04-21_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+from boto3.session import Session
+
+class MyClass(object):
+    def __init__(self, *args, **kwargs):
+        super(MyClass, self).__init__(*args, **kwargs)
+        print('Client instantiated!')
+
+def add_custom_class(base_classes, **kwargs):
+    base_classes.insert(0, MyClass)
+
+session = Session()
+session.events.register('creating-client-class.s3', add_custom_class)
+
+client = session.client('s3')
+```
+
+----------------------------------------
+
+TITLE: Updating an IAM User's Name with Boto3 in Python
+DESCRIPTION: This snippet demonstrates how to update an IAM user's name using the update_user method of the IAM client in Boto3. It requires the current username and the new username.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/iam-example-managing-users.rst#2025-04-21_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+import boto3
+
+# Create IAM client
+iam = boto3.client('iam')
+
+# Update a user name
+iam.update_user(
+    UserName='IAM_USER_NAME',
+    NewUserName='NEW_IAM_USER_NAME'
+)
+```
+
+----------------------------------------
+
+TITLE: Catching AWS Service Exceptions for Resource Clients in Python
+DESCRIPTION: This example illustrates how to catch a specific AWS service exception, such as S3's BucketAlreadyExists, when using a Boto3 Resource client by accessing the exception class via the client's meta property.
+SOURCE: https://github.com/boto/boto3/blob/develop/docs/source/guide/error-handling.rst#_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+
+```

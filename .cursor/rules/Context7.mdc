@@ -1,0 +1,77 @@
+---
+description: MCP or Model Context Server Protocols and Context7
+globs: 
+alwaysApply: false
+---
+# Rule: Using Context7 Model Context Protocol (MCP) Server
+
+## Overview
+Context7 is a Model Context Protocol (MCP) server that dynamically fetches up-to-date, version-specific documentation and code examples from official sources and injects them directly into your prompt context. This helps eliminate outdated API references, deprecated methods, and hallucinated functions that don't exist, resulting in more accurate and reliable code generation.
+
+## How Context7 Works
+When you include the trigger phrase `use context7` in your prompt, the MCP client routes relevant parts of your request to the Context7 server. The server identifies libraries mentioned in your query, fetches current documentation and examples, and includes them in the context before the AI generates a response.
+
+## Available Tools
+Context7 provides two main tools for accessing documentation:
+
+1. **`resolve-library-id`**: Resolves a general library name into a Context7-compatible library ID.
+   * **Parameters**:
+     * `libraryName` (required): The name of the library you want documentation for (e.g., "react", "nextjs", "postgres")
+
+2. **`get-library-docs`**: Fetches documentation for a library using a Context7-compatible library ID.
+   * **Parameters**:
+     * `context7CompatibleLibraryID` (required): The library ID (can be obtained from `resolve-library-id`)
+     * `topic` (optional): Focus the docs on a specific topic (e.g., "routing", "hooks", "authentication")
+     * `tokens` (optional, default 10000): Maximum number of tokens to return. Values less than the configured `DEFAULT_MINIMUM_TOKENS` or the default value of 10000 are automatically increased to that value.
+
+## How to Use Context7 in Your Prompts
+
+### Basic Usage
+Simply add the phrase `use context7` at the end of your prompt:
+
+```
+Create a basic Next.js project with app router. use context7
+```
+
+```
+Create a script to delete the rows where the city is "" given PostgreSQL credentials. use context7
+```
+
+### Advanced Usage
+For more targeted documentation retrieval, you can be more specific about libraries and topics:
+
+```
+How do I implement authentication in Express.js using Passport? use context7
+```
+
+```
+Show me how to use React Server Components with data fetching. use context7
+```
+
+### Tool Usage Guidelines
+1. When you need documentation for a specific library, format your prompts to clearly mention the library name.
+2. If you need information about a specific feature or function, include relevant keywords to help Context7 fetch the most relevant documentation.
+3. For complex queries involving multiple libraries, prioritize the main library in your prompt.
+4. Remember that Context7 works best when you're specific about what you're trying to accomplish.
+
+## Best Practices
+1. **Be Clear and Specific**: Mention the exact library, version (if applicable), and specific functionality you're interested in.
+2. **Mention Use Cases**: Describe what you're trying to build or the problem you're trying to solve.
+3. **One Task at a Time**: For complex projects, break down your requests into smaller, focused queries.
+4. **Verify and Iterate**: If the documentation isn't quite what you needed, refine your prompt to be more specific.
+
+## Limitations
+1. Context7 can only provide documentation for libraries and frameworks that it has access to.
+2. The quality of responses depends on the quality and comprehensiveness of the official documentation.
+3. Very new or obscure libraries might have limited documentation available.
+
+## Example Workflow
+1. **Write your prompt**: "How do I create a basic Express.js API with MongoDB connection? use context7"
+2. **Behind the scenes**:
+   - Context7 identifies Express.js and MongoDB as key libraries
+   - It fetches up-to-date documentation for both
+   - The documentation is injected into the prompt context
+3. **The AI response**: Generated code and explanations based on current, accurate documentation
+
+By following these guidelines, you'll get more accurate, up-to-date, and reliable coding assistance through Context7 MCP.
+

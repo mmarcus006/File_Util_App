@@ -1,0 +1,1397 @@
+TITLE: Generating JSON Schema from a BaseModel
+DESCRIPTION: Example demonstrating how to generate JSON schema from a Pydantic BaseModel with various field types including enums, unions, and field customizations. The example shows the structure of the generated schema and how to convert it to a JSON string.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/json_schema.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import json
+from enum import Enum
+from typing import Annotated, Union
+
+from pydantic import BaseModel, Field
+from pydantic.config import ConfigDict
+
+
+class FooBar(BaseModel):
+    count: int
+    size: Union[float, None] = None
+
+
+class Gender(str, Enum):
+    male = 'male'
+    female = 'female'
+    other = 'other'
+    not_given = 'not_given'
+
+
+class MainModel(BaseModel):
+    """
+    This is the description of the main model
+    """
+
+    model_config = ConfigDict(title='Main')
+
+    foo_bar: FooBar
+    gender: Annotated[Union[Gender, None], Field(alias='Gender')] = None
+    snap: int = Field(
+        default=42,
+        title='The Snap',
+        description='this is the value of snap',
+        gt=30,
+        lt=50,
+    )
+
+
+main_model_schema = MainModel.model_json_schema()  # (1)!
+print(json.dumps(main_model_schema, indent=2))  # (2)!
+"""
+{
+  "$defs": {
+    "FooBar": {
+      "properties": {
+        "count": {
+          "title": "Count",
+          "type": "integer"
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size"
+        }
+      },
+      "required": [
+        "count"
+      ],
+      "title": "FooBar",
+      "type": "object"
+    },
+    "Gender": {
+      "enum": [
+        "male",
+        "female",
+        "other",
+        "not_given"
+      ],
+      "title": "Gender",
+      "type": "string"
+    }
+  },
+  "description": "This is the description of the main model",
+  "properties": {
+    "foo_bar": {
+      "$ref": "#/$defs/FooBar"
+    },
+    "Gender": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Gender"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "snap": {
+      "default": 42,
+      "description": "this is the value of snap",
+      "exclusiveMaximum": 50,
+      "exclusiveMinimum": 30,
+      "title": "The Snap",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "foo_bar"
+  ],
+  "title": "Main",
+  "type": "object"
+}
+"""
+```
+
+----------------------------------------
+
+TITLE: Creating Custom Types with Annotated Pattern in Python
+DESCRIPTION: Demonstrates how to create a reusable custom data type (PositiveInt) using the annotated pattern with Pydantic. The example validates that integers are greater than zero.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/types.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated
+
+from pydantic import Field, TypeAdapter, ValidationError
+
+PositiveInt = Annotated[int, Field(gt=0)]  # (1)!
+
+ta = TypeAdapter(PositiveInt)
+
+print(ta.validate_python(1))
+#> 1
+
+try:
+    ta.validate_python(-1)
+except ValidationError as exc:
+    print(exc)
+    """
+    1 validation error for constrained-int
+      Input should be greater than 0 [type=greater_than, input_value=-1, input_type=int]
+    """
+```
+
+----------------------------------------
+
+TITLE: Using Annotated pattern to add constraints to nested types
+DESCRIPTION: Shows how to add validation constraints to elements of a collection type using the Annotated pattern.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md#2025-04-22_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated
+
+from pydantic import BaseModel, Field
+
+
+class Model(BaseModel):
+    int_list: list[Annotated[int, Field(gt=0)]]
+    # Valid: [1, 3]
+    # Invalid: [-1, 2]
+```
+
+----------------------------------------
+
+TITLE: Accessing Validated Data in Field Validators with Python
+DESCRIPTION: Demonstrates how to access already validated data in field validators using the ValidationInfo.data property. This example shows a password confirmation validator that checks if password_repeat matches the password field.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md#2025-04-22_snippet_14
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ValidationInfo, field_validator
+
+
+class UserModel(BaseModel):
+    password: str
+    password_repeat: str
+    username: str
+
+    @field_validator('password_repeat', mode='after')
+    @classmethod
+    def check_passwords_match(cls, value: str, info: ValidationInfo) -> str:
+        if value != info.data['password']:
+            raise ValueError('Passwords do not match')
+        return value
+```
+
+----------------------------------------
+
+TITLE: Basic Usage of validate_call Decorator in Python
+DESCRIPTION: Demonstrates how to use the validate_call decorator to parse and validate function arguments using type annotations, including type coercion and validation error handling.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validation_decorator.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import ValidationError, validate_call
+
+
+@validate_call
+def repeat(s: str, count: int, *, separator: bytes = b'') -> bytes:
+    b = s.encode()
+    return separator.join(b for _ in range(count))
+
+
+a = repeat('hello', 3)
+print(a)
+#> b'hellohellohello'
+
+b = repeat('x', '4', separator=b' ')
+print(b)
+#> b'x x x x'
+
+try:
+    c = repeat('hello', 'wrong')
+except ValidationError as exc:
+    print(exc)
+    """
+    1 validation error for repeat
+    1
+      Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='wrong', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Creating a Reusable Type with Validators Using the Annotated Pattern in Python
+DESCRIPTION: This code snippet demonstrates creating a reusable custom type with validators using Pydantic's Annotated pattern. It defines an EvenNumber type that validates input values are even integers, then uses it in multiple model classes.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md#2025-04-22_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated
+
+from pydantic import AfterValidator, BaseModel
+
+
+def is_even(value: int) -> int:
+    if value % 2 == 1:
+        raise ValueError(f'{value} is not an even number')
+    return value
+
+
+EvenNumber = Annotated[int, AfterValidator(is_even)]
+
+
+class Model1(BaseModel):
+    my_number: EvenNumber
+
+
+class Model2(BaseModel):
+    other_number: Annotated[EvenNumber, AfterValidator(lambda v: v + 2)]
+
+
+class Model3(BaseModel):
+    list_of_even_numbers: list[EvenNumber]  # (1)!
+```
+
+----------------------------------------
+
+TITLE: Validating Data with Pydantic Model Methods in Python
+DESCRIPTION: Demonstrates the three main validation methods in Pydantic: model_validate() for dictionary data, model_validate_json() for JSON strings, and model_validate_strings() for string value dictionaries. The example shows successful validation as well as handling validation errors for each method.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_11
+
+LANGUAGE: python
+CODE:
+```
+from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, ValidationError
+
+
+class User(BaseModel):
+    id: int
+    name: str = 'John Doe'
+    signup_ts: Optional[datetime] = None
+
+
+m = User.model_validate({'id': 123, 'name': 'James'})
+print(m)
+#> id=123 name='James' signup_ts=None
+
+try:
+    User.model_validate(['not', 'a', 'dict'])
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for User
+      Input should be a valid dictionary or instance of User [type=model_type, input_value=['not', 'a', 'dict'], input_type=list]
+    """
+
+m = User.model_validate_json('{"id": 123, "name": "James"}')
+print(m)
+#> id=123 name='James' signup_ts=None
+
+try:
+    m = User.model_validate_json('{"id": 123, "name": 123}')
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for User
+    name
+      Input should be a valid string [type=string_type, input_value=123, input_type=int]
+    """
+
+try:
+    m = User.model_validate_json('invalid JSON')
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for User
+      Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='invalid JSON', input_type=str]
+    """
+
+m = User.model_validate_strings({'id': '123', 'name': 'James'})
+print(m)
+#> id=123 name='James' signup_ts=None
+
+m = User.model_validate_strings(
+    {'id': '123', 'name': 'James', 'signup_ts': '2024-04-01T12:00:00'}
+)
+print(m)
+#> id=123 name='James' signup_ts=datetime.datetime(2024, 4, 1, 12, 0)
+
+try:
+    m = User.model_validate_strings(
+        {'id': '123', 'name': 'James', 'signup_ts': '2024-04-01'}, strict=True
+    )
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for User
+    signup_ts
+      Input should be a valid datetime, invalid datetime separator, expected `T`, `t`, `_` or space [type=datetime_parsing, input_value='2024-04-01', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Setting default values for model fields
+DESCRIPTION: Demonstrates two ways to provide default values for model fields: direct assignment and using the default parameter in Field().
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md#2025-04-22_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, Field
+
+
+class User(BaseModel):
+    # Both fields aren't required:
+    name: str = 'John Doe'
+    age: int = Field(default=20)
+```
+
+----------------------------------------
+
+TITLE: Creating and Using Generic Models with Python 3.9+ Syntax
+DESCRIPTION: Example of creating a reusable HTTP response payload wrapper using generic models in Pydantic with the traditional syntax. Shows how to declare type variables, create a generic model class, and use it with different type parameters.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_14
+
+LANGUAGE: python
+CODE:
+```
+from typing import Generic, TypeVar
+
+from pydantic import BaseModel, ValidationError
+
+DataT = TypeVar('DataT')  # (1)!
+
+
+class DataModel(BaseModel):
+    number: int
+
+
+class Response(BaseModel, Generic[DataT]):  # (2)!
+    data: DataT  # (3)!
+
+
+print(Response[int](data=1))
+#> data=1
+print(Response[str](data='value'))
+#> data='value'
+print(Response[str](data='value').model_dump())
+#> {'data': 'value'}
+
+data = DataModel(number=1)
+print(Response[DataModel](data=data).model_dump())
+#> {'data': {'number': 1}}
+try:
+    Response[int](data='value')
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for Response[int]
+    data
+      Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='value', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Implementing Password Matching Validation with Model After Validator in Python
+DESCRIPTION: This code snippet demonstrates using a model-level 'after' validator in Pydantic to check if two password fields match after individual field validation. It ensures password consistency before the model is considered valid.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md#2025-04-22_snippet_10
+
+LANGUAGE: python
+CODE:
+```
+from typing_extensions import Self
+
+from pydantic import BaseModel, model_validator
+
+
+class UserModel(BaseModel):
+    username: str
+    password: str
+    password_repeat: str
+
+    @model_validator(mode='after')
+    def check_passwords_match(self) -> Self:
+        if self.password != self.password_repeat:
+            raise ValueError('Passwords do not match')
+        return self
+```
+
+----------------------------------------
+
+TITLE: Defining a Basic Pydantic Model in Python
+DESCRIPTION: This snippet demonstrates how to create a basic Pydantic model with required and optional fields, as well as model configuration.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ConfigDict
+
+
+class User(BaseModel):
+    id: int
+    name: str = 'Jane Doe'
+
+    model_config = ConfigDict(str_max_length=10)  # (1)!
+```
+
+----------------------------------------
+
+TITLE: Using default_factory for dynamic default values
+DESCRIPTION: Shows how to use the default_factory parameter to generate default values dynamically, such as generating a unique ID.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md#2025-04-22_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
+
+
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: uuid4().hex)
+```
+
+----------------------------------------
+
+TITLE: Overriding Strict Mode for Individual Fields
+DESCRIPTION: Shows how to override the global strict mode configuration for individual fields using Field(strict=False), allowing specific fields to perform type coercion even in a model with strict mode enabled.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/strict_mode.md#2025-04-22_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class User(BaseModel):
+    model_config = ConfigDict(strict=True)
+
+    name: str
+    age: int = Field(strict=False)
+```
+
+----------------------------------------
+
+TITLE: Creating and Using Generic Models with Python 3.12+ Syntax (PEP 695)
+DESCRIPTION: Example showing how to create and use generic models in Pydantic using the new type parameter syntax introduced in Python 3.12 via PEP 695. Demonstrates creating the same HTTP response wrapper with the simplified syntax.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_15
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ValidationError
+
+
+class DataModel(BaseModel):
+    number: int
+
+
+class Response[DataT](BaseModel):  # (1)!
+    data: DataT  # (2)!
+
+
+print(Response[int](data=1))
+#> data=1
+print(Response[str](data='value'))
+#> data='value'
+print(Response[str](data='value').model_dump())
+#> {'data': 'value'}
+
+data = DataModel(number=1)
+print(Response[DataModel](data=data).model_dump())
+#> {'data': {'number': 1}}
+try:
+    Response[int](data='value')
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for Response[int]
+    data
+      Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='value', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Using Serialization Context in Pydantic
+DESCRIPTION: Demonstrates how to use context objects in serialization to dynamically control serialization behavior. This example shows filtering text by stopwords that are passed through the context parameter.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/serialization.md#2025-04-22_snippet_11
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, SerializationInfo, field_serializer
+
+
+class Model(BaseModel):
+    text: str
+
+    @field_serializer('text')
+    def remove_stopwords(self, v: str, info: SerializationInfo):
+        context = info.context
+        if context:
+            stopwords = context.get('stopwords', set())
+            v = ' '.join(w for w in v.split() if w.lower() not in stopwords)
+        return v
+
+
+model = Model.model_construct(**{'text': 'This is an example document'})
+print(model.model_dump())  # no context
+#> {'text': 'This is an example document'}
+print(model.model_dump(context={'stopwords': ['this', 'is', 'an']}))
+#> {'text': 'example document'}
+print(model.model_dump(context={'stopwords': ['document']}))
+#> {'text': 'This is an example'}
+```
+
+----------------------------------------
+
+TITLE: Implementing Faux Immutability with Frozen Config
+DESCRIPTION: Shows how to make Pydantic models immutable using model_config['frozen'] = True. Demonstrates that direct attribute changes raise errors while nested mutable objects can still be modified.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_28
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ConfigDict, ValidationError
+
+
+class FooBarModel(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    a: str
+    b: dict
+
+
+foobar = FooBarModel(a='hello', b={'apple': 'pear'})
+
+try:
+    foobar.a = 'different'
+except ValidationError as e:
+    print(e)
+    """
+    1 validation error for FooBarModel
+    a
+      Instance is frozen [type=frozen_instance, input_value='different', input_type=str]
+    """
+
+print(foobar.a)
+#> hello
+print(foobar.b)
+#> {'apple': 'pear'}
+foobar.b['apple'] = 'grape'
+print(foobar.b)
+#> {'apple': 'grape'}
+```
+
+----------------------------------------
+
+TITLE: Basic Pydantic Model Validation Example
+DESCRIPTION: Shows how to create a User model with various field types including integers, strings, datetime, and nested dictionaries. Demonstrates successful validation and data coercion.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/index.md#2025-04-22_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from datetime import datetime
+
+from pydantic import BaseModel, PositiveInt
+
+
+class User(BaseModel):
+    id: int
+    name: str = 'John Doe'
+    signup_ts: datetime | None
+    tastes: dict[str, PositiveInt]
+
+
+external_data = {
+    'id': 123,
+    'signup_ts': '2019-06-01 12:22',
+    'tastes': {
+        'wine': 9,
+        b'cheese': 7,
+        'cabbage': '1',
+    },
+}
+
+user = User(**external_data)
+
+print(user.id)
+#> 123
+print(user.model_dump())
+```
+
+----------------------------------------
+
+TITLE: Type Coercion with validate_call in Python
+DESCRIPTION: Shows how the validate_call decorator coerces parameter types based on function annotations, automatically converting a string date to a date object before function execution.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validation_decorator.md#2025-04-22_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from datetime import date
+
+from pydantic import validate_call
+
+
+@validate_call
+def greater_than(d1: date, d2: date, *, include_equal=False) -> date:  # (1)!
+    if include_equal:
+        return d1 >= d2
+    else:
+        return d1 > d2
+
+
+d1 = '2000-01-01'  # (2)!
+d2 = date(2001, 1, 1)
+greater_than(d1, d2, include_equal=True)
+```
+
+----------------------------------------
+
+TITLE: Creating Dynamic Models at Runtime
+DESCRIPTION: Demonstrates how to create Pydantic models dynamically using the create_model function. Shows basic field definition, equivalent static models, and how to use advanced features like Field, alias, and annotations.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/models.md#2025-04-22_snippet_21
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, create_model
+
+DynamicFoobarModel = create_model('DynamicFoobarModel', foo=str, bar=(int, 123))
+
+# Equivalent to:
+
+
+class StaticFoobarModel(BaseModel):
+    foo: str
+    bar: int = 123
+```
+
+----------------------------------------
+
+TITLE: Using Annotated pattern with Field() for metadata
+DESCRIPTION: Demonstrates the Annotated pattern to attach Field() and other metadata to a model field without implying default values.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/fields.md#2025-04-22_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated
+
+from pydantic import BaseModel, Field, WithJsonSchema
+
+
+class Model(BaseModel):
+    name: Annotated[str, Field(strict=True), WithJsonSchema({'extra': 'data'})]
+```
+
+----------------------------------------
+
+TITLE: Handling Third-Party Types in Pydantic
+DESCRIPTION: Demonstrates how to integrate third-party types with Pydantic. It creates a custom annotation class with __get_pydantic_core_schema__ and __get_pydantic_json_schema__ methods to handle validation, serialization, and schema generation for a third-party type that wasn't designed for Pydantic.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/types.md#2025-04-22_snippet_13
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated, Any
+
+from pydantic_core import core_schema
+
+from pydantic import (
+    BaseModel,
+    GetCoreSchemaHandler,
+    GetJsonSchemaHandler,
+    ValidationError,
+)
+from pydantic.json_schema import JsonSchemaValue
+
+
+class ThirdPartyType:
+    """
+    This is meant to represent a type from a third-party library that wasn't designed with Pydantic
+    integration in mind, and so doesn't have a `pydantic_core.CoreSchema` or anything.
+    """
+
+    x: int
+
+    def __init__(self):
+        self.x = 0
+
+
+class _ThirdPartyTypePydanticAnnotation:
+    @classmethod
+    def __get_pydantic_core_schema__(
+        cls,
+        _source_type: Any,
+        _handler: GetCoreSchemaHandler,
+    ) -> core_schema.CoreSchema:
+        """
+        We return a pydantic_core.CoreSchema that behaves in the following ways:
+
+        * ints will be parsed as `ThirdPartyType` instances with the int as the x attribute
+        * `ThirdPartyType` instances will be parsed as `ThirdPartyType` instances without any changes
+        * Nothing else will pass validation
+        * Serialization will always return just an int
+        """
+
+        def validate_from_int(value: int) -> ThirdPartyType:
+            result = ThirdPartyType()
+            result.x = value
+            return result
+
+        from_int_schema = core_schema.chain_schema(
+            [
+                core_schema.int_schema(),
+                core_schema.no_info_plain_validator_function(validate_from_int),
+            ]
+        )
+
+        return core_schema.json_or_python_schema(
+            json_schema=from_int_schema,
+            python_schema=core_schema.union_schema(
+                [
+                    # check if it's an instance first before doing any further work
+                    core_schema.is_instance_schema(ThirdPartyType),
+                    from_int_schema,
+                ]
+            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: instance.x
+            ),
+        )
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, _core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+    ) -> JsonSchemaValue:
+        # Use the same schema that would be used for `int`
+        return handler(core_schema.int_schema())
+
+
+# We now create an `Annotated` wrapper that we'll use as the annotation for fields on `BaseModel`s, etc.
+PydanticThirdPartyType = Annotated[
+    ThirdPartyType, _ThirdPartyTypePydanticAnnotation
+]
+
+
+# Create a model class that uses this annotation as a field
+class Model(BaseModel):
+    third_party_type: PydanticThirdPartyType
+
+
+# Demonstrate that this field is handled correctly, that ints are parsed into `ThirdPartyType`, and that
+# these instances are also "dumped" directly into ints as expected.
+m_int = Model(third_party_type=1)
+assert isinstance(m_int.third_party_type, ThirdPartyType)
+assert m_int.third_party_type.x == 1
+assert m_int.model_dump() == {'third_party_type': 1}
+
+# Do the same thing where an instance of ThirdPartyType is passed in
+instance = ThirdPartyType()
+assert instance.x == 0
+instance.x = 10
+
+m_instance = Model(third_party_type=instance)
+assert isinstance(m_instance.third_party_type, ThirdPartyType)
+assert m_instance.third_party_type.x == 10
+assert m_instance.model_dump() == {'third_party_type': 10}
+
+# Demonstrate that validation errors are raised as expected for invalid inputs
+try:
+    Model(third_party_type='a')
+except ValidationError as e:
+    print(e)
+    """
+    2 validation errors for Model
+    third_party_type.is-instance[ThirdPartyType]
+      Input should be an instance of ThirdPartyType [type=is_instance_of, input_value='a', input_type=str]
+    third_party_type.chain[int,function-plain[validate_from_int()]]
+      Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='a', input_type=str]
+    """
+
+
+assert Model.model_json_schema() == {
+    'properties': {
+        'third_party_type': {'title': 'Third Party Type', 'type': 'integer'}
+    },
+    'required': ['third_party_type'],
+    'title': 'Model',
+    'type': 'object',
+}
+```
+
+----------------------------------------
+
+TITLE: Serializing with Duck-Typing Using serialize_as_any Flag in Python
+DESCRIPTION: Demonstrates the use of the serialize_as_any flag to control duck-typing serialization behavior at runtime.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/serialization.md#2025-04-22_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel
+
+
+class User(BaseModel):
+    name: str
+
+
+class UserLogin(User):
+    password: str
+
+
+class OuterModel(BaseModel):
+    user1: User
+    user2: User
+
+
+user = UserLogin(name='pydantic', password='password')
+
+outer_model = OuterModel(user1=user, user2=user)
+print(outer_model.model_dump(serialize_as_any=True))  # (1)!
+"""
+{
+    'user1': {'name': 'pydantic', 'password': 'password'},
+    'user2': {'name': 'pydantic', 'password': 'password'},
+}
+"""
+
+print(outer_model.model_dump(serialize_as_any=False))  # (2)!
+#> {'user1': {'name': 'pydantic'}, 'user2': {'name': 'pydantic'}}
+```
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel
+
+
+class User(BaseModel):
+    name: str
+    friends: list['User']
+
+
+class UserLogin(User):
+    password: str
+
+
+class OuterModel(BaseModel):
+    user: User
+
+
+user = UserLogin(
+    name='samuel',
+    password='pydantic-pw',
+    friends=[UserLogin(name='sebastian', password='fastapi-pw', friends=[])],
+)
+
+print(OuterModel(user=user).model_dump(serialize_as_any=True))  # (1)!
+"""
+{
+    'user': {
+        'name': 'samuel',
+        'friends': [
+            {'name': 'sebastian', 'friends': [], 'password': 'fastapi-pw'}
+        ],
+        'password': 'pydantic-pw',
+    }
+}
+"""
+
+print(OuterModel(user=user).model_dump(serialize_as_any=False))  # (2)!
+"""
+{'user': {'name': 'samuel', 'friends': [{'name': 'sebastian', 'friends': []}]}}
+"""
+```
+
+----------------------------------------
+
+TITLE: Enabling Strict Mode in BaseModel with ConfigDict
+DESCRIPTION: Demonstrates how to enable strict mode for all fields in a Pydantic BaseModel using ConfigDict(strict=True), which prevents automatic type coercion and raises validation errors for incorrect input types.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/strict_mode.md#2025-04-22_snippet_7
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, ConfigDict, ValidationError
+
+
+class User(BaseModel):
+    model_config = ConfigDict(strict=True)
+
+    name: str
+    age: int
+    is_active: bool
+
+
+try:
+    User(name='David', age='33', is_active='yes')
+except ValidationError as exc:
+    print(exc)
+    """
+    2 validation errors for User
+    age
+      Input should be a valid integer [type=int_type, input_value='33', input_type=str]
+    is_active
+      Input should be a valid boolean [type=bool_type, input_value='yes', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Callable Discriminator with Dict and Model Input Handling
+DESCRIPTION: This example demonstrates how to create a callable discriminator that can handle both `dict` and `BaseModel` instances as input, covering both validation and serialization scenarios. It defines a `Discriminator` that uses a function `get_discriminator_value` to extract the discriminator value based on the input type. The `ThanksgivingDinner` model uses this discriminator to validate the `dessert` field, which can be either `ApplePie` or `PumpkinPie`.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/unions.md#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated, Any, Literal, Union
+
+from pydantic import BaseModel, Discriminator, Tag
+
+
+class Pie(BaseModel):
+    time_to_cook: int
+    num_ingredients: int
+
+
+class ApplePie(Pie):
+    fruit: Literal['apple'] = 'apple'
+
+
+class PumpkinPie(Pie):
+    filling: Literal['pumpkin'] = 'pumpkin'
+
+
+def get_discriminator_value(v: Any) -> str:
+    if isinstance(v, dict):
+        return v.get('fruit', v.get('filling'))
+    return getattr(v, 'fruit', getattr(v, 'filling', None))
+
+
+class ThanksgivingDinner(BaseModel):
+    dessert: Annotated[
+        Union[
+            Annotated[ApplePie, Tag('apple')],
+            Annotated[PumpkinPie, Tag('pumpkin')],
+        ],
+        Discriminator(get_discriminator_value),
+    ]
+
+
+apple_variation = ThanksgivingDinner.model_validate(
+    {'dessert': {'fruit': 'apple', 'time_to_cook': 60, 'num_ingredients': 8}}
+)
+print(repr(apple_variation))
+"""
+ThanksgivingDinner(dessert=ApplePie(time_to_cook=60, num_ingredients=8, fruit='apple'))
+"""
+
+pumpkin_variation = ThanksgivingDinner.model_validate(
+    {
+        'dessert': {
+            'filling': 'pumpkin',
+            'time_to_cook': 40,
+            'num_ingredients': 6,
+        }
+    }
+)
+print(repr(pumpkin_variation))
+"""
+ThanksgivingDinner(dessert=PumpkinPie(time_to_cook=40, num_ingredients=6, filling='pumpkin'))
+"""
+```
+
+----------------------------------------
+
+TITLE: Smart Mode Union Validation in Pydantic
+DESCRIPTION: This snippet demonstrates the default 'smart' mode for Union validation in Pydantic. It defines a `User` model with an `id` field that can be an integer, string, or UUID. Pydantic attempts to select the best match for the input based on exactness and the number of valid fields. This example showcases how the same field can accept different data types, and the validator successfully infers the correct type. This code requires Pydantic.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/unions.md#_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+from typing import Union
+from uuid import UUID
+
+from pydantic import BaseModel
+
+
+class User(BaseModel):
+    id: Union[int, str, UUID]
+    name: str
+
+
+user_01 = User(id=123, name='John Doe')
+print(user_01)
+#> id=123 name='John Doe'
+print(user_01.id)
+#> 123
+user_02 = User(id='1234', name='John Doe')
+print(user_02)
+#> id='1234' name='John Doe'
+print(user_02.id)
+#> 1234
+user_03_uuid = UUID('cf57432e-809e-4353-adbd-9d5c0d733868')
+user_03 = User(id=user_03_uuid, name='John Doe')
+print(user_03)
+#> id=UUID('cf57432e-809e-4353-adbd-9d5c0d733868') name='John Doe'
+print(user_03.id)
+#> cf57432e-809e-4353-adbd-9d5c0d733868
+print(user_03_uuid.int)
+#> 275603287559914445491632874575877060712
+```
+
+----------------------------------------
+
+TITLE: Custom Datetime Validator with Timezone Constraints in Python
+DESCRIPTION: Implements a custom validator for datetime objects that ensures they adhere to a specific timezone constraint. The validator uses __get_pydantic_core_schema__ to customize schema validation and a wrap validator to perform operations before and after default Pydantic validation.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/examples/custom_validators.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import datetime as dt
+from dataclasses import dataclass
+from pprint import pprint
+from typing import Annotated, Any, Callable, Optional
+
+import pytz
+from pydantic_core import CoreSchema, core_schema
+
+from pydantic import (
+    GetCoreSchemaHandler,
+    PydanticUserError,
+    TypeAdapter,
+    ValidationError,
+)
+
+
+@dataclass(frozen=True)
+class MyDatetimeValidator:
+    tz_constraint: Optional[str] = None
+
+    def tz_constraint_validator(
+        self,
+        value: dt.datetime,
+        handler: Callable,  # (1)!
+    ):
+        """Validate tz_constraint and tz_info."""
+        # handle naive datetimes
+        if self.tz_constraint is None:
+            assert (
+                value.tzinfo is None
+            ), 'tz_constraint is None, but provided value is tz-aware.'
+            return handler(value)
+
+        # validate tz_constraint and tz-aware tzinfo
+        if self.tz_constraint not in pytz.all_timezones:
+            raise PydanticUserError(
+                f'Invalid tz_constraint: {self.tz_constraint}',
+                code='unevaluable-type-annotation',
+            )
+        result = handler(value)  # (2)!
+        assert self.tz_constraint == str(
+            result.tzinfo
+        ), f'Invalid tzinfo: {str(result.tzinfo)}, expected: {self.tz_constraint}'
+
+        return result
+
+    def __get_pydantic_core_schema__(
+        self,
+        source_type: Any,
+        handler: GetCoreSchemaHandler,
+    ) -> CoreSchema:
+        return core_schema.no_info_wrap_validator_function(
+            self.tz_constraint_validator,
+            handler(source_type),
+        )
+
+
+LA = 'America/Los_Angeles'
+ta = TypeAdapter(Annotated[dt.datetime, MyDatetimeValidator(LA)])
+print(
+    ta.validate_python(dt.datetime(2023, 1, 1, 0, 0, tzinfo=pytz.timezone(LA)))
+)
+#> 2023-01-01 00:00:00-07:53
+
+LONDON = 'Europe/London'
+try:
+    ta.validate_python(
+        dt.datetime(2023, 1, 1, 0, 0, tzinfo=pytz.timezone(LONDON))
+    )
+except ValidationError as ve:
+    pprint(ve.errors(), width=100)
+    """
+    [{'ctx': {'error': AssertionError('Invalid tzinfo: Europe/London, expected: America/Los_Angeles')},
+    'input': datetime.datetime(2023, 1, 1, 0, 0, tzinfo=<DstTzInfo 'Europe/London' LMT-1 day, 23:59:00 STD>),
+    'loc': (),
+    'msg': 'Assertion failed, Invalid tzinfo: Europe/London, expected: America/Los_Angeles',
+    'type': 'assertion_error',
+    'url': 'https://errors.pydantic.dev/2.8/v/assertion_error'}]
+    """
+```
+
+----------------------------------------
+
+TITLE: Validating Single User Data with Pydantic and HTTPX in Python
+DESCRIPTION: This snippet demonstrates how to use Pydantic and HTTPX to fetch a single user's data from an API and validate it using a Pydantic model. It uses the User model to ensure the received data matches the expected structure.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/examples/requests.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import httpx
+
+from pydantic import BaseModel, EmailStr
+
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+
+
+url = 'https://jsonplaceholder.typicode.com/users/1'
+
+response = httpx.get(url)
+response.raise_for_status()
+
+user = User.model_validate(response.json())
+print(repr(user))
+#> User(id=1, name='Leanne Graham', email='Sincere@april.biz')
+```
+
+----------------------------------------
+
+TITLE: Using AliasChoices for Field Validation in Python with Pydantic
+DESCRIPTION: Shows how to use AliasChoices to specify multiple possible aliases for a field in a Pydantic model. This allows for flexible data validation using different field names.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/alias.md#2025-04-22_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, Field, AliasChoices
+
+
+class User(BaseModel):
+    first_name: str = Field(validation_alias=AliasChoices('first_name', 'fname'))
+    last_name: str = Field(validation_alias=AliasChoices('last_name', 'lname'))
+
+user = User.model_validate({'fname': 'John', 'lname': 'Doe'})  # (1)!
+print(user)
+#> first_name='John' last_name='Doe'
+user = User.model_validate({'first_name': 'John', 'lname': 'Doe'})  # (2)!
+print(user)
+#> first_name='John' last_name='Doe'
+```
+
+----------------------------------------
+
+TITLE: Sequence Type Validation in Pydantic
+DESCRIPTION: Example of using typing.Sequence with Pydantic models to validate lists and tuples while preserving the original container type when possible.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/api/standard_library_types.md#2025-04-22_snippet_13
+
+LANGUAGE: python
+CODE:
+```
+from typing import Sequence
+
+from pydantic import BaseModel
+
+
+class Model(BaseModel):
+    sequence_of_ints: Sequence[int] = None
+
+
+print(Model(sequence_of_ints=[1, 2, 3, 4]).sequence_of_ints)
+#> [1, 2, 3, 4]
+print(Model(sequence_of_ints=(1, 2, 3, 4)).sequence_of_ints)
+#> (1, 2, 3, 4)
+```
+
+----------------------------------------
+
+TITLE: Validating Data using Type Hints with Pydantic in Python
+DESCRIPTION: This example demonstrates how Pydantic uses Python type hints to define validation schemas. It shows validation of simple string fields, Literal types for constrained values, Annotated types with constraints, and complex nested data structures.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/why.md#2025-04-22_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated, Literal
+
+from annotated_types import Gt
+
+from pydantic import BaseModel
+
+
+class Fruit(BaseModel):
+    name: str  # (1)!
+    color: Literal['red', 'green']  # (2)!
+    weight: Annotated[float, Gt(0)]  # (3)!
+    bazam: dict[str, list[tuple[int, bool, float]]]  # (4)!
+
+
+print(
+    Fruit(
+        name='Apple',
+        color='red',
+        weight=4.2,
+        bazam={'foobar': [(1, True, 0.1)]},
+    )
+)
+#> name='Apple' color='red' weight=4.2 bazam={'foobar': [(1, True, 0.1)]}
+```
+
+----------------------------------------
+
+TITLE: Using Field Validator Decorator for Multiple Fields in Python
+DESCRIPTION: This code snippet demonstrates using the field_validator decorator in Pydantic to apply the same validation function to multiple fields simultaneously. It capitalizes two string fields using a single validator.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/validators.md#2025-04-22_snippet_9
+
+LANGUAGE: python
+CODE:
+```
+from pydantic import BaseModel, field_validator
+
+
+class Model(BaseModel):
+    f1: str
+    f2: str
+
+    @field_validator('f1', 'f2', mode='before')
+    @classmethod
+    def capitalize(cls, value: str) -> str:
+        return value.capitalize()
+```
+
+----------------------------------------
+
+TITLE: Strict Mode Validation with Annotated and TypedDict
+DESCRIPTION: This example demonstrates how to use Field(strict=True) as an annotation with TypedDict, enabling strict mode validation for specific fields in a dictionary-like structure.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/strict_mode.md#2025-04-22_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+from typing import Annotated
+
+from typing_extensions import TypedDict
+
+from pydantic import Field, TypeAdapter, ValidationError
+
+class MyDict(TypedDict):
+    x: Annotated[int, Field(strict=True)]
+
+try:
+    TypeAdapter(MyDict).validate_python({'x': '1'})
+except ValidationError as exc:
+    print(exc)
+    """
+    1 validation error for MyDict
+    x
+      Input should be a valid integer [type=int_type, input_value='1', input_type=str]
+    """
+```
+
+----------------------------------------
+
+TITLE: Generating top-level JSON schema with models_json_schema in Python
+DESCRIPTION: This example shows how to generate a top-level JSON schema that includes multiple models and their related sub-models in the $defs section. The models_json_schema function is used to generate a combined schema with a custom title.
+SOURCE: https://github.com/pydantic/pydantic/blob/main/docs/concepts/json_schema.md#2025-04-22_snippet_19
+
+LANGUAGE: python
+CODE:
+```
+import json
+
+from pydantic import BaseModel
+from pydantic.json_schema import models_json_schema
+
+
+class Foo(BaseModel):
+    a: str = None
+
+
+class Model(BaseModel):
+    b: Foo
+
+
+class Bar(BaseModel):
+    c: int
+
+
+_, top_level_schema = models_json_schema(
+    [(Model, 'validation'), (Bar, 'validation')], title='My Schema'
+)
+print(json.dumps(top_level_schema, indent=2))
+"""
+{
+  "$defs": {
+    "Bar": {
+      "properties": {
+        "c": {
+          "title": "C",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "c"
+      ],
+      "title": "Bar",
+      "type": "object"
+    },
+    "Foo": {
+      "properties": {
+        "a": {
+          "default": null,
+          "title": "A",
+          "type": "string"
+        }
+      },
+      "title": "Foo",
+      "type": "object"
+    },
+    "Model": {
+      "properties": {
+        "b": {
+          "$ref": "#/$defs/Foo"
+        }
+      },
+      "required": [
+        "b"
+      ],
+      "title": "Model",
+      "type": "object"
+    }
+  },
+  "title": "My Schema"
+}
+"""
+```
