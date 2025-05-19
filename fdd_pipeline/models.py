@@ -53,6 +53,44 @@ class FDDDocument(BaseModel):
     publication_year: Optional[int] = None
     processing_metadata: Dict[str, Any] = {}
     
+class Franchise(BaseModel):
+    """Core model for franchise information extracted from an FDD document.
+    
+    Contains key identifying and operational information about the franchise as detailed
+    in Item 1 and other sections of the Franchise Disclosure Document.
+    """
+    brand_name: str = Field(
+        description="The commercial brand name or trademark of the franchise as it appears to the public for example, McDonald's Corporation would be 'McDonald's'"
+    )
+    legal_name: Optional[str] = Field(
+        default=None, 
+        description="The legal entity name of the franchisor as registered with government authorities"
+    )
+    parent_company: Optional[str] = Field(
+        default=None, 
+        description="Name of the parent company that owns or controls the franchisor entity"
+    )
+    address: Optional[str] = Field(
+        default=None, 
+        description="Principal business address of the franchisor as listed in Item 1 of the FDD"
+    )
+    phone_number: Optional[str] = Field(
+        default=None, 
+        description="Primary contact phone number for the franchisor"
+    )
+    website: Optional[str] = Field(
+        default=None, 
+        description="Official website URL for the franchise or franchisor"
+    )
+    issuance_date: Optional[str] = Field(
+        default=None, 
+        description="Date when the FDD was formally issued, typically found on the cover page"
+    )
+    amendment_date: Optional[str] = Field(
+        default=None, 
+        description="Date of the most recent amendment or update to the FDD, if applicable"
+    )
+    
 # Add item-specific models for extraction
 class FDDItem1(BaseModel):
     """Item 1: Franchisor Information"""
