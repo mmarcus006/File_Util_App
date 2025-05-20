@@ -41,7 +41,6 @@ __pycache__/
 # output/
 
 # Large directories to exclude from Cursor indexing
-data/
 logs/
 
 # Large files

@@ -1,3 +1,3 @@
 """
-Test suite for the Bank Statement Analyzer.
+Test suite for the FDD Pipeline.
 """ 

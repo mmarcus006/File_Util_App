@@ -1,0 +1,942 @@
+TITLE: Opening Document from File - PyMuPDF Python
+DESCRIPTION: Demonstrates how to open a document using `pymupdf.open()` or `pymupdf.Document()`, creating a `Document` object. Requires a valid file path specified by `filename`. The opened document can be accessed for pages, metadata, etc.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+doc = pymupdf.open(filename)  # or pymupdf.Document(filename)
+```
+
+----------------------------------------
+
+TITLE: Opening a Local PDF File - PyMuPDF - Python
+DESCRIPTION: Shows the basic syntax for opening a local PDF file using the `pymupdf.open` function. This function returns a Document object, which is an alias for `pymupdf.Document`. Requires the pymupdf library.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/how-to-open-a-file.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+doc = pymupdf.open("a.pdf")
+```
+
+----------------------------------------
+
+TITLE: Extracting Page Text (PyMuPDF)
+DESCRIPTION: This basic snippet demonstrates how to extract text content from a specific page (page) of a document using the get_text method. The format and level of detail of the extracted text are controlled by the opt parameter, which can specify formats like "text", "blocks", "words", "html", "json", etc.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_19
+
+LANGUAGE: Python
+CODE:
+```
+text = page.get_text(opt)
+```
+
+----------------------------------------
+
+TITLE: Perform Basic PyMuPDF Text Extraction Python
+DESCRIPTION: Demonstrates extracting plain text from a page using the default "text" output format via `page.get_text("text")`. The result is printed to the console. This method typically includes default spacing and line breaks as found in the document layout. Requires a `page` object from PyMuPDF.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/app1.rst#_snippet_11
+
+LANGUAGE: Python
+CODE:
+```
+print(page.get_text("text"))
+```
+
+----------------------------------------
+
+TITLE: Merging PDF with Other File Types PyMuPDF Python
+DESCRIPTION: This snippet illustrates merging a PDF file with another supported document type, specifically an SVG file, using the `Document.insert_file` method. It opens both documents and inserts the content of the second document into the first, saving the merged output as a new PDF.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc_a = pymupdf.open("a.pdf") # open the 1st document
+doc_b = pymupdf.open("b.svg") # open the 2nd document
+
+doc_a.insert_file(doc_b) # merge the docs
+doc_a.save("a+b.pdf") # save the merged document with a new filename
+```
+
+----------------------------------------
+
+TITLE: Iterating Through Pages Forward - PyMuPDF Python
+DESCRIPTION: Provides a simple way to iterate through all pages of a document in forward order using the `Document` object as an iterator. Each iteration yields a `Page` object. Requires an opened `Document` object (`doc`).
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+for page in doc:
+    # do something with 'page'
+```
+
+----------------------------------------
+
+TITLE: Iterating Through Page Range - PyMuPDF Python
+DESCRIPTION: Shows how to iterate through a specific range of pages in a document using the `doc.pages()` method, which supports `start`, `stop`, and `step` arguments similar to Python slicing. Requires an opened `Document` object (`doc`).
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+for page in doc.pages(start, stop, step):
+    # do something with 'page'
+```
+
+----------------------------------------
+
+TITLE: Rendering Page as Pixmap - PyMuPDF Python
+DESCRIPTION: Renders the content of a page into a raster image format, returning a `Pixmap` object. By default, it produces an RGB image. Requires a loaded `Page` object (`page`). Supports options for resolution, colorspace, etc.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_11
+
+LANGUAGE: python
+CODE:
+```
+pix = page.get_pixmap()
+```
+
+----------------------------------------
+
+TITLE: Extracting All Text PyMuPDF Python
+DESCRIPTION: This example demonstrates how to extract all plain text from a document page by page and write it to a text file. It iterates through the document's pages, gets the text for each page using `page.get_text()`, encodes it to UTF-8, and writes it to an output file, adding a form feed character between pages.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("a.pdf") # open a document
+out = open("output.txt", "wb") # create a text output
+for page in doc: # iterate the document pages
+    text = page.get_text().encode("utf8") # get plain text (is in UTF-8)
+    out.write(text) # write text of page
+    out.write(bytes((12,))) # write page delimiter (form feed 0x0C)
+out.close()
+```
+
+----------------------------------------
+
+TITLE: Loading Specific Page by Number - PyMuPDF Python
+DESCRIPTION: Shows two ways to load a specific page from a document: using `doc.load_page(pno)` or the shorthand `doc[pno]`. `pno` is the 0-based page index. Returns a `Page` object. Requires an opened `Document` object (`doc`).
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+page = doc.load_page(pno)  # loads page number 'pno' of the document (0-based)
+page = doc[pno]  # the short form
+```
+
+----------------------------------------
+
+TITLE: Extracting All Document Text - PyMuPDF - Python
+DESCRIPTION: This Python script demonstrates how to open a document using PyMuPDF, extract all text content page by page, join it with a form feed character, encode it, and save it to a binary text file. It requires the input document filename as a command-line argument.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-text.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import sys, pathlib, pymupdf
+fname = sys.argv[1]  # get document filename
+with pymupdf.open(fname) as doc:  # open document
+    text = chr(12).join([page.get_text() for page in doc])
+# write as a binary file to support non-ASCII characters
+pathlib.Path(fname + ".txt").write_bytes(text.encode())
+```
+
+----------------------------------------
+
+TITLE: Installing or Upgrading PyMuPDF via pip
+DESCRIPTION: Installs or upgrades the PyMuPDF library using the pip package manager. This command is the standard way to install PyMuPDF and will use a pre-built wheel if available for the platform, otherwise it will attempt to build from source.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/installation.rst#_snippet_2
+
+LANGUAGE: shell
+CODE:
+```
+pip install --upgrade pymupdf
+```
+
+----------------------------------------
+
+TITLE: Iterating Through Page Annotations - PyMuPDF Python
+DESCRIPTION: Provides an iterator to loop through each annotation present on a PDF document page. Each iteration yields an `Annot` object representing an annotation. Requires a loaded `Page` object (`page`) from a PDF document.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_9
+
+LANGUAGE: python
+CODE:
+```
+for annot in page.annots():
+    # do something with 'annot'
+```
+
+----------------------------------------
+
+TITLE: Converting Basic Image Format using PyMuPDF Pixmap (Python)
+DESCRIPTION: Shows the fundamental process of loading an image from a file in any supported input format and saving it to another supported output format using the PyMuPDF Pixmap class. This simple two-line pattern forms the basis of many image conversion tasks.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-images.rst#_snippet_11
+
+LANGUAGE: python
+CODE:
+```
+pix = pymupdf.Pixmap("input.xxx")  # any supported input format
+pix.save("output.yyy")  # any supported output format
+```
+
+----------------------------------------
+
+TITLE: Iterating Through Page Form Fields - PyMuPDF Python
+DESCRIPTION: Provides an iterator to loop through each form field (widget) present on a PDF document page. Each iteration yields a `Widget` object. Requires a loaded `Page` object (`page`) from a PDF document.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_10
+
+LANGUAGE: python
+CODE:
+```
+for field in page.widgets():
+    # do something with 'field'
+```
+
+----------------------------------------
+
+TITLE: Opening Document and Extracting Text using PyMuPDF in Python
+DESCRIPTION: This snippet demonstrates the core workflow for processing a PDF document with PyMuPDF. It imports the library, opens a specified PDF file, iterates through each page of the document, and extracts the plain text content from the current page. It requires the PyMuPDF library installed via pip.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/README.md#_snippet_0
+
+LANGUAGE: Python
+CODE:
+```
+import pymupdf # imports the pymupdf library
+doc = pymupdf.open("example.pdf") # open a document
+for page in doc: # iterate the document pages
+  text = page.get_text() # get plain text encoded as UTF-8
+
+```
+
+----------------------------------------
+
+TITLE: Extracting Markdown from PDF (Python)
+DESCRIPTION: This Python snippet demonstrates the basic usage of PyMuPDF4LLM to open a PDF file and extract its content as a Markdown-formatted string. The function returns the complete Markdown text.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/pymupdf4llm/index.rst#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf4llm
+md_text = pymupdf4llm.to_markdown("input.pdf")
+```
+
+----------------------------------------
+
+TITLE: Encrypting PDF Document (PyMuPDF, Python)
+DESCRIPTION: This snippet demonstrates how to create a new PDF document and apply encryption with distinct owner and user passwords, as well as setting specific user permissions. It defines allowed actions (accessibility, print, copy, annotate) using `pymupdf.PDF_PERM_` flags, sets passwords and the encryption algorithm (AES 256). A new document and page are created, text is inserted, and the document is saved with the specified encryption parameters, securing the content based on the provided passwords and permissions.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_29
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+text = "some secret information" # keep this data secret
+perm = int(
+    pymupdf.PDF_PERM_ACCESSIBILITY # always use this
+    | pymupdf.PDF_PERM_PRINT # permit printing
+    | pymupdf.PDF_PERM_COPY # permit copying
+    | pymupdf.PDF_PERM_ANNOTATE # permit annotations
+)
+owner_pass = "owner" # owner password
+user_pass = "user" # user password
+encrypt_meth = pymupdf.PDF_ENCRYPT_AES_256 # strongest algorithm
+doc = pymupdf.open() # empty pdf
+page = doc.new_page() # empty page
+page.insert_text((50, 72), text) # insert the data
+doc.save(
+    "secret.pdf",
+    encryption=encrypt_meth, # set the encryption method
+    owner_pw=owner_pass, # set the owner password
+    user_pw=user_pass, # set the user password
+    permissions=perm # set permissions
+)
+```
+
+----------------------------------------
+
+TITLE: PyMuPDF Shape Object Usage Pattern (Python)
+DESCRIPTION: This snippet demonstrates the standard workflow for using the PyMuPDF `Shape` object, including creating a new shape, performing draw and text insertion operations, finishing shape segments, and finally committing changes to the page. It highlights the sequence necessary to apply graphical elements to a PDF page.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/shape.rst#_snippet_2
+
+LANGUAGE: Python
+CODE:
+```
+>>> shape = page.new_shape()
+>>> shape.draw1(...)
+>>> shape.draw2(...)
+>>> ...
+>>> shape.finish(width=..., color=..., fill=..., morph=...)
+>>> shape.draw3(...)
+>>> shape.draw4(...)
+>>> ...
+>>> shape.finish(width=..., color=..., fill=..., morph=...)
+>>> ...
+>>> shape.insert_text*
+>>> ...
+>>> shape.commit()
+>>> ....
+```
+
+----------------------------------------
+
+TITLE: Saving Pixmap to PNG File - PyMuPDF Python
+DESCRIPTION: Saves the `Pixmap` object representing a page image to a file. The example saves it as a PNG file named based on the original page number. Requires a `Pixmap` object (`pix`).
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/tutorial.rst#_snippet_12
+
+LANGUAGE: python
+CODE:
+```
+pix.save("page-%i.png" % page.number)
+```
+
+----------------------------------------
+
+TITLE: Converting Documents to PDF using PyMuPDF - Python
+DESCRIPTION: This Python script demonstrates how to convert various document types supported by PyMuPDF (like XPS, EPUB, images) into a PDF file. It includes logic to preserve the table of contents (TOC) and links, although it explicitly skips 'LINK_NAMED' types, noting this limitation.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-common-issues-and-their-solutions.rst#_snippet_1
+
+LANGUAGE: Python
+CODE:
+```
+    """
+    Demo script: Convert input file to a PDF
+    -----------------------------------------
+    Intended for multi-page input files like XPS, EPUB etc.
+
+    Features:
+    ---------
+    Recovery of table of contents and links of input file.
+    While this works well for bookmarks (outlines, table of contents),
+    links will only work if they are not of type "LINK_NAMED".
+    This link type is skipped by the script.
+
+    For XPS and EPUB input, internal links however **are** of type "LINK_NAMED".
+    Base library MuPDF does not resolve them to page numbers.
+
+    So, for anyone expert enough to know the internal structure of these
+    document types, can further interpret and resolve these link types.
+
+    Dependencies
+    --------------
+    PyMuPDF v1.14.0+
+    """
+    import sys
+    import pymupdf
+    if not (list(map(int, pymupdf.VersionBind.split("."))) >= [1,14,0]):
+        raise SystemExit("need PyMuPDF v1.14.0+")
+    fn = sys.argv[1]
+
+    print("Converting '%s' to '%s.pdf'" % (fn, fn))
+
+    doc = pymupdf.open(fn)
+
+    b = doc.convert_to_pdf()  # convert to pdf
+    pdf = pymupdf.open("pdf", b)  # open as pdf
+
+    toc= doc.get_toc()  # table of contents of input
+    pdf.set_toc(toc)  # simply set it for output
+    meta = doc.metadata  # read and set metadata
+    if not meta["producer"]:
+        meta["producer"] = "PyMuPDF v" + pymupdf.VersionBind
+
+    if not meta["creator"]:
+        meta["creator"] = "PyMuPDF PDF converter"
+    meta["modDate"] = pymupdf.get_pdf_now()
+    meta["creationDate"] = meta["modDate"]
+    pdf.set_metadata(meta)
+
+    # now process the links
+    link_cnti = 0
+    link_skip = 0
+    for pinput in doc:  # iterate through input pages
+        links = pinput.get_links()  # get list of links
+        link_cnti += len(links)  # count how many
+        pout = pdf[pinput.number]  # read corresp. output page
+        for l in links:  # iterate though the links
+            if l["kind"] == pymupdf.LINK_NAMED:  # we do not handle named links
+                print("named link page", pinput.number, l)
+                link_skip += 1  # count them
+                continue
+            pout.insert_link(l)  # simply output the others
+
+    # save the conversion result
+    pdf.save(fn + ".pdf", garbage=4, deflate=True)
+    # say how many named links we skipped
+    if link_cnti > 0:
+        print("Skipped %i named links of a total of %i in input." % (link_skip, link_cnti))
+```
+
+----------------------------------------
+
+TITLE: Converting Any Document to PDF in Memory - Python
+DESCRIPTION: Demonstrates how to convert any document type supported by PyMuPDF into a PDF format represented as a bytes object in memory. This bytes object can then be opened directly as a PyMuPDF document for further processing, especially useful for applying PDF-specific methods.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-images.rst#_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+pdfbytes = doc.convert_to_pdf()  # this a bytes object
+pdf = pymupdf.open("pdf", pdfbytes)  # open it as a PDF document
+# now use 'pdf' like any PDF document
+```
+
+----------------------------------------
+
+TITLE: Loading Documents with LangChain using PyMuPDFLoader (Python)
+DESCRIPTION: This snippet demonstrates how to load a PDF document using the dedicated PyMuPDFLoader provided by LangChain. It imports the loader, instantiates it with the file path, and calls the `load()` method to retrieve the document data.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/rag.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from langchain_community.document_loaders import PyMuPDFLoader
+loader = PyMuPDFLoader("example.pdf")
+data = loader.load()
+```
+
+----------------------------------------
+
+TITLE: Rearranging/Duplicating Pages with Select in PyMuPDF Python
+DESCRIPTION: This snippet provides an example of how the `select` method can be used not only to select a subset but also to rearrange and duplicate pages by providing a list of page indices in the desired order, including repetitions. This effectively creates a new page sequence.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_19
+
+LANGUAGE: python
+CODE:
+```
+doc.select([1, 1, 1, 5, 4, 9, 9, 9, 0, 2, 2, 2])
+```
+
+----------------------------------------
+
+TITLE: Converting PDF to Markdown using pymupdf4llm (Python)
+DESCRIPTION: This snippet demonstrates how to convert a PDF file into a single Markdown formatted string using the pymupdf4llm helper package. It imports the library, calls `to_markdown()` with the input file path, and then writes the resulting text to an output file encoded in UTF8.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/rag.rst#_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+# convert the document to markdown
+import pymupdf4llm
+md_text = pymupdf4llm.to_markdown("input.pdf")
+
+# Write the text to some file in UTF8-encoding
+import pathlib
+pathlib.Path("output.md").write_bytes(md_text.encode())
+```
+
+----------------------------------------
+
+TITLE: Adding Image (Logo) PyMuPDF Python
+DESCRIPTION: This example demonstrates adding an image, like a logo, to a specific position (top-left corner, defined by a rectangle) on every page of a document. It iterates through pages and uses `page.insert_image()` with a specified `Rect` object to place the image.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("document.pdf") # open a document
+
+for page_index in range(len(doc)): # iterate over pdf pages
+    page = doc[page_index] # get the page
+
+    # insert an image logo from a file name at the top left of the document
+    page.insert_image(pymupdf.Rect(0,0,50,50),filename="my-logo.png")
+
+doc.save("logo-document.pdf") # save the document with a new filename
+```
+
+----------------------------------------
+
+TITLE: Generating Images from Document Pages - Python
+DESCRIPTION: This script opens a document specified via command line argument and iterates through its pages, rendering each page to a pixmap and saving it as a PNG file in the script's directory. It's a basic command-line tool example.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-images.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import sys, pymupdf  # import the bindings
+fname = sys.argv[1]  # get filename from command line
+doc = pymupdf.open(fname)  # open document
+for page in doc:  # iterate through the pages
+    pix = page.get_pixmap()  # render page to an image
+    pix.save("page-%i.png" % page.number)  # store image as a PNG
+```
+
+----------------------------------------
+
+TITLE: Applying PyMuPDF Matrices for Scaling and Shifting Rectangles - Python
+DESCRIPTION: This snippet demonstrates how to use PyMuPDF's `Matrix` class to perform scaling and translation transformations on a `Rect` object. It shows creating matrices for specific transformations, multiplying a rectangle by a matrix to get the transformed rectangle, and drawing the original and transformed rectangles on a new PDF page. Requires PyMuPDF library. Inputs are initial rectangle coordinates and matrix parameters; output is a PDF file ("matrix-effects.pdf") showing the results.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/matrix.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+# just definitions and a temp PDF
+RED = (1, 0, 0)
+BLUE = (0, 0, 1)
+GREEN = (0, 1, 0)
+doc = pymupdf.open()
+page = doc.new_page()
+
+# rectangle
+r1 = pymupdf.Rect(100, 100, 200, 200)
+
+# scales down by 50% in x- and up by 50% in y-direction
+mat1 = pymupdf.Matrix(0.5, 1.5)
+
+# shifts by 50 in both directions
+mat2 = pymupdf.Matrix(1, 0, 0, 1, 50, 50)
+
+# draw corresponding rectangles
+page.draw_rect(r1, color=RED)  # original
+page.draw_rect(r1 * mat1, color=GREEN)  # scaled
+page.draw_rect(r1 * mat2, color=BLUE)  # shifted
+doc.ez_save("matrix-effects.pdf")
+```
+
+----------------------------------------
+
+TITLE: Redacting Specific Text (PyMuPDF, Python)
+DESCRIPTION: This snippet demonstrates the process of finding and securely redacting specific text occurrences within a PDF document. It opens a PDF, iterates through each page, uses `search_for` to locate all instances of a target string ("Jane Doe"), adds a redaction annotation over the rectangle of each found instance, applies these redactions to permanently remove the underlying content from the page, saves the modified document, and finally closes it.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_33
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+# Open the PDF document
+doc = pymupdf.open('test.pdf')
+
+# Iterate over each page of the document
+for page in doc:
+    # Find all instances of "Jane Doe" on the current page
+    instances = page.search_for("Jane Doe")
+
+    # Redact each instance of "Jane Doe" on the current page
+    for inst in instances:
+        page.add_redact_annot(inst)
+
+    # Apply the redactions to the current page
+    page.apply_redactions()
+
+# Save the modified document
+doc.save('redacted_document.pdf')
+
+# Close the document
+doc.close()
+```
+
+----------------------------------------
+
+TITLE: Iterative HTML Layout with Element Positioning Callback - Python
+DESCRIPTION: This Python snippet demonstrates the iterative process of rendering HTML content to a PDF using `pymupdf.Story` and `pymupdf.DocumentWriter`. It shows how to use `story.place()` in a loop to determine content layout across pages and `story.element_positions()` with a callback function (`recorder`) to capture the positions of rendered elements on each page.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/story-class.rst#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+HTML = """
+<html>
+    <head></head>
+    <body>
+        <h1>Header level 1</h1>
+        <h2>Header level 2</h2>
+        <p>Hello MuPDF!</p>
+    </body>
+</html>
+"""
+MEDIABOX = pymupdf.paper_rect("letter")  # size of a page
+WHERE = MEDIABOX + (36, 36, -36, -36)  # leave borders of 0.5 inches
+story =  pymupdf.Story(html=HTML)  # make the story
+writer = pymupdf.DocumentWriter("test.pdf")  # make the writer
+pno = 0 # current page number
+more = 1  # will be set to 0 when done
+while more:  # loop until all story content is processed
+    dev = writer.begin_page(MEDIABOX)  # make a device to write on the page
+    more, filled = story.place(WHERE)  # compute content positions on page
+    story.element_positions(recorder, {"page": pno})  # provide page number in addition
+    story.draw(dev)
+    writer.end_page()
+    pno += 1  # increase page number
+writer.close()  # close output file
+
+def recorder(elpos):
+    pass
+
+```
+
+----------------------------------------
+
+TITLE: Deleting Multiple Pages from PDF with PyMuPDF Python
+DESCRIPTION: This snippet demonstrates how to delete a range of pages from a PDF document using PyMuPDF. It involves opening the document and using the `delete_pages` method with the `from_page` and `to_page` parameters (zero-based indices) to specify the inclusive range of pages to remove. The changes are saved afterwards.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_15
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("test.pdf") # open a document
+doc.delete_pages(from_page=9, to_page=14) # delete a page range from the document
+doc.save("test-deleted-pages.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Deleting Single Page from PDF with PyMuPDF Python
+DESCRIPTION: This snippet illustrates how to delete a single page from a PDF document using PyMuPDF. It requires opening the document and calling `delete_page` with the zero-based index of the page to remove. The modified document is then saved.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_14
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("test.pdf") # open a document
+doc.delete_page(0) # delete the 1st page of the document
+doc.save("test-deleted-page-one.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Inserting HTML Table with Image into PDF (pymupdf, Python)
+DESCRIPTION: This snippet creates a PDF page and inserts complex HTML content including a table with inline CSS and an image. It requires an `pymupdf.Archive` object pointing to the directory containing the image file (`img-cake.png`) for `insert_htmlbox` to locate it.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-text.rst#_snippet_10
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+import os
+
+filedir = os.path.dirname(__file__)
+
+
+text = """
+<style>
+body {
+    font-family: sans-serif;
+}
+
+td,
+th {
+    border: 1px solid blue;
+    border-right: none;
+    border-bottom: none;
+    padding: 5px;
+    text-align: center;
+}
+
+table {
+    border-right: 1px solid blue;
+    border-bottom: 1px solid blue;
+    border-spacing: 0;
+}
+</style>
+
+<body>
+<p><b>Some Colors</b></p>
+<table>
+    <tr>
+    <th>Lime</th>
+    <th>Lemon</th>
+    <th>Image</th>
+    <th>Mauve</th>
+    </tr>
+    <tr>
+    <td>Green</td>
+    <td>Yellow</td>
+    <td><img src="img-cake.png" width=50></td>
+    <td>Between<br>Gray and Purple</td>
+    </tr>
+</table>
+</body>
+"""
+
+doc = pymupdf.Document()
+
+page = doc.new_page()
+rect = page.rect + (36, 36, -36, -36)
+
+# we must specify an Archive because of the image
+page.insert_htmlbox(rect, text, archive=pymupdf.Archive("."))
+
+doc.ez_save(__file__.replace(".py", ".pdf"))
+```
+
+----------------------------------------
+
+TITLE: Inserting Multilingual Text into PDF (pymupdf, Python)
+DESCRIPTION: This snippet demonstrates how `pymupdf.insert_htmlbox` handles text in various languages, including those requiring complex text shaping like right-to-left scripts or Devanagari. It joins greetings in multiple languages into a single string and inserts it into a PDF page within a specified rectangle.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-text.rst#_snippet_11
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+greetings = (
+    "Hello, World!",  # english
+    "Hallo, Welt!",  # german
+    "سلام دنیا!",  # persian
+    "வணக்கம், உலகம்!",  # tamil
+    "สวัสดีชาวโลก!",  # thai
+    "Привіт Світ!",  # ucranian
+    "שלום עולם!",  # hebrew
+    "ওহে বিশ্ব!",  # bengali
+    "你好世界！",  # chinese
+    "こんにちは世界！",  # japanese
+    "안녕하세요, 월드!",  # korean
+    "नमस्कार, विश्व !",  # sanskrit
+    "हैलो वर्ल्ड!",  # hindi
+)
+doc = pymupdf.open()
+page = doc.new_page()
+rect = (50, 50, 200, 500)
+
+# join greetings into one text string
+text = " ... ".join([t for t in greetings])
+
+# the output of the above is simple:
+page.insert_htmlbox(rect, text)
+doc.save(__file__.replace(".py", ".pdf"))
+```
+
+----------------------------------------
+
+TITLE: Drawing Circles with PyMuPDF (Python)
+DESCRIPTION: This snippet illustrates two methods for drawing a circle on a PyMuPDF page: directly calling `page.draw_circle()` with parameters for position, radius, color, and width, and using a `Shape` object which allows for combining multiple drawing operations before applying properties and committing them to the page.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-drawing-and-graphics.rst#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+# Draw a circle on the page using the Page method
+page.draw_circle((center_x, center_y), radius, color=(1, 0, 0), width=2)
+
+# Draw a circle on the page using a Shape object
+shape = page.new_shape()
+shape.draw_circle((center_x, center_y), radius)
+shape.finish(color=(1, 0, 0), width=2)
+shape.commit(overlay=True)
+```
+
+----------------------------------------
+
+TITLE: Copying Single Page within PDF with PyMuPDF Python
+DESCRIPTION: This snippet demonstrates how to duplicate a single page within the same PDF document using PyMuPDF. It requires opening the document and calling `copy_page` with the zero-based index of the page to copy. By default, the copy is placed at the end of the document. The document is then saved.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_17
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("test.pdf") # open a document
+doc.copy_page(0) # copy the 1st page and puts it at the end of the document
+doc.save("test-page-copied.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Inserting Image into PDF Page using PyMuPDF (Python)
+DESCRIPTION: Outlines the required parameters for the `Page.insert_image` method used to add an image to a specified rectangle on a PyMuPDF PDF page object. It details that the image source can be a file, a bytes stream, or an existing pixmap object.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-images.rst#_snippet_18
+
+LANGUAGE: python
+CODE:
+```
+page.insert_image(
+    rect,                  # where to place the image (rect-like)
+    filename=None,         # image in a file
+    stream=None,           # image in memory (bytes)
+    pixmap=None,           # image from pixmap
+    mask=None,             # specify alpha channel separately
+    rotate=0,              # rotate (int, multiple of 90)
+    xref=0,                # re-use existing image
+    oc=0                   # control visibility via OCG / OCMD
+)
+```
+
+----------------------------------------
+
+TITLE: Splitting PDF into Even and Odd Pages with PyMuPDF Python
+DESCRIPTION: This snippet demonstrates how to split a PDF document into two separate documents: one containing only the even-indexed pages and one containing only the odd-indexed pages. It uses list comprehensions to generate the index lists and the `select` method to create the subsets, saving each subset as a new PDF.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_20
+
+LANGUAGE: python
+CODE:
+```
+p_even = [p in range(doc.page_count) if p % 2 == 0]
+p_odd  = [p in range(doc.page_count) if p % 2 == 1]
+
+doc.select(p_even) # only the even pages left over
+doc.save("even.pdf") # save the "even" PDF
+doc.close() # recycle the file
+doc = pymupdf.open(doc.name) # re-open
+doc.select(p_odd) # and do the same with the odd pages
+doc.save("odd.pdf")
+```
+
+----------------------------------------
+
+TITLE: Inserting GOTO Link PyMuPDF Python
+DESCRIPTION: Demonstrates how to create and insert a LINK_GOTO using PyMuPDF. It requires a bounding box (bbox) on the current page, a target page number (pno), and an optional target point (point) on the target page. The dictionary d defines the link properties, which is then passed to the page.insert_link() method. Dependencies include the pymupdf library and a page object representing the current page.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/page.rst#_snippet_8
+
+LANGUAGE: Python
+CODE:
+```
+d = {"kind": pymupdf.LINK_GOTO, "page": pno, "from": bbox, "to": point}
+page.insert_link(d)
+```
+
+----------------------------------------
+
+TITLE: Selecting Pages to Keep with PyMuPDF Python
+DESCRIPTION: This snippet shows how to select and keep only a specified subset of pages from a PDF document using PyMuPDF. It involves opening the document and calling `select` with a list of zero-based page indices to retain. All other pages are discarded. The document containing only the selected pages is saved.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_18
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("test.pdf") # open a document
+doc.select([0, 1]) # select the 1st & 2nd page of the document
+doc.save("just-page-one-and-two.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Adding Blank Page to PDF with PyMuPDF Python
+DESCRIPTION: This snippet shows how to add a new blank page to a PDF document using PyMuPDF. It involves opening the document and calling the `new_page` method with the insertion point (-1 for the end) and specifying the desired width and height for the new page. The document is then saved with the added page.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_23
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open(...) # some new or existing PDF document
+page = doc.new_page(-1, # insertion point: end of document
+                        width = 595, # page dimension: A4 portrait
+                        height = 842)
+doc.save("doc-with-new-blank-page.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Loading Documents with LlamaIndex using PyMuPDFReader (Python)
+DESCRIPTION: This snippet shows how to load a PDF document into LlamaIndex using the PyMuPDFReader. It imports the reader, instantiates it, and uses the `load()` method, passing the file path as a parameter, to get the document objects.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/rag.rst#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from llama_index.readers.file import PyMuPDFReader
+loader = PyMuPDFReader()
+documents = loader.load(file_path="example.pdf")
+```
+
+----------------------------------------
+
+TITLE: Embedding File within PDF Document with PyMuPDF Python
+DESCRIPTION: This snippet shows how to embed an entire external PDF file directly into another PDF document using PyMuPDF. It involves opening both the main document and the document to be embedded, getting the byte data of the embedded document, and then using `embfile_add` to add it to the main document's embedded files collection.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/the-basics.rst#_snippet_13
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open("test.pdf") # open main document
+embedded_doc = pymupdf.open("my-embed.pdf") # open document you want to embed
+
+embedded_data = embedded_doc.tobytes() # get the document byte data as a buffer
+
+# embed with the file name and the data
+doc.embfile_add("my-embedded_file.pdf", embedded_data)
+
+doc.save("document-with-embed.pdf") # save the document
+```
+
+----------------------------------------
+
+TITLE: Inserting Image on Multiple Pages (PyMuPDF) - Python
+DESCRIPTION: Demonstrates how to insert the same image onto every page of a document using PyMuPDF's `insert_image` method. It shows how to reuse the image data using the `xref` parameter for performance optimization when inserting the same image multiple times.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/page.rst#_snippet_1
+
+LANGUAGE: Python
+CODE:
+```
+>>> doc = pymupdf.open(...)
+>>> rect = pymupdf.Rect(0, 0, 50, 50)       # put thumbnail in upper left corner
+>>> img = open("some.jpg", "rb").read()  # an image file
+>>> img_xref = 0                         # first execution embeds the image
+>>> for page in doc:
+      img_xref = page.insert_image(rect, stream=img,
+                 xref=img_xref,  2nd time reuses existing image
+          )
+>>> doc.save(...)
+```
+
+----------------------------------------
+
+TITLE: Filling Text Boxes with Rotation (PyMuPDF)
+DESCRIPTION: This script demonstrates using `shape.insert_textbox` to fit text within specific rectangular areas on a page. It divides a larger rectangle into four sub-rectangles and inserts text with different rotation values (0, 90, 180, 270) into each, also drawing the rectangles themselves for clarity. Uses a `Shape` object for drawing and inserting.
+SOURCE: https://github.com/pymupdf/pymupdf/blob/main/docs/recipes-text.rst#_snippet_8
+
+LANGUAGE: python
+CODE:
+```
+import pymupdf
+
+doc = pymupdf.open()  # new or existing PDF
+page = doc.new_page()  # new page, or choose doc[n]
+
+# write in this overall area
+rect = pymupdf.Rect(100, 100, 300, 150)
+
+# partition the area in 4 equal sub-rectangles
+CELLS = pymupdf.make_table(rect, cols=4, rows=1)
+
+t1 = "text with rotate = 0."  # these texts we will written
+t2 = "text with rotate = 90."
+t3 = "text with rotate = 180."
+t4 = "text with rotate = 270."
+text = [t1, t2, t3, t4]
+red = pymupdf.pdfcolor["red"]  # some colors
+gold = pymupdf.pdfcolor["gold"]
+blue = pymupdf.pdfcolor["blue"]
+"""
+We use a Shape object (something like a canvas) to output the text and
+the rectangles surrounding it for demonstration.
+"""
+shape = page.new_shape()  # create Shape
+for i in range(len(CELLS[0])):
+    shape.draw_rect(CELLS[0][i])  # draw rectangle
+    shape.insert_textbox(
+        CELLS[0][i], text[i], fontname="hebo", color=blue, rotate=90 * i
+    )
+
+shape.finish(width=0.3, color=red, fill=gold)
+
+shape.commit()  # write all stuff to the page
+doc.ez_save(__file__.replace(".py", ".pdf"))
+```
