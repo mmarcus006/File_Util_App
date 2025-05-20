@@ -36,3 +36,8 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4-turbo")
 HURIDOCS_CONTAINER_NAME = "pdf-document-layout-analysis"
 HURIDOCS_API_PORT = 5060
 HURIDOCS_API_URL = f"http://localhost:{HURIDOCS_API_PORT}" 
+
+# Docling Configuration
+DOCLING_CONTAINER_NAME = "docling-server"
+DOCLING_API_PORT = 8000
+DOCLING_API_URL = f"http://localhost:{DOCLING_API_PORT}" 
