@@ -14,7 +14,7 @@ import sys
 # Add parent directory to path for direct script execution
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from fdd_pipeline.models import FileInfo, FDDDocument, DocumentStatus
+from fdd_pipeline.models import FileInfo, FDDDocument, DocumentStatus, ProcessingStageEnum
 from fdd_pipeline.storage.cloud_storage import R2Storage
 from fdd_pipeline.storage.baserow import BaserowClient
 from fdd_pipeline.config import DATA_DIR
@@ -99,8 +99,9 @@ def ingest_pdf(file_path: str, table_id: int) -> Optional[FDDDocument]:
         # Create document record
         document = FDDDocument(
             document_id=document_id,
-            file_info=file_info,
-            status=DocumentStatus(status="pending", current_stage="ingested")
+            file_name=file_info.filename,
+            file_hash=file_info.file_hash,
+            status=DocumentStatus(current_stage=ProcessingStageEnum.PENDING)
         )
         
         # Create record in Baserow
@@ -111,7 +112,7 @@ def ingest_pdf(file_path: str, table_id: int) -> Optional[FDDDocument]:
             "filename": filename,
             "file_size": file_size,
             "status": "pending",
-            "current_stage": "ingested"
+            "current_stage": ProcessingStageEnum.PENDING.value
         }
         
         result = baserow.create_record(table_id, record)

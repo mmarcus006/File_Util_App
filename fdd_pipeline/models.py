@@ -5,23 +5,24 @@ Pydantic data models for FDD Pipeline
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
+from enum import Enum
 
-class FileInfo(BaseModel):
-    """Information about a file in the system."""
-    file_id: str
-    filename: str
-    file_path: str
-    file_size: Optional[int] = None
-    file_hash: Optional[str] = None
-    upload_timestamp: Optional[datetime] = None
+class ProcessingStageEnum(str, Enum):
+    PENDING = "Pending"
+    LAYOUT_DONE = "LayoutDone"
+    HEADERS_EXTRACTED = "HeadersExtracted"
+    SECTIONING = "Sectioning"
+    LLM_PROCESSING = "LLMProcessing"
+    EXTRACTED = "Extracted"
+    COMPLETE = "Complete"
+    COMPLETE_WITH_WARNINGS = "CompleteWithWarnings"
+    ERROR = "Error"
 
 class DocumentStatus(BaseModel):
     """Status tracking for a document in processing."""
-    status: str = "pending"  # pending, processing, completed, error
-    current_stage: Optional[str] = None
+    current_stage: Optional[ProcessingStageEnum] = None
     last_updated: datetime = Field(default_factory=datetime.utcnow)
     error_message: Optional[str] = None
-    completion_percentage: float = 0.0
     
 class SectionHeader(BaseModel):
     """Information about an identified FDD section header."""
@@ -31,22 +32,14 @@ class SectionHeader(BaseModel):
     end_page: Optional[int] = None
     page_count: Optional[int] = None
     confidence_score: float = 0.0
-    
-class ExhibitHeader(BaseModel):
-    """Information about an identified FDD exhibit."""
-    exhibit_letter: str
-    title: str
-    start_page: int
-    end_page: Optional[int] = None
-    page_count: Optional[int] = None
 
 class FDDDocument(BaseModel):
     """Core tracking model for an FDD document."""
     document_id: str
-    file_info: FileInfo
+    file_name: str
+    file_hash: str
     status: DocumentStatus = Field(default_factory=DocumentStatus)
     sections: List[SectionHeader] = []
-    exhibits: List[ExhibitHeader] = []
     layout_json_path: Optional[str] = None
     extracted_data_path: Optional[str] = None
     franchise_name: Optional[str] = None
@@ -62,17 +55,20 @@ class Franchise(BaseModel):
     brand_name: str = Field(
         description="The commercial brand name or trademark of the franchise as it appears to the public for example, McDonald's Corporation would be 'McDonald's'"
     )
-    legal_name: Optional[str] = Field(
-        default=None, 
-        description="The legal entity name of the franchisor as registered with government authorities"
-    )
     parent_company: Optional[str] = Field(
         default=None, 
         description="Name of the parent company that owns or controls the franchisor entity"
     )
-    address: Optional[str] = Field(
+    address: Optional[str] = Field(None, description="Headquarters address")
+    city: Optional[str] = Field(None, description="City of headquarters")
+    state: Optional[str] = Field(None, description="State of headquarters")
+    zip_code: Optional[str] = Field(None, description="ZIP code of headquarters")
+    founded_year: Optional[int] = Field(None, description="Year the company was founded")
+    franchising_since: Optional[int] = Field(None, description="Year franchising operations began")
+    business_description: Optional[str] = Field(None, description="Brief description of the business")
+    email:Optional[str] = Field(
         default=None, 
-        description="Principal business address of the franchisor as listed in Item 1 of the FDD"
+        description="Primary contact email address for the franchisor"
     )
     phone_number: Optional[str] = Field(
         default=None, 
